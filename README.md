@@ -1,31 +1,59 @@
 # WikiFeed
 
-Ein endloser, lernender Wikipedia-Feed — erst der Abstract, beim Antippen der ganze Artikel. Der Feed passt sich an dein Verhalten an (lokal, ohne Server), mit Suche, Sammlungen, A/B/C/D-Quiz, Lese-Rückblick und einer „genug gelernt?"-Pause.
+An endless, learning Wikipedia feed — abstracts first, the full article on tap. The feed adapts to your behaviour entirely on-device (no server, no accounts), with search, collections, an A/B/C/D quiz, a reading recap, and a gentle "had enough for today?" nudge.
 
-Alles läuft in einer einzigen `index.html` — kein Build, kein Backend. Personalisierung, Sterne, Sammlungen und Statistiken liegen ausschließlich im `localStorage` deines Browsers.
+The whole app is a single `index.html` — no build step, no backend. Everything you do (personalization, stars, collections, stats) stays in your browser's `localStorage`.
 
-## Funktionen
+## Features
 
-- **Endlos-Feed** aus Wikipedia mit drei Kartenvarianten (Standard, kompakt, Feature)
-- **Personalisierung** über Verhalten: Stern (stärkstes Signal) > Artikel öffnen > Verweildauer, plus „Weniger davon"-Negativsignal und adaptive Explore/Exploit-Rate
-- **Serendipität**: in unregelmäßigen Abständen ein „Zufallsfund"
-- **Suche** mit Live-Vorschlägen und „Zuletzt gesucht"
-- **Sammlungen** und **Teilen** (Web Share API)
-- **Quiz** nach ~10 gelesenen Artikeln
-- **Lese-Rückblick** (Scrollytelling aus deinen eigenen Daten)
-- **DE / EN / FR** — Oberflächensprache und Artikelsprache getrennt einstellbar
-- **Hell/Dunkel**, barrierearm (Fokusführung, WCAG-AA-Kontraste), `prefers-reduced-motion`
-- **PWA**: installierbar, App-Shell offline nutzbar
+- **Endless feed** of Wikipedia articles with three card rhythms (standard, compact, feature)
+- **Behaviour-based personalization** — star (strongest signal) > opening an article > dwell time, plus a "less like this" negative signal and an adaptive explore/exploit rate
+- **Serendipity** — an occasional "random find" mixed in at irregular intervals
+- **Search** with live suggestions and recent searches
+- **Collections** and **sharing** (Web Share API, clipboard fallback)
+- **Quiz** that appears after ~10 articles read, generated from what you've actually read
+- **Reading recap** — a short scrollytelling story built from your own stats
+- **Three languages (DE / EN / FR)** with interface language and article language set independently
+- **Light / dark theme**, accessible by design (focus management, WCAG-AA contrast, `prefers-reduced-motion`)
+- **PWA** — installable, app shell works offline
 
-## Lokal starten
+## How personalization works
 
-Einfach `index.html` im Browser öffnen — funktioniert direkt vom Dateisystem (Daten werden per JSONP geladen, daher kein CORS-Problem).
+Every interaction feeds a small on-device profile:
 
-## Datenschutz
+| Signal | Weight | Effect |
+| --- | --- | --- |
+| Star / favourite | strongest | boosts the article's topics; used as a recommendation seed |
+| Open full article | medium | seeds related content via the API's `morelike` |
+| Dwell time | weakest (capped) | a light nudge, so a long article can't dominate the profile |
+| "Less like this" | negative | hides the article, dampens its topics, weakens that recommendation source |
 
-Es werden keine personenbezogenen Daten an einen Server gesendet. Alle Präferenzen bleiben lokal im Browser. Inhalte stammen direkt von der Wikipedia-API.
+The feed mixes related content (exploit) with random discovery (explore); the balance shifts toward exploration after misses and toward your interests after hits. None of this leaves the browser — open the dev console and type `state.profile` to inspect it.
 
-## Lizenz & Inhalte
+## Tech
 
-- Code: MIT (siehe `LICENSE`).
-- Artikelinhalte stammen von Wikipedia und stehen unter [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). WikiFeed zeigt sie an und verlinkt auf den Originalartikel.
+- Single self-contained `index.html`: vanilla HTML/CSS/JS, no framework, no build.
+- Content is loaded from the public Wikipedia Action API via **JSONP**, so the app works even when opened directly from the file system (no CORS setup needed).
+- PWA layer: `manifest.json` + `sw.js` (app-shell precache, font caching). Wikipedia responses are intentionally not cached (JSONP callbacks are unique per request), so offline shows the in-app retry state rather than stale content.
+
+## Run locally
+
+Just open `index.html` in a browser — it works straight from disk.
+
+To exercise the PWA / service worker, serve it over HTTP:
+
+```bash
+python3 -m http.server 8000
+# then open http://localhost:8000
+```
+
+Being a static site, it can be hosted on any static host (e.g. GitHub Pages); the PWA/install support requires serving it over HTTPS.
+
+## Privacy
+
+No personal data is sent to any server. All preferences live in your browser. Article content is fetched directly from Wikipedia.
+
+## License & content
+
+- Code is released under the [MIT License](LICENSE).
+- Article content comes from Wikipedia and is licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). WikiFeed displays it and links back to the original article.
