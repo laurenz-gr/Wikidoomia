@@ -1,0 +1,2033 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>WikiFeed</title>
+<meta name="description" content="Ein endloser, lernender Wikipedia-Feed.">
+<meta name="theme-color" content="#f4f4f2" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#15171d" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="WikiFeed">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f4f2;
+    --ink:#1a1a1a;
+    --muted:#5a5a5a;
+    --paper:#ffffff;
+    --border:#1a1a1a;
+    --shadow:#1a1a1a;
+    --accent:#ff6b35;
+    --accent-ink:#1a1a1a;
+    --accent2:#1557ff;
+    --danger:#be1e2d;
+    --gold:#f4a700;
+    --accent-text:#c2410c;   /* accessible orange for text on light surfaces (≥4.5:1) */
+    --gold-text:#8a6500;     /* accessible gold for text on light surfaces */
+    --on-accent2:#ffffff;    /* text on filled accent2 backgrounds */
+    --focus:#0f62ff;
+
+    /* Liquid Glass */
+    --glass-bg:rgba(255,255,255,.55);
+    --glass-bg-strong:rgba(255,255,255,.72);
+    --glass-brd:rgba(255,255,255,.65);
+    --glass-hi:rgba(255,255,255,.9);
+    --glass-shadow:rgba(20,30,60,.18);
+    --dot:rgba(20,30,60,.10);
+  }
+  .dark{
+    --bg:#15171d;
+    --ink:#f4f4f2;
+    --muted:#aab0bb;
+    --paper:#262932;
+    --border:#f4f4f2;
+    --shadow:#000;
+    --accent:#ff7a47;
+    --accent-ink:#1a1a1a;
+    --accent2:#5b8cff;
+    --danger:#d63848;
+    --gold:#ffc23d;
+    --accent-text:#ff7a47;   /* orange on dark surfaces already meets contrast */
+    --gold-text:#ffc23d;
+    --on-accent2:#0b1020;    /* dark text on lighter accent2 in dark mode (≥4.5:1) */
+    --focus:#9dc0ff;
+
+    --glass-bg:rgba(40,44,55,.50);
+    --glass-bg-strong:rgba(42,46,58,.78);
+    --glass-brd:rgba(255,255,255,.14);
+    --glass-hi:rgba(255,255,255,.22);
+    --glass-shadow:rgba(0,0,0,.5);
+    --dot:rgba(255,255,255,.07);
+  }
+
+  *{box-sizing:border-box;-webkit-tap-highlight-color:rgba(0,0,0,.06)}
+  html,body{height:100%;margin:0}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+    overflow-x:hidden;
+    line-height:1.5;
+  }
+  /* subtle fixed dot texture so glass surfaces have something to refract (no orbs/blobs) */
+  body::before{
+    content:"";
+    position:fixed; inset:0;
+    z-index:-2;
+    background-image:radial-gradient(var(--dot) 1px, transparent 1.5px);
+    background-size:22px 22px;
+    pointer-events:none;
+  }
+
+  h1,h2,h3,.bebas{
+    font-family:'Bebas Neue','Impact',sans-serif;
+    font-weight:400;
+    text-transform:uppercase;
+    letter-spacing:0;
+    margin:0;
+  }
+
+  .glass{
+    background:var(--glass-bg);
+    backdrop-filter:blur(18px) saturate(160%);
+    -webkit-backdrop-filter:blur(18px) saturate(160%);
+    border:1px solid var(--glass-brd);
+    box-shadow:0 8px 30px var(--glass-shadow), inset 0 1px 0 var(--glass-hi);
+  }
+
+  /* ---------- Top bar ---------- */
+  .topbar{
+    position:sticky; top:0; z-index:40;
+    display:flex; align-items:center; gap:12px;
+    padding:10px max(14px,env(safe-area-inset-left));
+    border-radius:0 0 16px 16px;
+    margin:0 0 8px;
+  }
+  .brand{display:flex; align-items:baseline; gap:8px; margin-right:auto; min-width:0}
+  .brand .logo{
+    font-size:1.9rem; line-height:.9;
+    color:var(--ink);
+  }
+  .brand .logo .ac{color:var(--accent-text)}
+  .brand .sub{font-size:11px; font-weight:700; color:var(--muted); white-space:nowrap}
+
+  .seg{
+    display:inline-flex; border-radius:999px; overflow:hidden;
+    border:1px solid var(--glass-brd); background:var(--glass-bg);
+    backdrop-filter:blur(12px) saturate(150%); -webkit-backdrop-filter:blur(12px) saturate(150%);
+  }
+  .seg button{
+    border:0; background:transparent; color:var(--ink);
+    font:inherit; font-weight:800; cursor:pointer;
+    padding:8px 13px; min-height:40px; font-size:13px;
+  }
+  .seg button.active{background:var(--accent2); color:var(--on-accent2)}
+
+  .iconbtn{
+    width:42px; height:42px; flex:0 0 auto;
+    display:inline-flex; align-items:center; justify-content:center;
+    border-radius:14px; cursor:pointer; color:var(--ink);
+    border:1px solid var(--glass-brd); background:var(--glass-bg);
+    backdrop-filter:blur(12px) saturate(150%); -webkit-backdrop-filter:blur(12px) saturate(150%);
+    box-shadow:inset 0 1px 0 var(--glass-hi);
+    transition:transform .14s ease;
+    position:relative;
+  }
+  .iconbtn:hover{transform:translateY(-1px)}
+  .iconbtn:active{transform:translateY(1px)}
+  .iconbtn .ic{width:20px;height:20px}
+  .badge-count{
+    position:absolute; top:-5px; right:-5px;
+    min-width:18px; height:18px; padding:0 4px;
+    border-radius:999px; background:var(--accent); color:var(--accent-ink);
+    font-size:11px; font-weight:900; line-height:18px; text-align:center;
+    border:2px solid var(--bg);
+  }
+
+  .ic{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+  .ic.fill{fill:currentColor;stroke:currentColor}
+
+  /* ---------- Search bar ---------- */
+  .searchbar{
+    position:sticky; top:64px; z-index:35;
+    max-width:680px; margin:0 auto 8px;
+    display:flex; gap:8px; align-items:center;
+    padding:8px; border-radius:16px;
+  }
+  .searchbar[hidden]{display:none}
+  .searchbar:not([hidden]){
+    background:var(--glass-bg); border:1px solid var(--glass-brd);
+    backdrop-filter:blur(18px) saturate(160%); -webkit-backdrop-filter:blur(18px) saturate(160%);
+    box-shadow:0 8px 30px var(--glass-shadow), inset 0 1px 0 var(--glass-hi);
+  }
+  .searchbar #searchInput{flex:1; min-width:0}
+
+  .search-results{
+    max-width:680px; margin:0 auto 10px; padding:8px;
+    border-radius:16px; max-height:64vh; overflow-y:auto; -webkit-overflow-scrolling:touch;
+    background:var(--glass-bg-strong); border:1px solid var(--glass-brd);
+    backdrop-filter:blur(18px) saturate(160%); -webkit-backdrop-filter:blur(18px) saturate(160%);
+    box-shadow:0 8px 30px var(--glass-shadow), inset 0 1px 0 var(--glass-hi);
+  }
+  .search-results[hidden]{display:none}
+  .search-head{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);padding:6px 8px}
+  .search-recent{display:flex;flex-wrap:wrap;gap:8px;padding:2px 6px 6px}
+  .sresult{display:flex;gap:11px;align-items:center;padding:9px;border-radius:12px;cursor:pointer}
+  .sresult:hover,.sresult:focus-visible{background:color-mix(in srgb,var(--accent2) 14%,transparent);outline:none}
+  .sresult img,.sresult .ph{width:48px;height:48px;border-radius:10px;flex:0 0 auto;object-fit:cover}
+  .sresult .ph{background:color-mix(in srgb,var(--accent2) 14%, var(--paper))}
+  .sresult .st{min-width:0}
+  .sresult .st b{display:block;font-size:14.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .sresult .st span{display:block;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+  /* ---------- Feed ---------- */
+  .feed{
+    max-width:680px;
+    margin:0 auto;
+    padding:6px 14px calc(40px + env(safe-area-inset-bottom));
+    display:flex; flex-direction:column; gap:20px;
+  }
+
+  .card{
+    border-radius:16px;
+    overflow:hidden;
+    position:relative;
+    animation:rise .5s cubic-bezier(.2,.8,.2,1) both;
+  }
+  @keyframes rise{from{opacity:0; transform:translateY(16px) scale(.99)}to{opacity:1;transform:none}}
+
+  .card .hero{
+    position:relative;
+    cursor:pointer;
+    background:color-mix(in srgb,var(--accent2) 12%, var(--paper));
+  }
+  .card .hero img{display:block; width:100%; height:220px; object-fit:cover}
+  .card .hero.noimg{height:120px; display:flex; align-items:flex-end}
+  .reason{
+    position:absolute; top:12px; left:12px; z-index:2;
+    display:inline-flex; align-items:center; gap:6px;
+    padding:5px 11px; border-radius:999px;
+    font-size:11px; font-weight:900; letter-spacing:.02em;
+    background:var(--glass-bg-strong);
+    backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+    border:1px solid var(--glass-brd);
+    box-shadow:inset 0 1px 0 var(--glass-hi);
+  }
+  .reason .ic{width:13px;height:13px}
+  .reason.foryou{color:var(--accent-text)}
+  .reason.explore{color:var(--accent2)}
+  .reason.surprise{color:var(--gold-text)}
+  .langtag{
+    position:absolute; top:12px; right:12px; z-index:2;
+    padding:4px 9px; border-radius:8px; font-size:11px; font-weight:900;
+    background:var(--glass-bg-strong); border:1px solid var(--glass-brd);
+    backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+  }
+
+  .card .body{padding:16px 18px 14px}
+  .card h2{font-size:1.7rem; line-height:1; cursor:pointer}
+  .card h2:hover{color:var(--accent)}
+  .desc{margin:4px 0 0; color:var(--muted); font-size:12.5px; font-weight:700}
+  .extract{margin:10px 0 0; font-size:15px; color:var(--ink)}
+  .readmore{
+    margin-top:8px; display:inline-flex; align-items:center; gap:6px;
+    background:none; border:0; padding:0; cursor:pointer;
+    color:var(--accent2); font:inherit; font-weight:800; font-size:13px;
+  }
+  .readmore .ic{width:15px;height:15px}
+
+  .actions{
+    display:flex; align-items:center; gap:8px;
+    padding:6px 14px 16px;
+  }
+  .actbtn{
+    flex:0 0 auto;
+    display:inline-flex; align-items:center; gap:7px;
+    padding:9px 13px; border-radius:14px; cursor:pointer;
+    border:1px solid var(--glass-brd); background:var(--glass-bg);
+    backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+    box-shadow:inset 0 1px 0 var(--glass-hi);
+    color:var(--ink); font:inherit; font-weight:800; font-size:13px;
+    transition:transform .14s ease;
+  }
+  .actbtn:hover{transform:translateY(-1px)}
+  .actbtn:active{transform:translateY(1px)}
+  .actbtn .ic{width:18px;height:18px}
+  .actbtn.icon{padding:9px;width:44px;min-width:44px;justify-content:center}
+  .actbtn.icon .ic{width:20px;height:20px}
+  .actbtn.star.on{background:color-mix(in srgb,var(--gold) 26%,var(--paper)); color:#7a5500; border-color:color-mix(in srgb,var(--gold) 60%,var(--border))}
+  .actbtn.star.on .ic{fill:var(--gold); stroke:var(--gold)}
+  .dark .actbtn.star.on{color:var(--gold)}
+  .actbtn.coll.on{background:color-mix(in srgb,var(--accent2) 22%,var(--paper)); color:var(--accent2)}
+  .actbtn.coll.on .ic{fill:currentColor}
+  .actbtn.grow{margin-left:auto}
+
+  /* card rhythm variants */
+  .v-feature .hero img{height:380px}
+  .v-feature .body{padding:18px 20px 14px}
+  .v-feature h2{font-size:2.5rem; line-height:.92}
+  .v-feature .extract{font-size:15.5px}
+  .v-compact .body{padding:16px 18px 12px}
+  .v-compact h2{font-size:1.3rem}
+  .v-compact .extract{margin-top:6px}
+  .is-starred::after{
+    content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+    box-shadow:inset 0 0 0 2px color-mix(in srgb, var(--gold) 60%, transparent);
+  }
+  /* delight: satisfying star + ring, celebratory score pop (no elastic/bounce easing) */
+  .just-starred::after{animation:ringin .5s cubic-bezier(.25,1,.5,1)}
+  @keyframes ringin{from{box-shadow:inset 0 0 0 12px color-mix(in srgb,var(--gold) 40%,transparent);opacity:.2}to{opacity:1}}
+  .actbtn.star.pulse .ic{animation:starpop .44s cubic-bezier(.25,1,.5,1)}
+  @keyframes starpop{0%{transform:scale(1)}45%{transform:scale(1.35)}100%{transform:scale(1)}}
+  .quiz-result .score{animation:popscore .55s cubic-bezier(.25,1,.5,1)}
+  @keyframes popscore{0%{transform:scale(.5);opacity:0}60%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}
+
+  .skeleton{height:300px;border-radius:16px;position:relative;overflow:hidden}
+  .skeleton::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,var(--glass-hi),transparent);transform:translateX(-100%);animation:sweep 1.3s infinite}
+  @keyframes sweep{to{transform:translateX(100%)}}
+
+  .sentinel{height:10px}
+  .feed-end{text-align:center;color:var(--muted);font-weight:800;font-size:13px;padding:20px}
+  .pause-card{border-radius:16px;padding:18px;text-align:left}
+  .pause-card h3{font-size:1.4rem;margin-bottom:4px}
+  .pause-card p{margin:0 0 14px;color:var(--muted);font-size:14px}
+
+  /* ---------- Overlays / drawer ---------- */
+  .scrim{
+    position:fixed; inset:0; z-index:60;
+    background:rgba(10,12,20,.45);
+    backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px);
+    display:none;
+  }
+  .scrim.open{display:block}
+
+  .drawer{
+    position:fixed; top:0; right:0; bottom:0; z-index:70;
+    width:min(440px,92vw);
+    transform:translateX(102%);
+    transition:transform .32s cubic-bezier(.2,.8,.2,1);
+    border-radius:18px 0 0 18px;
+    display:flex; flex-direction:column;
+    padding:18px 16px calc(18px + env(safe-area-inset-bottom));
+  }
+  .drawer.open{transform:none}
+  .drawer-head{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .drawer-head h2{font-size:1.5rem;margin-right:auto}
+  .drawer-scroll{overflow-y:auto;-webkit-overflow-scrolling:touch;padding-right:2px}
+
+  .panel{padding:2px 0 14px;margin-bottom:14px;border-bottom:1px solid color-mix(in srgb,var(--muted) 20%,transparent)}
+  .panel:last-of-type{border-bottom:0}
+  .panel h3{font-size:1.15rem;margin-bottom:8px}
+  .muted{color:var(--muted);font-size:13px;font-weight:600}
+
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{
+    display:inline-flex;align-items:center;gap:7px;
+    padding:7px 12px;border-radius:999px;cursor:pointer;
+    border:1px solid var(--glass-brd);background:var(--glass-bg);
+    backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    color:var(--ink);font-weight:800;font-size:13px;user-select:none;
+    transition:transform .12s ease;
+  }
+  .chip:hover{transform:translateY(-1px)}
+  .chip.sel{background:var(--accent2);color:var(--on-accent2);border-color:transparent}
+  .chip .ic{width:14px;height:14px}
+
+  .bar{height:7px;border-radius:999px;background:color-mix(in srgb,var(--muted) 30%,transparent);overflow:hidden}
+  .bar > i{display:block;height:100%;border-radius:999px;background:var(--accent)}
+  .statline{display:flex;gap:8px;margin-bottom:14px}
+  .stat{flex:1 1 0;min-width:0;text-align:center;padding:9px 6px;border-radius:12px;border:1px solid var(--glass-brd);background:var(--glass-bg);font-size:10.5px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.03em}
+  .stat b{display:block;font-family:'Bebas Neue','Impact',sans-serif;font-weight:400;font-size:1.7rem;line-height:1;color:var(--accent-text);letter-spacing:0;margin-bottom:2px}
+  .topic-row{display:flex;align-items:center;gap:10px;margin:8px 0}
+  .topic-row .name{flex:0 0 38%;font-weight:800;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .topic-row .bar{flex:1}
+
+  .coll-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid color-mix(in srgb,var(--muted) 22%,transparent)}
+  .coll-item:last-child{border-bottom:0}
+  .coll-item .ttl{flex:1;font-weight:800;font-size:14px;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .coll-item .ttl:hover{color:var(--accent)}
+  .mini{width:34px;height:34px;border-radius:9px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--glass-brd);background:var(--glass-bg);color:var(--ink)}
+  .mini .ic{width:16px;height:16px}
+
+  .field{
+    width:100%; font:inherit; font-weight:700; font-size:15px;
+    padding:11px 13px; border-radius:13px; color:var(--ink);
+    border:1px solid var(--glass-brd); background:var(--glass-bg-strong);
+    backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+  }
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:11px 16px;border-radius:14px;cursor:pointer;font:inherit;font-weight:800;
+    border:1px solid var(--glass-brd);background:var(--glass-bg);color:var(--ink);
+    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    box-shadow:inset 0 1px 0 var(--glass-hi);transition:transform .14s ease;min-height:46px;
+  }
+  .btn:hover{transform:translateY(-1px)} .btn:active{transform:translateY(1px)}
+  .btn.primary{background:var(--accent);color:var(--accent-ink);border-color:transparent}
+  .btn.alt{background:var(--accent2);color:var(--on-accent2);border-color:transparent}
+  .btn .ic{width:18px;height:18px}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+  /* ---------- Full article ---------- */
+  .reader{
+    position:fixed; inset:0; z-index:80;
+    transform:translateY(100%);
+    transition:transform .38s cubic-bezier(.2,.8,.2,1);
+    display:flex; flex-direction:column;
+    background:var(--glass-bg-strong);
+    backdrop-filter:blur(26px) saturate(170%); -webkit-backdrop-filter:blur(26px) saturate(170%);
+  }
+  .reader.open{transform:none}
+  .reader-bar{
+    display:flex;align-items:center;gap:10px;
+    padding:12px max(14px,env(safe-area-inset-left));
+    border-bottom:1px solid var(--glass-brd);
+  }
+  .reader-bar .rttl{flex:1;font-size:1.2rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .reader-scroll{
+    overflow-y:auto;-webkit-overflow-scrolling:touch;
+    padding:18px max(16px,env(safe-area-inset-left)) calc(60px + env(safe-area-inset-bottom));
+  }
+  .reader-inner{max-width:1080px;margin:0 auto}
+  .reader-inner h1.title{font-size:2.6rem;line-height:.95;margin-bottom:6px}
+
+  .wiki-content{font-size:16px;line-height:1.65}
+  .wiki-content::after{content:"";display:block;clear:both}
+  .wiki-content p{margin:0 0 14px}
+  .wiki-content h2,.wiki-content h3,.wiki-content h4{font-family:'Bebas Neue','Impact',sans-serif;text-transform:uppercase;margin:22px 0 8px;border-bottom:2px solid color-mix(in srgb,var(--muted) 30%,transparent);padding-bottom:4px}
+  .wiki-content h2{font-size:1.6rem} .wiki-content h3{font-size:1.3rem}
+  .wiki-content a{color:var(--accent2);text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--accent2) 40%,transparent)}
+  .wiki-content a:hover{color:var(--accent)}
+  .wiki-content img{max-width:100%;height:auto;border-radius:12px}
+  .wiki-content figure{margin:14px 0}
+  .wiki-content figcaption{font-size:12.5px;color:var(--muted);margin-top:4px}
+  .wiki-content ul,.wiki-content ol{padding-left:22px;margin:0 0 14px}
+  .wiki-content li{margin:4px 0}
+  .wiki-content table{max-width:100%;display:block;overflow-x:auto;border-collapse:collapse;font-size:13px;margin:14px 0}
+  .wiki-content table td,.wiki-content table th{border:1px solid color-mix(in srgb,var(--muted) 30%,transparent);padding:6px 8px}
+  .wiki-content sup{font-size:.7em}
+  .wiki-content .thumb{margin:14px 0}
+  .wiki-content .infobox{float:right;width:340px;max-width:42%;margin:0 0 16px 22px;font-size:13px;border:1px solid color-mix(in srgb,var(--muted) 30%,transparent);border-radius:10px;overflow:hidden}
+  .wiki-content .tright,.wiki-content .thumbright,.wiki-content figure.mw-halign-right{float:right;clear:right;margin:4px 0 12px 18px;max-width:46%}
+  .wiki-content .tleft,.wiki-content .thumbleft,.wiki-content figure.mw-halign-left{float:left;clear:left;margin:4px 18px 12px 0;max-width:46%}
+  @media (max-width:640px){
+    .wiki-content .infobox,.wiki-content .tright,.wiki-content .tleft,.wiki-content .thumbright,.wiki-content .thumbleft,.wiki-content figure.mw-halign-right,.wiki-content figure.mw-halign-left{float:none;width:100%;max-width:100%;margin:14px 0}
+  }
+  .wiki-content .mw-editsection,.wiki-content .navbox,.wiki-content .vertical-navbox,.wiki-content .metadata,.wiki-content .noprint,.wiki-content #toc,.wiki-content .toc,.wiki-content .hatnote,.wiki-content .mw-empty-elt,.wiki-content .reference-text .cite-bracket{display:none}
+
+  /* ---------- Quiz ---------- */
+  .quiz{
+    position:fixed; inset:0; z-index:85;
+    transform:translateY(100%);
+    transition:transform .38s cubic-bezier(.2,.8,.2,1);
+    display:flex; flex-direction:column;
+    background:var(--glass-bg-strong);
+    backdrop-filter:blur(26px) saturate(170%); -webkit-backdrop-filter:blur(26px) saturate(170%);
+  }
+  .quiz.open{transform:none}
+  .quiz-progress{font-weight:800;color:var(--muted);font-size:13px}
+  .quiz-inner{max-width:680px;margin:0 auto}
+  .quiz-kicker{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--accent2);margin-bottom:10px}
+  .quiz-desc{font-size:19px;line-height:1.55;margin:0 0 20px}
+  .quiz-opt{
+    display:flex;align-items:center;gap:10px;width:100%;text-align:left;
+    margin:9px 0;padding:14px 16px;border-radius:14px;cursor:pointer;
+    border:1px solid var(--glass-brd);background:var(--glass-bg);color:var(--ink);
+    font:inherit;font-weight:700;font-size:15px;transition:transform .12s ease;
+  }
+  .quiz-opt:hover:not(:disabled){transform:translateY(-1px)}
+  .quiz-opt:disabled{cursor:default}
+  .quiz-letter{flex:0 0 auto;width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;border-radius:8px;background:var(--glass-bg);border:1px solid var(--glass-brd);font-family:'Bebas Neue','Impact',sans-serif;font-size:1.05rem;color:var(--accent2)}
+  .qopt-label{flex:1}
+  .quiz-opt .mark{width:20px;height:20px;flex:0 0 auto;opacity:0;margin-left:auto}
+  .quiz-opt.correct .quiz-letter{background:#1f9d55;color:#fff;border-color:#1f9d55}
+  .quiz-opt.wrong .quiz-letter{background:var(--danger);color:#fff;border-color:var(--danger)}
+  .quiz-opt.correct{background:color-mix(in srgb,#1f9d55 22%,var(--paper));border-color:#1f9d55;color:var(--ink)}
+  .quiz-opt.correct .mark{opacity:1;color:#1f9d55}
+  .quiz-opt.wrong{background:color-mix(in srgb,var(--danger) 18%,var(--paper));border-color:var(--danger)}
+  .quiz-actions{display:flex;justify-content:flex-end;margin-top:18px}
+  .quiz-result{text-align:center;padding:32px 0}
+  .quiz-result .score{font-family:'Bebas Neue','Impact',sans-serif;font-size:4.5rem;line-height:1;color:var(--accent-text)}
+  .quiz-result p{color:var(--muted);margin:6px 0 20px}
+
+  /* ---------- Lese-Rückblick (scrollytelling) ---------- */
+  .recap{
+    position:fixed; inset:0; z-index:90;
+    transform:translateY(100%);
+    transition:transform .4s cubic-bezier(.2,.8,.2,1);
+    background:var(--bg);
+  }
+  .recap.open{transform:none}
+  .recap-close{position:fixed; top:max(14px,env(safe-area-inset-top)); right:14px; z-index:4}
+  .recap-progress{position:fixed; left:0; top:0; height:3px; width:0; background:var(--accent); z-index:4}
+  .recap-scroll{height:100%; overflow-y:auto; -webkit-overflow-scrolling:touch}
+  .recap-scene{
+    min-height:100svh; box-sizing:border-box;
+    display:flex; flex-direction:column; justify-content:center;
+    max-width:680px; margin:0 auto; padding:48px 24px;
+  }
+  .recap-scene .kicker{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--accent2);margin-bottom:16px;opacity:0;transform:translateY(12px);transition:opacity .6s ease, transform .6s ease}
+  .recap-scene .headline{font-family:'Bebas Neue','Impact',sans-serif;font-weight:400;font-size:clamp(2.4rem,8vw,4.2rem);line-height:.95;margin:0 0 14px;opacity:0;transform:translateY(18px);transition:opacity .6s ease .05s, transform .6s ease .05s}
+  .recap-scene .sub{font-size:17px;line-height:1.5;color:var(--muted);max-width:46ch;opacity:0;transform:translateY(18px);transition:opacity .6s ease .12s, transform .6s ease .12s}
+  .recap-scene.in .kicker,.recap-scene.in .headline,.recap-scene.in .sub{opacity:1;transform:none}
+  .recap-num{color:var(--accent-text)}
+  .recap-bars{margin-top:26px;display:flex;flex-direction:column;gap:14px}
+  .recap-bar .lbl{display:flex;justify-content:space-between;gap:10px;font-weight:800;font-size:14px;margin-bottom:6px}
+  .recap-bar .lbl span:last-child{color:var(--muted)}
+  .recap-bar .track{height:14px;border-radius:999px;background:color-mix(in srgb,var(--muted) 22%,transparent);overflow:hidden}
+  .recap-bar .track i{display:block;height:100%;width:0;border-radius:999px;background:var(--accent)}
+  .recap-scene.in .recap-bar .track i{width:var(--w);transition:width 1s cubic-bezier(.25,1,.5,1) .15s}
+  .recap-chips{display:flex;flex-wrap:wrap;gap:9px;margin-top:22px}
+  .recap-chip{padding:9px 14px;border-radius:14px;border:1px solid var(--glass-brd);background:var(--glass-bg);font-weight:700;font-size:14px;opacity:0;transform:translateY(10px);transition:opacity .5s ease, transform .5s ease}
+  .recap-scene.in .recap-chip{opacity:1;transform:none}
+  .recap-cta{margin-top:28px;display:flex;gap:10px;flex-wrap:wrap;opacity:0;transition:opacity .6s ease .2s}
+  .recap-scene.in .recap-cta{opacity:1}
+
+  /* ---------- Toast ---------- */
+  .toast{
+    position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom));transform:translate(-50%,16px);
+    z-index:120;padding:11px 18px;border-radius:14px;font-weight:800;font-size:14px;
+    background:var(--glass-bg-strong);border:1px solid var(--glass-brd);
+    backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    box-shadow:0 10px 30px var(--glass-shadow);
+    opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;
+  }
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+
+  /* ---------- Onboarding ---------- */
+  .onb{
+    position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:18px;
+    background:rgba(10,12,20,.5);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  }
+  .onb.open{display:flex}
+  .onb .sheet{width:min(560px,100%);max-height:88vh;overflow-y:auto;border-radius:24px;padding:24px}
+  .onb h2{font-size:2rem;line-height:1}
+  .onb .lead{color:var(--muted);font-weight:600;margin:6px 0 16px;font-size:14px}
+
+  @media (max-width:520px){
+    .brand .sub{display:none}
+    .card .hero img{height:190px}
+    .v-feature .hero img{height:240px}
+    .v-feature h2{font-size:1.9rem}
+    .actbtn span.lbl{display:none}
+    .topbar{gap:7px; padding:8px 10px}
+    .brand .logo{font-size:1.5rem}
+    .iconbtn{width:40px;height:40px}
+    .seg button{padding:8px 10px}
+    .searchbar{top:56px}
+    .actbtn.icon{width:auto; flex:1 1 0}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation:none!important;transition:none!important}
+  }
+  .focusable:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+</style>
+</head>
+<body>
+
+<!-- icon sprite -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77 5.82 21l1.18-6.88-5-4.87 6.91-1.01L12 2z"/></symbol>
+  <symbol id="i-bookmark" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2zM22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></symbol>
+  <symbol id="i-sparkles" viewBox="0 0 24 24"><path d="M12 3l1.8 4.6L18 9.4l-4.2 1.8L12 16l-1.8-4.8L6 9.4l4.2-1.8zM18 15l.9 2.3L21 18l-2.1.7L18 21l-.9-2.3L15 18l2.1-.7z"/></symbol>
+  <symbol id="i-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m16.2 7.8-2.9 6.4-6.4 2.9 2.9-6.4z"/></symbol>
+  <symbol id="i-collection" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="14" rx="2"/><path d="M7 21h10M9 17v4M15 17v4"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></symbol>
+  <symbol id="i-ext" viewBox="0 0 24 24"><path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M17 14V2"/><path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22a3.13 3.13 0 0 1-3-3.88Z"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.59 13.51 6.83 3.98"/><path d="m15.41 6.51-6.82 3.98"/></symbol>
+  <symbol id="i-quiz" viewBox="0 0 24 24"><path d="M21.42 10.92a1 1 0 0 0-.02-1.84L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.84l8.57 3.9a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+</defs></svg>
+
+<header class="topbar glass">
+  <div class="brand">
+    <span class="logo bebas">Wiki<span class="ac">Feed</span></span>
+    <span class="sub" data-i18n="brandSub">dein Wissens‑Feed</span>
+  </div>
+  <div class="seg" id="langSeg" role="group" data-i18n-aria="articleLang" data-i18n-title="articleLang" aria-label="Sprache" title="Artikelsprache">
+    <button data-lang="de" class="active focusable">DE</button>
+    <button data-lang="en" class="focusable">EN</button>
+    <button data-lang="fr" class="focusable">FR</button>
+  </div>
+  <button class="iconbtn focusable" id="btnQuiz" data-i18n-title="startQuiz" data-i18n-aria="startQuiz" title="Quiz starten" aria-label="Quiz starten" hidden>
+    <svg class="ic"><use href="#i-quiz"/></svg>
+    <span class="badge-count">!</span>
+  </button>
+  <button class="iconbtn focusable" id="btnSearch" data-i18n-title="search" data-i18n-aria="search" title="Suchen" aria-label="Suchen">
+    <svg class="ic"><use href="#i-search"/></svg>
+  </button>
+  <button class="iconbtn focusable" id="btnColl" data-i18n-title="collProfile" data-i18n-aria="collProfile" title="Sammlungen & Profil" aria-label="Sammlungen & Profil">
+    <svg class="ic"><use href="#i-collection"/></svg>
+    <span class="badge-count" id="collBadge" hidden>0</span>
+  </button>
+  <button class="iconbtn focusable" id="btnTheme" data-i18n-title="theme" data-i18n-aria="themeAria" title="Hell/Dunkel" aria-label="Theme wechseln">
+    <svg class="ic"><use href="#i-moon"/></svg>
+  </button>
+</header>
+
+<div class="searchbar" id="searchBar" hidden>
+  <input class="field focusable" id="searchInput" data-i18n-ph="searchPh" placeholder="Auf Wikipedia suchen…" autocomplete="off">
+  <button class="iconbtn focusable" id="searchGo" data-i18n-title="search" data-i18n-aria="search" title="Suchen" aria-label="Suchen"><svg class="ic"><use href="#i-search"/></svg></button>
+  <button class="iconbtn focusable" id="searchClose" data-i18n-title="close" data-i18n-aria="close" title="Schließen" aria-label="Schließen"><svg class="ic"><use href="#i-x"/></svg></button>
+</div>
+<div class="search-results" id="searchResults" hidden></div>
+
+<main class="feed" id="feed" aria-live="polite"></main>
+<div class="sentinel" id="sentinel"></div>
+
+<!-- Collections / profile drawer -->
+<div class="scrim" id="scrim"></div>
+<aside class="drawer glass" id="drawer" aria-hidden="true" data-i18n-aria="collProfile" aria-label="Sammlungen und Profil">
+  <div class="drawer-head">
+    <h2 class="bebas" data-i18n="myFeed">Mein WikiFeed</h2>
+    <button class="iconbtn focusable" id="closeDrawer" data-i18n-aria="close" aria-label="Schließen"><svg class="ic"><use href="#i-x"/></svg></button>
+  </div>
+  <div class="drawer-scroll">
+    <div class="panel" id="profilePanel">
+      <h3 class="bebas" data-i18n="topicProfile">Dein Themenprofil</h3>
+      <div id="profileBody"><p class="muted" data-i18n="noData">Noch keine Daten.</p></div>
+      <button class="btn focusable" id="openRecap" style="margin-top:12px;width:100%"><svg class="ic"><use href="#i-sparkles"/></svg><span data-i18n="recapBtn">Mein Lese-Rückblick</span></button>
+    </div>
+    <div class="panel">
+      <div class="row" style="justify-content:space-between;margin-bottom:8px">
+        <h3 class="bebas" style="margin:0" data-i18n="collections">Sammlungen</h3>
+        <button class="iconbtn focusable" id="newColl" data-i18n-title="newColl" data-i18n-aria="newColl" title="Neue Sammlung" aria-label="Neue Sammlung"><svg class="ic"><use href="#i-plus"/></svg></button>
+      </div>
+      <div id="collList"><p class="muted" data-i18n="noColls">Noch keine Sammlungen.</p></div>
+    </div>
+    <div class="panel">
+      <h3 class="bebas" data-i18n="interests">Interessen</h3>
+      <div class="chips" id="interestChips"></div>
+    </div>
+    <div class="panel">
+      <h3 class="bebas" data-i18n="uiLanguage">Sprache der Oberfläche</h3>
+      <div class="seg" id="uiLangSeg" role="group" data-i18n-aria="uiLanguage" aria-label="Sprache der Oberfläche" style="margin-top:4px">
+        <button data-uilang="de" class="focusable">DE</button>
+        <button data-uilang="en" class="focusable">EN</button>
+        <button data-uilang="fr" class="focusable">FR</button>
+      </div>
+    </div>
+    <div class="row" style="justify-content:space-between;margin-top:4px">
+      <button class="btn focusable" id="resetProfile"><svg class="ic"><use href="#i-refresh"/></svg><span data-i18n="resetProfile">Profil zurücksetzen</span></button>
+    </div>
+  </div>
+</aside>
+
+<!-- Reader -->
+<div class="reader glass" id="reader" aria-hidden="true">
+  <div class="reader-bar">
+    <button class="iconbtn focusable" id="closeReader" data-i18n-aria="backToFeed" aria-label="Zurück zum Feed"><svg class="ic"><use href="#i-x"/></svg></button>
+    <span class="rttl bebas" id="readerTitle"></span>
+    <button class="iconbtn star focusable" id="readerStar" data-i18n-aria="starMark" aria-label="Mit Stern markieren"><svg class="ic"><use href="#i-star"/></svg></button>
+    <button class="iconbtn focusable" id="readerColl" data-i18n-aria="toCollection" aria-label="Zu Sammlung"><svg class="ic"><use href="#i-bookmark"/></svg></button>
+    <button class="iconbtn focusable" id="readerShare" data-i18n-aria="share" aria-label="Teilen"><svg class="ic"><use href="#i-share"/></svg></button>
+    <a class="iconbtn focusable" id="readerExt" target="_blank" rel="noopener" data-i18n-aria="openWiki" aria-label="Auf Wikipedia öffnen"><svg class="ic"><use href="#i-ext"/></svg></a>
+  </div>
+  <div class="reader-scroll" id="readerScroll">
+    <div class="reader-inner">
+      <h1 class="title bebas" id="readerH1"></h1>
+      <div class="wiki-content" id="readerContent"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Lese-Rückblick (scrollytelling) -->
+<div class="recap" id="recap" aria-hidden="true">
+  <div class="recap-progress" id="recapProgress"></div>
+  <button class="iconbtn focusable recap-close" id="closeRecap" aria-label="Schließen"><svg class="ic"><use href="#i-x"/></svg></button>
+  <div class="recap-scroll" id="recapScroll"></div>
+</div>
+
+<!-- Quiz -->
+<div class="quiz" id="quiz" aria-hidden="true">
+  <div class="reader-bar">
+    <button class="iconbtn focusable" id="closeQuiz" data-i18n-aria="closeQuizAria" aria-label="Quiz schließen"><svg class="ic"><use href="#i-x"/></svg></button>
+    <span class="rttl bebas" data-i18n="quiz">Quiz</span>
+    <span class="quiz-progress" id="quizProgress"></span>
+  </div>
+  <div class="reader-scroll">
+    <div class="quiz-inner" id="quizBody"></div>
+  </div>
+</div>
+
+<!-- Onboarding -->
+<div class="onb" id="onb">
+  <div class="sheet glass">
+    <h2 class="bebas" data-i18n="welcome">Willkommen bei WikiFeed</h2>
+    <p class="lead" data-i18n="onbLead">Wähle ein paar Themen für den Start.</p>
+    <div class="chips" id="onbChips" style="margin-bottom:14px"></div>
+    <div class="row" style="margin-bottom:14px">
+      <input class="field focusable" id="onbCustom" data-i18n-ph="onbCustomPh" placeholder="Eigenes Thema hinzufügen…" style="flex:1;min-width:160px">
+      <button class="btn focusable" id="onbAdd"><svg class="ic"><use href="#i-plus"/></svg></button>
+    </div>
+    <div class="row" style="justify-content:space-between">
+      <button class="btn focusable" id="onbSkip" data-i18n="skip">Überspringen</button>
+      <button class="btn primary focusable" id="onbStart"><svg class="ic"><use href="#i-sparkles"/></svg><span data-i18n="startFeed">Feed starten</span></button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+/* ============================================================
+   WikiFeed — Wikipedia endless feed with on-device personalization
+   Signals: star (strongest) > open article (medium) > dwell (weakest)
+   ============================================================ */
+
+const LS = {
+  get(k,f){ try{ const v=localStorage.getItem(k); return v==null?f:JSON.parse(v);}catch(e){return f;} },
+  set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
+};
+
+const PRESET_TOPICS = {
+  de:["Geschichte","Wissenschaft","Technik","Kunst","Musik","Natur","Geographie","Sport","Philosophie","Astronomie","Medizin","Politik","Film","Literatur","Mathematik","Architektur","Psychologie","Biologie"],
+  en:["History","Science","Technology","Art","Music","Nature","Geography","Sport","Philosophy","Astronomy","Medicine","Politics","Film","Literature","Mathematics","Architecture","Psychology","Biology"],
+  fr:["Histoire","Science","Technologie","Art","Musique","Nature","Géographie","Sport","Philosophie","Astronomie","Médecine","Politique","Cinéma","Littérature","Mathématiques","Architecture","Psychologie","Biologie"]
+};
+
+/* ---------- i18n: full UI in de / en / fr ---------- */
+const I18N = {
+  de:{
+    htmlLang:"de", wikiName:"Deutsche Wikipedia",
+    brandSub:"dein Wissens‑Feed", langGroup:"Sprache", articleLang:"Artikelsprache", uiLanguage:"Sprache der Oberfläche",
+    startQuiz:"Quiz starten", search:"Suchen", collProfile:"Sammlungen & Profil",
+    theme:"Hell/Dunkel", themeAria:"Theme wechseln", searchPh:"Auf Wikipedia suchen…", close:"Schließen",
+    myFeed:"Mein WikiFeed", topicProfile:"Dein Themenprofil", recapBtn:"Mein Lese-Rückblick",
+    collections:"Sammlungen", newColl:"Neue Sammlung", noColls:"Noch keine Sammlungen.",
+    interests:"Interessen", resetProfile:"Profil zurücksetzen",
+    backToFeed:"Zurück zum Feed", starMark:"Mit Stern markieren", toCollection:"Zu Sammlung",
+    share:"Teilen", openWiki:"Auf Wikipedia öffnen", closeQuizAria:"Quiz schließen", quiz:"Quiz",
+    welcome:"Willkommen bei WikiFeed", onbLead:"Wähle ein paar Themen für den Start.",
+    onbCustomPh:"Eigenes Thema hinzufügen…", skip:"Überspringen", startFeed:"Feed starten",
+    readFull:"Ganzen Artikel lesen", forYou:"Für dich", forYouTitle:"Auf Basis deiner geöffneten und markierten Artikel",
+    serendipity:"Zufallsfund", serendipityTitle:"Zufallsfund zum Stöbern", lessLikeThis:"Weniger davon",
+    loadingArticle:"Lade Artikel…", loadFail:"Konnte den Artikel nicht laden.", loadErr:"Fehler beim Laden.",
+    starRemoved:"Stern entfernt", starred:"★ Mit Stern markiert", linkCopied:"Link kopiert",
+    removedFrom:n=>`Aus „${n}“ entfernt`, addedTo:n=>`Zu „${n}“ hinzugefügt`,
+    searchToast:t=>`Suche: ${t}`, recentSearches:"Zuletzt gesucht", noResults:"Keine Treffer",
+    profileReset:"Profil zurückgesetzt", quizReady:"Quiz bereit – teste dein Wissen",
+    quizTooFew:"Lies noch ein paar Artikel für ein Quiz", recapTooFew:"Noch zu wenig gelesen für einen Rückblick",
+    streakCele:n=>`${n} Tage Serie — weiter so!`, errPrefix:m=>`Fehler: ${m}`,
+    couldNotLoad:"Konnte keine Artikel laden.", retry:"Erneut versuchen",
+    cancel:"Abbrechen", create:"Anlegen", collNamePh:"Name der Sammlung", del:"Löschen",
+    deleteCollTitle:"Sammlung löschen", deleteCollMsg:n=>`„${n}“ wirklich löschen?`,
+    resetConfirm:"Themenprofil, Sterne und Verlauf zurücksetzen? Sammlungen bleiben erhalten.", reset:"Zurücksetzen",
+    inCollection:"In Sammlung", newCollPh:"Neue Sammlung…",
+    statStreak:"Tage Serie", statToday:"Min heute", statArticles:"Artikel",
+    noData:"Noch keine Daten.", noTopics:"Noch keine Themen erfasst.",
+    profileSummary:(s,a)=>`${s} markiert · ${a} Artikel im Profil`, empty:"leer",
+    pauseTitle:"Schon viel entdeckt heute", pauseMsg:n=>`Du hast rund ${n} Artikel durchgesehen. Eine kurze Pause hilft beim Behalten.`,
+    keepReading:"Weiterlesen", enoughToday:"Für heute genug", seeYouLater:"Bis später — schön, dass du da warst.",
+    quizKicker:"Welcher Artikel wird beschrieben?", next:"Weiter", result:"Ergebnis",
+    quizPerfect:"Perfekt!", quizGood:"Stark gelesen!", quizMeh:"Dranbleiben lohnt sich.",
+    rkUmfang:"Dein Lese-Rückblick", rArticlesOpened:"Artikel geöffnet",
+    rSub1:d=>`Dazu <strong>${d}</strong> konzentrierte Lesezeit — gezählt nur, während du wirklich dabei warst.`,
+    rkRhythm:"Dranbleiben", rDay:"Tag", rDays:"Tage", rInARow:"in Folge",
+    rhyth:st=>st>=7?"Lesen ist bei dir zur Gewohnheit geworden.":st>=3?"Eine Routine zeichnet sich ab.":st>=1?"Der Anfang einer Routine.":"Ein guter Tag, eine zu beginnen.",
+    rSub2:m=>`Heute bereits <strong>${m} Min</strong> gelesen.`,
+    rkThemes:"Deine Themen", rHeadThemes:"Worum dein Kopf kreist",
+    rSub3:t=>`Am stärksten zieht es dich zu <strong>${t}</strong> — abgeleitet daraus, was du öffnest und markierst.`,
+    rkHigh:"Höhepunkte", rStarred:"mit Stern markiert",
+    rSub4:(items,count)=>`Das hat dich besonders gepackt${items?` — und ${items} Artikel in ${count} ${count===1?"Sammlung":"Sammlungen"} aufbewahrt`:""}.`,
+    rkRecent:"Zuletzt vertieft", rHeadRecent:"Wo du tiefer eingestiegen bist",
+    rSubRecent:"Tipp: Mit dem Stern hältst du fest, was dich packt — dann erscheint es künftig hier.",
+    rkNext:"Weiter geht's", rMore:t=>`Mehr ${t}?`, rRound2:"Bereit für Runde zwei?",
+    rSub5:has=>`Dein Feed hat ${has?"schon nachgelegt":"noch viel für dich"}. Oder prüf, was hängengeblieben ist.`,
+    consoleMsg:"Neugierig, wie der Feed lernt? Tippe  state.profile  ein – das ist dein lokales Themenprofil. Nichts verlässt deinen Browser. Viel Entdeckerfreude."
+  },
+  en:{
+    htmlLang:"en", wikiName:"English Wikipedia",
+    brandSub:"your knowledge feed", langGroup:"Language", articleLang:"Article language", uiLanguage:"Interface language",
+    startQuiz:"Start quiz", search:"Search", collProfile:"Collections & profile",
+    theme:"Light/Dark", themeAria:"Toggle theme", searchPh:"Search Wikipedia…", close:"Close",
+    myFeed:"My WikiFeed", topicProfile:"Your topic profile", recapBtn:"My reading recap",
+    collections:"Collections", newColl:"New collection", noColls:"No collections yet.",
+    interests:"Interests", resetProfile:"Reset profile",
+    backToFeed:"Back to the feed", starMark:"Mark with a star", toCollection:"Add to collection",
+    share:"Share", openWiki:"Open on Wikipedia", closeQuizAria:"Close quiz", quiz:"Quiz",
+    welcome:"Welcome to WikiFeed", onbLead:"Pick a few topics to start.",
+    onbCustomPh:"Add your own topic…", skip:"Skip", startFeed:"Start the feed",
+    readFull:"Read the full article", forYou:"For you", forYouTitle:"Based on the articles you open and star",
+    serendipity:"Random find", serendipityTitle:"A random find to explore", lessLikeThis:"Less like this",
+    loadingArticle:"Loading article…", loadFail:"Couldn't load the article.", loadErr:"Loading error.",
+    starRemoved:"Star removed", starred:"★ Starred", linkCopied:"Link copied",
+    removedFrom:n=>`Removed from “${n}”`, addedTo:n=>`Added to “${n}”`,
+    searchToast:t=>`Search: ${t}`, recentSearches:"Recent searches", noResults:"No results",
+    profileReset:"Profile reset", quizReady:"Quiz ready – test your knowledge",
+    quizTooFew:"Read a few more articles for a quiz", recapTooFew:"Not enough read yet for a recap",
+    streakCele:n=>`${n}-day streak — keep it up!`, errPrefix:m=>`Error: ${m}`,
+    couldNotLoad:"Couldn't load any articles.", retry:"Try again",
+    cancel:"Cancel", create:"Create", collNamePh:"Collection name", del:"Delete",
+    deleteCollTitle:"Delete collection", deleteCollMsg:n=>`Really delete “${n}”?`,
+    resetConfirm:"Reset topic profile, stars and history? Collections are kept.", reset:"Reset",
+    inCollection:"To collection", newCollPh:"New collection…",
+    statStreak:"day streak", statToday:"min today", statArticles:"articles",
+    noData:"No data yet.", noTopics:"No topics captured yet.",
+    profileSummary:(s,a)=>`${s} starred · ${a} articles in profile`, empty:"empty",
+    pauseTitle:"You've explored a lot today", pauseMsg:n=>`You've gone through about ${n} articles. A short break helps you remember.`,
+    keepReading:"Keep reading", enoughToday:"Enough for today", seeYouLater:"See you later — glad you stopped by.",
+    quizKicker:"Which article is described?", next:"Next", result:"Result",
+    quizPerfect:"Perfect!", quizGood:"Well read!", quizMeh:"Worth sticking with it.",
+    rkUmfang:"Your reading recap", rArticlesOpened:"articles opened",
+    rSub1:d=>`Plus <strong>${d}</strong> of focused reading — counted only while you were really there.`,
+    rkRhythm:"Staying consistent", rDay:"day", rDays:"days", rInARow:"in a row",
+    rhyth:st=>st>=7?"Reading has become a habit for you.":st>=3?"A routine is taking shape.":st>=1?"The start of a routine.":"A good day to begin one.",
+    rSub2:m=>`Already <strong>${m} min</strong> read today.`,
+    rkThemes:"Your topics", rHeadThemes:"What's on your mind",
+    rSub3:t=>`You're drawn most to <strong>${t}</strong> — inferred from what you open and star.`,
+    rkHigh:"Highlights", rStarred:"starred",
+    rSub4:(items,count)=>`These really caught you${items?` — and you kept ${items} articles in ${count} ${count===1?"collection":"collections"}`:""}.`,
+    rkRecent:"Recently explored", rHeadRecent:"Where you went deeper",
+    rSubRecent:"Tip: star what grabs you — then it shows up here.",
+    rkNext:"What's next", rMore:t=>`More ${t}?`, rRound2:"Ready for round two?",
+    rSub5:has=>`Your feed has ${has?"already lined more up":"plenty more for you"}. Or check what stuck.`,
+    consoleMsg:"Curious how the feed learns? Type  state.profile  — that's your local topic profile. Nothing leaves your browser. Happy exploring."
+  },
+  fr:{
+    htmlLang:"fr", wikiName:"Wikipédia en français",
+    brandSub:"ton fil de savoir", langGroup:"Langue", articleLang:"Langue des articles", uiLanguage:"Langue de l'interface",
+    startQuiz:"Lancer le quiz", search:"Rechercher", collProfile:"Collections et profil",
+    theme:"Clair/Sombre", themeAria:"Changer de thème", searchPh:"Rechercher sur Wikipédia…", close:"Fermer",
+    myFeed:"Mon WikiFeed", topicProfile:"Ton profil thématique", recapBtn:"Mon bilan de lecture",
+    collections:"Collections", newColl:"Nouvelle collection", noColls:"Pas encore de collections.",
+    interests:"Centres d'intérêt", resetProfile:"Réinitialiser le profil",
+    backToFeed:"Retour au fil", starMark:"Marquer d'une étoile", toCollection:"Ajouter à une collection",
+    share:"Partager", openWiki:"Ouvrir sur Wikipédia", closeQuizAria:"Fermer le quiz", quiz:"Quiz",
+    welcome:"Bienvenue sur WikiFeed", onbLead:"Choisis quelques thèmes pour commencer.",
+    onbCustomPh:"Ajouter ton propre thème…", skip:"Passer", startFeed:"Démarrer le fil",
+    readFull:"Lire l'article complet", forYou:"Pour toi", forYouTitle:"D'après les articles que tu ouvres et marques",
+    serendipity:"Trouvaille", serendipityTitle:"Une trouvaille à explorer", lessLikeThis:"Moins de ça",
+    loadingArticle:"Chargement de l'article…", loadFail:"Impossible de charger l'article.", loadErr:"Erreur de chargement.",
+    starRemoved:"Étoile retirée", starred:"★ Marqué d'une étoile", linkCopied:"Lien copié",
+    removedFrom:n=>`Retiré de « ${n} »`, addedTo:n=>`Ajouté à « ${n} »`,
+    searchToast:t=>`Recherche : ${t}`, recentSearches:"Recherches récentes", noResults:"Aucun résultat",
+    profileReset:"Profil réinitialisé", quizReady:"Quiz prêt – teste tes connaissances",
+    quizTooFew:"Lis encore quelques articles pour un quiz", recapTooFew:"Pas assez lu pour un bilan",
+    streakCele:n=>`Série de ${n} jours — continue !`, errPrefix:m=>`Erreur : ${m}`,
+    couldNotLoad:"Impossible de charger des articles.", retry:"Réessayer",
+    cancel:"Annuler", create:"Créer", collNamePh:"Nom de la collection", del:"Supprimer",
+    deleteCollTitle:"Supprimer la collection", deleteCollMsg:n=>`Supprimer « ${n} » ?`,
+    resetConfirm:"Réinitialiser le profil thématique, les étoiles et l'historique ? Les collections sont conservées.", reset:"Réinitialiser",
+    inCollection:"Vers une collection", newCollPh:"Nouvelle collection…",
+    statStreak:"jours d'affilée", statToday:"min aujourd'hui", statArticles:"articles",
+    noData:"Pas encore de données.", noTopics:"Aucun thème enregistré.",
+    profileSummary:(s,a)=>`${s} marqués · ${a} articles dans le profil`, empty:"vide",
+    pauseTitle:"Déjà beaucoup exploré aujourd'hui", pauseMsg:n=>`Tu as parcouru environ ${n} articles. Une courte pause aide à mémoriser.`,
+    keepReading:"Continuer", enoughToday:"Assez pour aujourd'hui", seeYouLater:"À bientôt — merci d'être passé.",
+    quizKicker:"Quel article est décrit ?", next:"Suivant", result:"Résultat",
+    quizPerfect:"Parfait !", quizGood:"Bien lu !", quizMeh:"Ça vaut la peine de persévérer.",
+    rkUmfang:"Ton bilan de lecture", rArticlesOpened:"articles ouverts",
+    rSub1:d=>`Et <strong>${d}</strong> de lecture attentive — comptée uniquement quand tu étais vraiment là.`,
+    rkRhythm:"La régularité", rDay:"jour", rDays:"jours", rInARow:"d'affilée",
+    rhyth:st=>st>=7?"Lire est devenu une habitude chez toi.":st>=3?"Une routine se dessine.":st>=1?"Le début d'une routine.":"Un bon jour pour en commencer une.",
+    rSub2:m=>`Déjà <strong>${m} min</strong> lues aujourd'hui.`,
+    rkThemes:"Tes thèmes", rHeadThemes:"Ce qui t'occupe l'esprit",
+    rSub3:t=>`Ce qui t'attire le plus : <strong>${t}</strong> — déduit de ce que tu ouvres et marques.`,
+    rkHigh:"Moments forts", rStarred:"marqués d'une étoile",
+    rSub4:(items,count)=>`Ça t'a particulièrement marqué${items?` — et tu as gardé ${items} articles dans ${count} ${count===1?"collection":"collections"}`:""}.`,
+    rkRecent:"Approfondi récemment", rHeadRecent:"Là où tu as creusé",
+    rSubRecent:"Astuce : marque d'une étoile ce qui te plaît — ça apparaîtra ici.",
+    rkNext:"La suite", rMore:t=>`Encore ${t} ?`, rRound2:"Prêt pour un deuxième tour ?",
+    rSub5:has=>`Ton fil a ${has?"déjà prévu la suite":"encore beaucoup pour toi"}. Ou vérifie ce qui est resté.`,
+    consoleMsg:"Curieux de voir comment le fil apprend ? Tape  state.profile  — c'est ton profil thématique local. Rien ne quitte ton navigateur. Bonne exploration."
+  }
+};
+const WIKI_NAMES={de:"Deutsche Wikipedia",en:"English Wikipedia",fr:"Wikipédia en français"};
+function t(key,...args){
+  const dict=I18N[state.uiLang]||I18N.de;
+  let v=dict[key]; if(v===undefined) v=I18N.de[key];
+  return typeof v==="function" ? v(...args) : v;
+}
+function applyStaticI18n(){
+  document.querySelectorAll("[data-i18n]").forEach(el=>{ el.textContent=t(el.dataset.i18n); });
+  document.querySelectorAll("[data-i18n-title]").forEach(el=>{ el.title=t(el.dataset.i18nTitle); });
+  document.querySelectorAll("[data-i18n-aria]").forEach(el=>{ el.setAttribute("aria-label",t(el.dataset.i18nAria)); });
+  document.querySelectorAll("[data-i18n-ph]").forEach(el=>{ el.placeholder=t(el.dataset.i18nPh); });
+}
+
+const WEIGHTS = { dwell:0.18, dwellCap:1.2, open:2.0, star:5.0 };
+
+const state = {
+  lang: LS.get("wf_lang","de"),          // article / content language (Wikipedia source)
+  uiLang: LS.get("wf_uilang", LS.get("wf_lang","de")), // interface language
+  theme: LS.get("wf_theme","light"),
+  interests: LS.get("wf_interests",[]),
+  // profile.seeds: { "Article Title": score }  — used as morelike seeds
+  // profile.cats:  { "Category": score }       — shown as topic profile
+  profile: LS.get("wf_profile",{seeds:{},cats:{}}),
+  stars: LS.get("wf_stars",{}),          // title -> article meta
+  collections: LS.get("wf_collections",{}), // name -> [meta]
+  disliked: LS.get("wf_disliked",{}),    // title -> 1 (never reshow, negative signal)
+  recent: LS.get("wf_recent",[]),        // recent search terms
+  readPool: LS.get("wf_readpool",[]),    // recently opened articles (quiz material)
+  openedSinceQuiz:0,                     // counts opens toward next quiz offer
+  exploit: LS.get("wf_exploit",0.5),     // adaptive exploit-vs-explore probability
+  stats: LS.get("wf_stats",{day:"",lastActive:"",streak:0,openedToday:0,total:0}),
+  seen: new Set(),
+  feedGen:0,                             // generation token; bumped on resetFeed to cancel stale loads
+  pendingStrategies:[],                  // forced strategies (e.g. from search)
+  cardsSinceSurprise:0,                  // variable-ratio serendipity counter
+  surpriseAt:5,
+  sessionCards:0,                        // cards seen this session (pause nudge)
+  nextPauseAt:30,
+  queueBusy:false,
+  endReached:false
+};
+
+function saveProfile(){ LS.set("wf_profile",state.profile); }
+function api(){ return `https://${state.lang}.wikipedia.org/w/api.php`; }
+
+/* ---------- helpers ---------- */
+const $ = s => document.querySelector(s);
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+
+/* ---------- accessibility: focus trap for overlays (stack-aware, restores focus) ---------- */
+const FOCUS_SEL='a[href],button:not([disabled]),input:not([disabled]),select,textarea,[tabindex]:not([tabindex="-1"])';
+const focusStack=[];
+function trapFocus(container){
+  const prev=document.activeElement;
+  const handler=(e)=>{
+    if(e.key!=="Tab") return;
+    const topx=focusStack[focusStack.length-1];
+    if(!topx || topx.container!==container) return;
+    const items=[...container.querySelectorAll(FOCUS_SEL)].filter(el=>el.offsetParent!==null);
+    if(!items.length) return;
+    const first=items[0], last=items[items.length-1];
+    if(e.shiftKey && (document.activeElement===first || !container.contains(document.activeElement))){ e.preventDefault(); last.focus(); }
+    else if(!e.shiftKey && (document.activeElement===last || !container.contains(document.activeElement))){ e.preventDefault(); first.focus(); }
+  };
+  document.addEventListener("keydown",handler,true);
+  focusStack.push({container,handler,prev});
+  const items=[...container.querySelectorAll(FOCUS_SEL)].filter(el=>el.offsetParent!==null);
+  const target=items[0]||container;
+  if(target&&target.focus) try{ target.focus(); }catch(e){}
+}
+function releaseFocus(){
+  const top=focusStack.pop(); if(!top) return;
+  document.removeEventListener("keydown",top.handler,true);
+  try{ top.prev&&top.prev.focus&&top.prev.focus(); }catch(e){}
+}
+
+/* ---------- feed performance: cap DOM growth on endless scroll ---------- */
+function trimFeed(){
+  if(reader.classList.contains("open")||$("#quiz").classList.contains("open")||$("#recap").classList.contains("open")) return;
+  const MAX=100;
+  const cards=feedEl.querySelectorAll(".card");
+  const target=cards.length-MAX;
+  if(target<=0) return;
+  let freed=0;
+  for(let i=0;i<target;i++){
+    const c=cards[i];
+    if(c.getBoundingClientRect().bottom>0) break;   // never remove visible cards
+    freed+=c.offsetHeight+20;                        // card height + flex gap
+    c.remove();
+  }
+  if(freed>0) window.scrollBy(0,-freed);             // compensate so nothing jumps
+}
+
+/* glass modals replacing native prompt()/confirm() */
+function modalPrompt({title,placeholder="",value="",confirm="OK"}){
+  return new Promise(resolve=>{
+    const w=document.createElement("div"); w.className="onb open";
+    w.innerHTML=`<div class="sheet glass" style="max-width:420px">
+      <div class="row" style="justify-content:space-between;margin-bottom:12px">
+        <h2 class="bebas" style="font-size:1.4rem">${esc(title)}</h2>
+        <button class="iconbtn" data-x aria-label="Schließen">${svgIc("i-x")}</button>
+      </div>
+      <input class="field focusable" data-in placeholder="${esc(placeholder)}" value="${esc(value)}" style="margin-bottom:14px">
+      <div class="row" style="justify-content:flex-end">
+        <button class="btn focusable" data-cancel>${esc(t("cancel"))}</button>
+        <button class="btn primary focusable" data-ok>${esc(confirm)}</button>
+      </div></div>`;
+    document.body.appendChild(w); trapFocus(w);
+    const input=w.querySelector("[data-in]");
+    const done=v=>{ w.remove(); releaseFocus(); resolve(v); };
+    setTimeout(()=>input.focus(),30);
+    w.querySelector("[data-x]").onclick=()=>done(null);
+    w.querySelector("[data-cancel]").onclick=()=>done(null);
+    w.querySelector("[data-ok]").onclick=()=>done(input.value.trim()||null);
+    w.addEventListener("click",e=>{ if(e.target===w) done(null); });
+    input.addEventListener("keydown",e=>{ if(e.key==="Enter") done(input.value.trim()||null); if(e.key==="Escape") done(null); });
+  });
+}
+function modalConfirm({title,message="",confirm="OK",danger=false}){
+  return new Promise(resolve=>{
+    const w=document.createElement("div"); w.className="onb open";
+    w.innerHTML=`<div class="sheet glass" style="max-width:420px">
+      <h2 class="bebas" style="font-size:1.4rem;margin-bottom:8px">${esc(title)}</h2>
+      <p class="muted" style="margin-bottom:16px">${esc(message)}</p>
+      <div class="row" style="justify-content:flex-end">
+        <button class="btn focusable" data-cancel>${esc(t("cancel"))}</button>
+        <button class="btn focusable" data-ok>${esc(confirm)}</button>
+      </div></div>`;
+    document.body.appendChild(w); trapFocus(w);
+    const okb=w.querySelector("[data-ok]");
+    if(danger){ okb.style.background="var(--danger)"; okb.style.color="#fff"; okb.style.borderColor="transparent"; }
+    else okb.classList.add("primary");
+    const onKey=e=>{ if(e.key==="Escape") done(false); };
+    const done=v=>{ w.remove(); document.removeEventListener("keydown",onKey); releaseFocus(); resolve(v); };
+    w.querySelector("[data-cancel]").onclick=()=>done(false);
+    okb.onclick=()=>done(true);
+    w.addEventListener("click",e=>{ if(e.target===w) done(false); });
+    document.addEventListener("keydown",onKey);
+  });
+}
+
+let toastT;
+function toast(msg){
+  const t=$("#toast"); t.textContent=msg; t.classList.add("show");
+  clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("show"),2200);
+}
+function weightedPick(obj){
+  const keys=Object.keys(obj); if(!keys.length) return null;
+  let total=0; for(const k of keys) total+=obj[k];
+  let r=Math.random()*total;
+  for(const k of keys){ r-=obj[k]; if(r<=0) return k; }
+  return keys[keys.length-1];
+}
+function topEntries(obj,n){
+  return Object.entries(obj).sort((a,b)=>b[1]-a[1]).slice(0,n);
+}
+function randInt(a,b){ return a+Math.floor(Math.random()*(b-a+1)); }
+function dayStr(offset=0){ return new Date(Date.now()+offset*864e5).toISOString().slice(0,10); }
+
+/* adaptive explore/exploit: exploit rises after positive engagement, falls after a miss */
+function nudgeExploit(d){
+  state.exploit=Math.max(0.30,Math.min(0.85,(state.exploit||0.5)+d));
+  LS.set("wf_exploit",state.exploit);
+}
+/* streak + reading stats */
+function markActiveToday(){
+  const t=dayStr(), s=state.stats;
+  if(s.lastActive!==t){
+    s.streak = (s.lastActive===dayStr(-1)) ? (s.streak||0)+1 : 1;
+    s.lastActive=t; s.openedToday=0; s.todaySeconds=0;   // reset daily counters
+    if([3,7,14,30,50,100,200,365].includes(s.streak)) setTimeout(()=>celebrateStreak(s.streak),500);
+  }
+}
+function registerOpen(){
+  markActiveToday();
+  const s=state.stats;
+  s.openedToday=(s.openedToday||0)+1;
+  s.total=(s.total||0)+1;
+  LS.set("wf_stats",s);
+  renderProfile();
+}
+
+/* engaged-session timer: counts seconds only while the tab is visible AND the
+   user has interacted within the idle window — measures attentive time, not an
+   app left open in a background tab. */
+const IDLE_MS=120000;
+let lastActivityTs=Date.now(), engagedTicks=0;
+["scroll","click","keydown","touchstart"].forEach(ev=>
+  window.addEventListener(ev,()=>{ lastActivityTs=Date.now(); },{passive:true}));
+function tickEngaged(){
+  if(document.visibilityState!=="visible") return;
+  if(Date.now()-lastActivityTs>IDLE_MS) return;
+  markActiveToday();
+  const s=state.stats;
+  s.todaySeconds=(s.todaySeconds||0)+1;
+  s.totalSeconds=(s.totalSeconds||0)+1;
+  if(++engagedTicks%10===0){
+    LS.set("wf_stats",s);
+    if(drawer.classList.contains("open")) renderProfile();
+  }
+}
+setInterval(tickEngaged,1000);
+window.addEventListener("visibilitychange",()=>{ if(document.hidden) LS.set("wf_stats",state.stats); });
+function currentStreak(){
+  const s=state.stats;
+  return (s.lastActive===dayStr()||s.lastActive===dayStr(-1)) ? (s.streak||0) : 0;
+}
+/* lightweight, dependency-free confetti for earned moments; respects reduced-motion */
+function burstConfetti(){
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const c=document.createElement("canvas");
+  c.style.cssText="position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:130";
+  c.width=innerWidth; c.height=innerHeight;
+  document.body.appendChild(c);
+  const ctx=c.getContext("2d");
+  const cols=["#ff6b35","#1557ff","#f4a700","#1f9d55"], parts=[];
+  for(let i=0;i<90;i++) parts.push({
+    x:c.width/2+(Math.random()-.5)*140, y:c.height*0.34,
+    vx:(Math.random()-.5)*9, vy:Math.random()*-9-3, g:.22+Math.random()*.1,
+    s:5+Math.random()*6, rot:Math.random()*6.28, vr:(Math.random()-.5)*.3, col:cols[i%4]});
+  const start=performance.now();
+  (function frame(now){
+    ctx.clearRect(0,0,c.width,c.height);
+    parts.forEach(p=>{ p.vy+=p.g; p.x+=p.vx; p.y+=p.vy; p.rot+=p.vr;
+      const a=Math.max(0,1-(now-start)/2300);
+      ctx.save(); ctx.globalAlpha=a; ctx.translate(p.x,p.y); ctx.rotate(p.rot);
+      ctx.fillStyle=p.col; ctx.fillRect(-p.s/2,-p.s/2,p.s,p.s*0.6); ctx.restore(); });
+    if(now-start<2400) requestAnimationFrame(frame); else c.remove();
+  })(start);
+}
+function celebrateStreak(n){ toast(t("streakCele",n)); burstConfetti(); }
+
+/* ---------- API ----------
+   Uses JSONP (script-tag) instead of fetch(). This avoids CORS entirely and
+   works even when the page is opened as a local file:// document (where Safari
+   and embedded previews block cross-origin fetch). MediaWiki supports JSONP via
+   the &callback= parameter. */
+let jsonpSeq=0;
+function apiGet(params){
+  return new Promise((resolve,reject)=>{
+    const cb="wfcb_"+(++jsonpSeq)+"_"+Math.floor(Math.random()*1e6);
+    const u=new URL(api());
+    const p={format:"json",...params,callback:cb};
+    Object.entries(p).forEach(([k,v])=>u.searchParams.set(k,v));
+    const s=document.createElement("script");
+    let finished=false;
+    const cleanup=()=>{ try{delete window[cb];}catch(e){window[cb]=undefined;} s.remove(); clearTimeout(timer); };
+    const timer=setTimeout(()=>{ if(!finished){ finished=true; cleanup(); reject(new Error("Zeitüberschreitung")); } },15000);
+    window[cb]=(data)=>{ if(finished) return; finished=true; cleanup(); resolve(data); };
+    s.onerror=()=>{ if(!finished){ finished=true; cleanup(); reject(new Error("Netzwerk-/Ladefehler")); } };
+    s.src=u.toString();
+    document.head.appendChild(s);
+  });
+}
+function normalizePages(json){
+  const pages=json?.query?.pages; if(!pages) return [];
+  return Object.values(pages)
+    .filter(p=>p && !p.missing && p.extract)
+    .map(p=>({
+      title:p.title,
+      extract:(p.extract||"").trim(),
+      thumb:p.thumbnail?.source||null,
+      url:p.fullurl||p.canonicalurl||`https://${state.lang}.wikipedia.org/wiki/${encodeURIComponent(p.title)}`,
+      lang:state.lang
+    }))
+    .filter(a=>a.extract.length>60);
+}
+const COMMON = {
+  action:"query",
+  prop:"extracts|pageimages|info", exintro:1, explaintext:1,
+  exlimit:"max", piprop:"thumbnail", pithumbsize:"720", inprop:"url"
+};
+async function fetchRandom(n=6){
+  const j=await apiGet({...COMMON, generator:"random", grnnamespace:0, grnlimit:n});
+  return normalizePages(j);
+}
+async function fetchMoreLike(title,n=6){
+  try{
+    const j=await apiGet({...COMMON, generator:"search",
+      gsrsearch:"morelike:"+title, gsrnamespace:0, gsrlimit:n, gsrqiprofile:"classic_noboostlinks"});
+    return normalizePages(j);
+  }catch(e){ return []; }
+}
+async function fetchSearch(term,n=6){
+  const j=await apiGet({...COMMON, generator:"search", gsrsearch:term, gsrnamespace:0, gsrlimit:n});
+  return normalizePages(j);
+}
+async function fetchSuggest(term,n=8){
+  const j=await apiGet({action:"query", generator:"prefixsearch", gpssearch:term, gpslimit:n,
+    prop:"extracts|pageimages|info", exintro:1, explaintext:1, exlimit:"max",
+    piprop:"thumbnail", pithumbsize:160, inprop:"url"});
+  const pages=j?.query?.pages; if(!pages) return [];
+  return Object.values(pages)
+    .sort((a,b)=>(a.index||0)-(b.index||0))
+    .map(p=>({title:p.title, extract:(p.extract||"").trim(), thumb:p.thumbnail?.source||null,
+      url:p.fullurl||`https://${state.lang}.wikipedia.org/wiki/${encodeURIComponent(p.title)}`, lang:state.lang}));
+}
+async function fetchFull(title){
+  const j=await apiGet({action:"parse",page:title,prop:"text",redirects:1,disableeditsection:1,disabletoc:1});
+  return j?.parse?.text?.["*"]||null;
+}
+async function fetchCategories(title){
+  try{
+    const j=await apiGet({action:"query",prop:"categories",titles:title,cllimit:30,clshow:"!hidden"});
+    const pages=j?.query?.pages||{};
+    const out=[];
+    Object.values(pages).forEach(p=>(p.categories||[]).forEach(c=>{
+      const name=c.title.replace(/^(Kategorie|Category):/,"");
+      if(name && !/^(Wikipedia|Wikipédia)/.test(name) && name.length<48) out.push(name);
+    }));
+    return out;
+  }catch(e){ return []; }
+}
+
+/* ---------- personalization ---------- */
+function bumpSeed(title,amount){
+  state.profile.seeds[title]=(state.profile.seeds[title]||0)+amount;
+  // keep map bounded
+  const keys=Object.keys(state.profile.seeds);
+  if(keys.length>60){
+    const cut=topEntries(state.profile.seeds,50);
+    state.profile.seeds=Object.fromEntries(cut);
+  }
+  saveProfile();
+}
+async function enrichCats(title,amount){
+  const cats=await fetchCategories(title);
+  cats.slice(0,8).forEach(c=>{ state.profile.cats[c]=(state.profile.cats[c]||0)+amount; });
+  const keys=Object.keys(state.profile.cats);
+  if(keys.length>80) state.profile.cats=Object.fromEntries(topEntries(state.profile.cats,60));
+  saveProfile();
+  renderProfile();
+}
+function signalOpen(meta){
+  bumpSeed(meta.title,WEIGHTS.open);
+  enrichCats(meta.title,WEIGHTS.open);
+  nudgeExploit(+0.04);   // engaged → lean a bit more into the working vein
+  registerOpen();        // streak + reading stats
+  noteRead(meta);        // build quiz material, offer quiz after ~10 reads
+}
+function signalStar(meta,on){
+  bumpSeed(meta.title, on?WEIGHTS.star:-WEIGHTS.star);
+  nudgeExploit(on?+0.10:-0.06);
+  if(on) enrichCats(meta.title,WEIGHTS.star); else renderProfile();
+}
+async function dampenCats(title,amount){
+  const cats=await fetchCategories(title);
+  cats.slice(0,8).forEach(c=>{ if(state.profile.cats[c]!=null) state.profile.cats[c]=Math.max(0,state.profile.cats[c]-amount); });
+  saveProfile(); renderProfile();
+}
+function signalDislike(meta,seed){
+  state.disliked[meta.title]=1; LS.set("wf_disliked",state.disliked);
+  delete state.profile.seeds[meta.title];                 // never seed from a disliked article
+  if(seed && state.profile.seeds[seed]!=null) bumpSeed(seed,-WEIGHTS.open); // this recommendation source under-performed
+  nudgeExploit(-0.12);                                    // a miss → widen the net again
+  dampenCats(meta.title,WEIGHTS.open);                    // pull its topics down in the profile
+  saveProfile();
+}
+async function shareArticle(meta){
+  const data={title:meta.title,text:meta.title,url:meta.url};
+  if(navigator.share){
+    try{ await navigator.share(data); return; }
+    catch(e){ if(e&&e.name==="AbortError") return; }
+  }
+  try{ await navigator.clipboard.writeText(meta.url); toast(t("linkCopied")); }
+  catch(e){ toast(meta.url); }
+}
+const dwellAccum={};
+function signalDwell(title,seconds){
+  const prev=dwellAccum[title]||0;
+  const add=Math.min(seconds*WEIGHTS.dwell, WEIGHTS.dwellCap-prev);
+  if(add>0.01){ dwellAccum[title]=prev+add; bumpSeed(title,add); }
+}
+function hasProfile(){ return Object.values(state.profile.seeds).some(v=>v>=WEIGHTS.open); }
+
+function pickStrategy(){
+  const r=Math.random();
+  const strongSeeds=Object.fromEntries(Object.entries(state.profile.seeds).filter(([,v])=>v>=WEIGHTS.open));
+  const profileOn=Object.keys(strongSeeds).length>0;
+  // exploit grows after hits, shrinks after misses (adaptive ε-greedy)
+  if(profileOn && r<state.exploit){ return {type:"morelike", seed:weightedPick(strongSeeds)}; }
+  if(state.interests.length && Math.random()<0.5){
+    return {type:"search", term:state.interests[Math.floor(Math.random()*state.interests.length)]};
+  }
+  return {type:"random"};
+}
+
+/* ---------- feed rendering ---------- */
+const feedEl=$("#feed");
+
+function svgIc(id,cls){ return `<svg class="ic ${cls||''}"><use href="#${id}"/></svg>`; }
+
+function articleCard(meta, reason, seed){
+  const card=document.createElement("article");
+  card.dataset.title=meta.title;
+
+  // Rhythm: feature (big, overlaid title) for serendipity finds with an image;
+  // compact (no image) for thumbnail-less articles; standard otherwise.
+  const starred=!!state.stars[meta.title];
+  const variant = (reason==="serendipity" && meta.thumb) ? "feature" : (meta.thumb ? "standard" : "compact");
+  card.className="card glass v-"+variant+(starred?" is-starred":"");
+
+  // Subtle hints only — most cards carry no badge at all.
+  let reasonHtml="";
+  if(reason==="foryou") reasonHtml=`<span class="reason foryou" title="${esc(t("forYouTitle"))}">${svgIc("i-sparkles")} ${esc(t("forYou"))}</span>`;
+  else if(reason==="serendipity") reasonHtml=`<span class="reason surprise" title="${esc(t("serendipityTitle"))}">${svgIc("i-compass")} ${esc(t("serendipity"))}</span>`;
+  const langHtml=`<span class="langtag">${meta.lang.toUpperCase()}</span>`;
+
+  if(variant!=="compact"){
+    const hero=document.createElement("div");
+    hero.className="hero";
+    hero.innerHTML=`${reasonHtml}${langHtml}<img loading="lazy" alt="" src="${esc(meta.thumb)}">`;
+    hero.addEventListener("click",()=>openReader(meta));
+    card.appendChild(hero);
+  }
+
+  const body=document.createElement("div");
+  body.className="body";
+  const h2=document.createElement("h2"); h2.className="bebas"; h2.textContent=meta.title;
+  h2.addEventListener("click",()=>openReader(meta));
+  body.appendChild(h2);
+  const ex=document.createElement("p"); ex.className="extract";
+  const lim = variant==="feature"?170 : (variant==="compact"?280 : 340);
+  ex.textContent = meta.extract.length>lim ? meta.extract.slice(0,lim).trim()+"…" : meta.extract;
+  const rm=document.createElement("button"); rm.className="readmore focusable";
+  rm.innerHTML=`${svgIc("i-book")} ${esc(t("readFull"))}`;
+  rm.addEventListener("click",()=>openReader(meta));
+  body.append(ex,rm);
+  card.appendChild(body);
+
+  const actions=document.createElement("div");
+  actions.className="actions";
+
+  const starBtn=document.createElement("button");
+  starBtn.className="actbtn icon star focusable"+(state.stars[meta.title]?" on":"");
+  starBtn.title=t("starMark"); starBtn.setAttribute("aria-label",t("starMark"));
+  starBtn.innerHTML=svgIc("i-star");
+  starBtn.addEventListener("click",()=>{
+    toggleStar(meta);
+    const on=!!state.stars[meta.title];
+    starBtn.classList.toggle("on",on);
+    card.classList.toggle("is-starred",on);
+    if(on){
+      starBtn.classList.add("pulse"); setTimeout(()=>starBtn.classList.remove("pulse"),470);
+      card.classList.add("just-starred"); setTimeout(()=>card.classList.remove("just-starred"),540);
+    }
+  });
+
+  const collBtn=document.createElement("button");
+  collBtn.className="actbtn icon coll focusable"+(inAnyCollection(meta.title)?" on":"");
+  collBtn.title=t("toCollection"); collBtn.setAttribute("aria-label",t("toCollection"));
+  collBtn.innerHTML=svgIc("i-bookmark");
+  collBtn.addEventListener("click",()=>openCollectionPicker(meta,()=>{
+    collBtn.classList.toggle("on",inAnyCollection(meta.title));
+  }));
+
+  const downBtn=document.createElement("button");
+  downBtn.className="actbtn icon focusable";
+  downBtn.title=t("lessLikeThis"); downBtn.setAttribute("aria-label",t("lessLikeThis"));
+  downBtn.innerHTML=svgIc("i-down");
+  downBtn.addEventListener("click",()=>{
+    signalDislike(meta,seed);
+    card.style.transition="opacity .25s, transform .25s";
+    card.style.opacity="0"; card.style.transform="scale(.96)";
+    setTimeout(()=>{ card.remove(); if(feedEl.querySelectorAll(".card").length<3) loadMore(); },240);
+    toast(t("lessLikeThis"));
+  });
+
+  const shareBtn=document.createElement("button");
+  shareBtn.className="actbtn icon focusable";
+  shareBtn.title=t("share"); shareBtn.setAttribute("aria-label",t("share"));
+  shareBtn.innerHTML=svgIc("i-share");
+  shareBtn.addEventListener("click",()=>shareArticle(meta));
+
+  actions.append(starBtn,collBtn,downBtn,shareBtn);
+  card.appendChild(actions);
+
+  observeDwell(card,meta.title);
+  return card;
+}
+
+async function loadMore(){
+  if(state.queueBusy||state.endReached) return;
+  state.queueBusy=true;
+  const gen=state.feedGen;               // abort if resetFeed() runs while we await
+  // skeletons
+  const skels=[];
+  for(let i=0;i<2;i++){ const s=document.createElement("div"); s.className="skeleton glass"; feedEl.appendChild(s); skels.push(s); }
+
+  let attempts=0, added=0;
+  try{
+    while(added<4 && attempts<6){
+      attempts++;
+      // Variable-ratio serendipity: every 4–8 cards, drop in a surprise random find.
+      const surprise = state.pendingStrategies.length===0 && state.cardsSinceSurprise>=state.surpriseAt;
+      const strat = surprise ? {type:"serendipity"}
+                  : (state.pendingStrategies.length ? state.pendingStrategies.shift() : pickStrategy());
+      let batch=[];
+      if(strat.type==="morelike") batch=await fetchMoreLike(strat.seed);
+      else if(strat.type==="search") batch=await fetchSearch(strat.term);
+      else batch=await fetchRandom();
+      if(gen!==state.feedGen) return;     // a reset happened mid-fetch → drop this stale batch
+      if(strat.type==="morelike" && batch.length===0){ batch=await fetchRandom(); if(gen!==state.feedGen) return; }
+      // Only morelike → "Für dich"; serendipity → "Zufallsfund"; search/random unlabelled.
+      const reason = strat.type==="morelike" ? "foryou" : (strat.type==="serendipity" ? "serendipity" : "none");
+      const seed = strat.type==="morelike" ? strat.seed : null;
+      for(const a of batch){
+        if(state.seen.has(a.title) || state.disliked[a.title]) continue;
+        state.seen.add(a.title);
+        const ref = (skels[0] && skels[0].parentNode===feedEl) ? skels[0] : null;
+        feedEl.insertBefore(articleCard(a,reason,seed), ref);
+        added++; state.sessionCards++;
+        if(strat.type==="serendipity"){ state.cardsSinceSurprise=0; state.surpriseAt=randInt(4,8); break; }
+        state.cardsSinceSurprise++;
+      }
+    }
+  }catch(e){
+    if(gen===state.feedGen) toast(t("errPrefix",(e&&e.message)?e.message:"?"));
+  }finally{
+    skels.forEach(s=>s.remove());
+    if(gen===state.feedGen) state.queueBusy=false;   // don't clobber a newer load
+  }
+  if(gen===state.feedGen && added===0 && feedEl.querySelectorAll(".card").length===0){
+    const box=document.createElement("div");
+    box.className="feed-end";
+    box.innerHTML=`${esc(t("couldNotLoad"))} <button class="btn" style="margin-top:10px">${esc(t("retry"))}</button>`;
+    box.querySelector("button").addEventListener("click",()=>{ box.remove(); loadMore(); });
+    feedEl.appendChild(box);
+  }
+  if(gen===state.feedGen) trimFeed();
+  maybeShowPause();
+}
+
+/* gentle "you've read a lot today" nudge — healthy-by-design, dismissible */
+function maybeShowPause(){
+  if(state.endReached || state.sessionCards < state.nextPauseAt) return;
+  if(feedEl.querySelector(".pause-card")) return;
+  state.nextPauseAt = state.sessionCards + 40;   // re-arm, no nagging
+  const box=document.createElement("div");
+  box.className="pause-card glass";
+  box.innerHTML=`<h3 class="bebas">${esc(t("pauseTitle"))}</h3>
+    <p>${esc(t("pauseMsg",state.sessionCards))}</p>
+    <div class="row">
+      <button class="btn focusable" data-more>${esc(t("keepReading"))}</button>
+      <button class="btn primary focusable" data-stop>${esc(t("enoughToday"))}</button>
+    </div>`;
+  box.querySelector("[data-more]").addEventListener("click",()=>box.remove());
+  box.querySelector("[data-stop]").addEventListener("click",()=>{
+    state.endReached=true;
+    box.replaceWith(Object.assign(document.createElement("div"),
+      {className:"feed-end",textContent:t("seeYouLater")}));
+    window.scrollTo({top:0,behavior:"smooth"});
+  });
+  feedEl.appendChild(box);
+}
+
+function resetFeed(){
+  state.feedGen=(state.feedGen||0)+1;    // invalidate any in-flight loadMore
+  state.seen=new Set(); state.endReached=false; state.queueBusy=false;
+  state.cardsSinceSurprise=0; state.surpriseAt=randInt(4,8);
+  feedEl.innerHTML="";
+  loadMore().then(()=>loadMore());
+}
+
+/* ---------- dwell tracking ---------- */
+const dwellTimers=new Map();
+const dwellObserver=new IntersectionObserver((entries)=>{
+  entries.forEach(en=>{
+    const title=en.target.dataset.title;
+    if(en.isIntersecting && en.intersectionRatio>0.6){
+      if(!dwellTimers.has(title)) dwellTimers.set(title,Date.now());
+    }else{
+      const start=dwellTimers.get(title);
+      if(start){ signalDwell(title,(Date.now()-start)/1000); dwellTimers.delete(title); }
+    }
+  });
+},{threshold:[0,0.6,1]});
+function observeDwell(card,title){ dwellObserver.observe(card); }
+window.addEventListener("visibilitychange",()=>{
+  if(document.hidden){ dwellTimers.forEach((start,title)=>signalDwell(title,(Date.now()-start)/1000)); dwellTimers.clear(); }
+});
+
+/* ---------- reader ---------- */
+let currentReaderMeta=null;
+const reader=$("#reader");
+async function openReader(meta){
+  currentReaderMeta=meta;
+  signalOpen(meta);
+  $("#readerTitle").textContent=meta.title;
+  $("#readerH1").textContent=meta.title;
+  $("#readerExt").href=meta.url;
+  $("#readerStar").classList.toggle("on",!!state.stars[meta.title]);
+  const c=$("#readerContent");
+  c.innerHTML=`<p class="muted">${esc(t("loadingArticle"))}</p>`;
+  const wasOpen=reader.classList.contains("open");
+  reader.classList.add("open"); reader.setAttribute("aria-hidden","false");
+  $("#readerScroll").scrollTop=0;
+  document.body.style.overflow="hidden";
+  if(!wasOpen) trapFocus(reader);
+  try{
+    const html=await fetchFull(meta.title);
+    if(!html){ c.innerHTML=`<p class="muted">${esc(t("loadFail"))} <a href="${meta.url}" target="_blank" rel="noopener">${esc(t("openWiki"))}</a>.</p>`; return; }
+    c.innerHTML=html;
+    fixMedia(c);
+    rewriteWikiLinks(c);
+  }catch(e){
+    c.innerHTML=`<p class="muted">${esc(t("loadErr"))} <a href="${meta.url}" target="_blank" rel="noopener">${esc(t("openWiki"))}</a>.</p>`;
+  }
+}
+function closeReader(){
+  if(!reader.classList.contains("open")) return;
+  reader.classList.remove("open"); reader.setAttribute("aria-hidden","true");
+  document.body.style.overflow=""; currentReaderMeta=null; releaseFocus();
+}
+function fixMedia(container){
+  // Wikipedia parse output uses protocol-relative (//upload…) and root-relative (/w/…)
+  // URLs that break from a file:// page. Normalise src/poster/srcset on all media.
+  const host=`https://${state.lang}.wikipedia.org`;
+  const fixUrl=v=>{ if(!v) return v; if(v.startsWith("//")) return "https:"+v; if(v.startsWith("/")) return host+v; return v; };
+  container.querySelectorAll("img,source,audio,video").forEach(el=>{
+    const ds=el.getAttribute("data-src");
+    if(ds && !el.getAttribute("src")) el.setAttribute("src",ds);
+    const src=el.getAttribute("src"); if(src) el.setAttribute("src",fixUrl(src));
+    const poster=el.getAttribute("poster"); if(poster) el.setAttribute("poster",fixUrl(poster));
+    const ss=el.getAttribute("srcset")||el.getAttribute("data-srcset");
+    if(ss) el.setAttribute("srcset", ss.split(",").map(part=>{ const seg=part.trim().split(/\s+/); seg[0]=fixUrl(seg[0]); return seg.join(" "); }).join(", "));
+    if(el.tagName==="IMG") el.removeAttribute("loading");
+  });
+}
+function rewriteWikiLinks(container){
+  container.querySelectorAll("a[href]").forEach(a=>{
+    const href=a.getAttribute("href");
+    if(href.startsWith("/wiki/") && !href.includes(":")){
+      const title=decodeURIComponent(href.slice(6)).replace(/_/g," ").split("#")[0];
+      a.addEventListener("click",ev=>{
+        ev.preventDefault();
+        openReader({title, extract:"", thumb:null,
+          url:`https://${state.lang}.wikipedia.org/wiki/${encodeURIComponent(title)}`, lang:state.lang});
+      });
+    }else if(href.startsWith("/")){
+      a.setAttribute("href",`https://${state.lang}.wikipedia.org${href}`); a.target="_blank"; a.rel="noopener";
+    }else if(href.startsWith("#")){
+      a.addEventListener("click",ev=>{
+        ev.preventDefault();
+        const el=document.getElementById(decodeURIComponent(href.slice(1)));
+        if(el) el.scrollIntoView({behavior:"smooth"});
+      });
+    }else{ a.target="_blank"; a.rel="noopener"; }
+  });
+}
+$("#closeReader").addEventListener("click",closeReader);
+$("#readerStar").addEventListener("click",()=>{
+  if(currentReaderMeta){ toggleStar(currentReaderMeta); $("#readerStar").classList.toggle("on",!!state.stars[currentReaderMeta.title]); }
+});
+$("#readerColl").addEventListener("click",()=>{ if(currentReaderMeta) openCollectionPicker(currentReaderMeta); });
+$("#readerShare").addEventListener("click",()=>{ if(currentReaderMeta) shareArticle(currentReaderMeta); });
+
+/* ---------- quiz: "which article is described?" from recently read articles ---------- */
+function noteRead(meta){
+  if(meta.extract && meta.extract.length>80){
+    state.readPool=[{title:meta.title,extract:meta.extract,url:meta.url,lang:meta.lang},
+      ...state.readPool.filter(a=>a.title!==meta.title)].slice(0,24);
+    LS.set("wf_readpool",state.readPool);
+  }
+  state.openedSinceQuiz++;
+  if(state.openedSinceQuiz>=10 && state.readPool.filter(a=>a.extract&&a.extract.length>80).length>=4) offerQuiz();
+}
+function offerQuiz(){
+  state.openedSinceQuiz=0;
+  $("#btnQuiz").hidden=false;
+  toast(t("quizReady"));
+}
+function maskTitle(text,title){
+  const safe=title.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+  let t=text.replace(new RegExp(safe,"gi"),"…");
+  t=t.replace(/\s*\([^)]*\)/g," ").replace(/\s{2,}/g," ").trim();   // strip parentheticals
+  return t.length>240 ? t.slice(0,240).trim()+"…" : t;
+}
+function buildQuiz(){
+  const pool=state.readPool.filter(a=>a.extract&&a.extract.length>80);
+  const allTitles=[...new Set([...pool.map(a=>a.title),...Array.from(state.seen)])];
+  const picks=[...pool].sort(()=>Math.random()-0.5).slice(0,5);
+  const qs=[];
+  for(const a of picks){
+    const distract=allTitles.filter(t=>t!==a.title).sort(()=>Math.random()-0.5).slice(0,3);
+    if(distract.length<3) continue;
+    qs.push({desc:maskTitle(a.extract,a.title), answer:a.title,
+      options:[a.title,...distract].sort(()=>Math.random()-0.5)});
+  }
+  return qs;
+}
+let quizState=null;
+function startQuiz(){
+  const qs=buildQuiz();
+  if(qs.length<3){ toast(t("quizTooFew")); return; }
+  quizState={qs,idx:0,score:0};
+  const q=$("#quiz"); q.classList.add("open"); q.setAttribute("aria-hidden","false");
+  $("#btnQuiz").hidden=true;
+  document.body.style.overflow="hidden";
+  renderQuizQ();
+  trapFocus(q);
+}
+function closeQuiz(){
+  const q=$("#quiz"); if(!q.classList.contains("open")) return;
+  q.classList.remove("open"); q.setAttribute("aria-hidden","true");
+  document.body.style.overflow=""; quizState=null; releaseFocus();
+}
+function renderQuizQ(){
+  const {qs,idx}=quizState;
+  $("#quizProgress").textContent=`${idx+1} / ${qs.length}`;
+  const q=qs[idx];
+  $("#quizBody").innerHTML=`<div class="quiz-kicker">${esc(t("quizKicker"))}</div>
+    <p class="quiz-desc">${esc(q.desc)}</p><div id="quizOpts"></div>
+    <div class="quiz-actions" id="quizNextWrap"></div>`;
+  const opts=$("#quizOpts");
+  q.options.forEach((opt,i)=>{
+    const b=document.createElement("button"); b.className="quiz-opt focusable";
+    b.innerHTML=`<span class="quiz-letter">${"ABCD"[i]}</span><span class="qopt-label">${esc(opt)}</span><svg class="ic mark"><use href="#i-check"/></svg>`;
+    b.addEventListener("click",()=>answerQuiz(opt));
+    opts.appendChild(b);
+  });
+  $("#quiz .reader-scroll").scrollTop=0;
+}
+function answerQuiz(opt){
+  const opts=$("#quizOpts"); if(opts.dataset.done) return; opts.dataset.done="1";
+  const q=quizState.qs[quizState.idx];
+  [...opts.children].forEach(b=>{
+    b.disabled=true;
+    const label=b.querySelector(".qopt-label").textContent;
+    if(label===q.answer) b.classList.add("correct");
+    else if(label===opt) b.classList.add("wrong");
+  });
+  if(opt===q.answer) quizState.score++;
+  const next=document.createElement("button"); next.className="btn primary focusable";
+  next.textContent = quizState.idx<quizState.qs.length-1 ? t("next") : t("result");
+  next.addEventListener("click",()=>{
+    if(quizState.idx<quizState.qs.length-1){ quizState.idx++; renderQuizQ(); }
+    else renderQuizResult();
+  });
+  $("#quizNextWrap").appendChild(next);
+}
+function renderQuizResult(){
+  const {score,qs}=quizState;
+  $("#quizProgress").textContent="";
+  const msg = score===qs.length ? t("quizPerfect") : (score>=Math.ceil(qs.length*0.6) ? t("quizGood") : t("quizMeh"));
+  $("#quizBody").innerHTML=`<div class="quiz-result">
+    <div class="score">${score}/${qs.length}</div><p>${esc(msg)}</p>
+    <button class="btn primary focusable" id="quizDone">${esc(t("backToFeed"))}</button></div>`;
+  $("#quizDone").addEventListener("click",closeQuiz);
+  if(score===qs.length) burstConfetti();
+}
+$("#btnQuiz").addEventListener("click",startQuiz);
+$("#closeQuiz").addEventListener("click",closeQuiz);
+
+/* ---------- Lese-Rückblick: scroll story built from the user's own data ---------- */
+function fmtDur(sec){
+  const m=Math.round((sec||0)/60);
+  if(m<60) return m+" Min";
+  const h=Math.floor(m/60), mm=m%60; return mm ? `${h} Std ${mm} Min` : `${h} Std`;
+}
+function animateCount(el){
+  const target=+el.dataset.count||0;
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches || target<=0){ el.textContent=target.toLocaleString({de:"de-DE",en:"en-US",fr:"fr-FR"}[state.lang]||"de-DE"); return; }
+  const t0=performance.now(), dur=900;
+  (function step(now){
+    const p=Math.min(1,(now-t0)/dur), e=1-Math.pow(1-p,3);
+    el.textContent=Math.round(target*e).toLocaleString({de:"de-DE",en:"en-US",fr:"fr-FR"}[state.lang]||"de-DE");
+    if(p<1) requestAnimationFrame(step);
+  })(t0);
+}
+function buildRecap(){
+  const s=state.stats;
+  const cats=topEntries(state.profile.cats,5).filter(([,v])=>v>0);
+  const topTopic=cats[0]?cats[0][0]:null;
+  const starsTitles=Object.keys(state.stars);
+  const collCount=Object.keys(state.collections).length;
+  const collItems=Object.values(state.collections).reduce((a,b)=>a+b.length,0);
+  const sc=[];
+
+  sc.push(`<section class="recap-scene">
+    <div class="kicker">${esc(t("rkUmfang"))}</div>
+    <h2 class="headline"><span class="recap-num" data-count="${s.total||0}">0</span> ${esc(t("rArticlesOpened"))}</h2>
+    <p class="sub">${t("rSub1",fmtDur(s.totalSeconds))}</p>
+  </section>`);
+
+  const st=currentStreak();
+  sc.push(`<section class="recap-scene">
+    <div class="kicker">${esc(t("rkRhythm"))}</div>
+    <h2 class="headline"><span class="recap-num" data-count="${st}">0</span> ${esc(st===1?t("rDay"):t("rDays"))} ${esc(t("rInARow"))}</h2>
+    <p class="sub">${esc(t("rhyth",st))} ${t("rSub2",Math.floor((s.todaySeconds||0)/60))}</p>
+  </section>`);
+
+  if(cats.length){
+    const max=cats[0][1];
+    const bars=cats.map(([name,v])=>`<div class="recap-bar"><div class="lbl"><span>${esc(name)}</span></div><div class="track"><i style="--w:${Math.max(10,Math.round(v/max*100))}%"></i></div></div>`).join("");
+    sc.push(`<section class="recap-scene">
+      <div class="kicker">${esc(t("rkThemes"))}</div>
+      <h2 class="headline">${esc(t("rHeadThemes"))}</h2>
+      <p class="sub">${t("rSub3",esc(topTopic))}</p>
+      <div class="recap-bars">${bars}</div>
+    </section>`);
+  }
+
+  if(starsTitles.length){
+    const chips=starsTitles.slice(0,6).map((title,i)=>`<span class="recap-chip" style="transition-delay:${i*70}ms">${esc(title)}</span>`).join("");
+    sc.push(`<section class="recap-scene">
+      <div class="kicker">${esc(t("rkHigh"))}</div>
+      <h2 class="headline"><span class="recap-num" data-count="${starsTitles.length}">0</span> ${esc(t("rStarred"))}</h2>
+      <p class="sub">${t("rSub4",collItems,collCount)}</p>
+      <div class="recap-chips">${chips}</div>
+    </section>`);
+  }else if(state.readPool.length){
+    const chips=state.readPool.slice(0,6).map((a,i)=>`<span class="recap-chip" style="transition-delay:${i*70}ms">${esc(a.title)}</span>`).join("");
+    sc.push(`<section class="recap-scene">
+      <div class="kicker">${esc(t("rkRecent"))}</div>
+      <h2 class="headline">${esc(t("rHeadRecent"))}</h2>
+      <p class="sub">${esc(t("rSubRecent"))}</p>
+      <div class="recap-chips">${chips}</div>
+    </section>`);
+  }
+
+  const outHead = topTopic ? t("rMore",esc(topTopic)) : t("rRound2");
+  const quizReady = state.readPool.filter(a=>a.extract&&a.extract.length>80).length>=4;
+  sc.push(`<section class="recap-scene">
+    <div class="kicker">${esc(t("rkNext"))}</div>
+    <h2 class="headline">${outHead}</h2>
+    <p class="sub">${t("rSub5",!!topTopic)}</p>
+    <div class="recap-cta">
+      <button class="btn primary focusable" id="recapToFeed">${esc(t("backToFeed"))}</button>
+      ${quizReady?`<button class="btn focusable" id="recapToQuiz">${esc(t("startQuiz"))}</button>`:""}
+    </div>
+  </section>`);
+
+  const host=$("#recapScroll");
+  host.innerHTML=sc.join("");
+  const f=$("#recapToFeed"); if(f) f.addEventListener("click",closeRecap);
+  const q=$("#recapToQuiz"); if(q) q.addEventListener("click",()=>{ closeRecap(); startQuiz(); });
+
+  const io=new IntersectionObserver(es=>{
+    es.forEach(en=>{ if(en.isIntersecting){ en.target.classList.add("in"); en.target.querySelectorAll("[data-count]").forEach(animateCount); io.unobserve(en.target); }});
+  },{threshold:.35});
+  host.querySelectorAll(".recap-scene").forEach(s=>io.observe(s));
+
+  host.onscroll=function(){ const max=this.scrollHeight-this.clientHeight; $("#recapProgress").style.width=(max>0?this.scrollTop/max*100:0)+"%"; };
+}
+function openRecap(){
+  if((state.stats.total||0)<3){ toast(t("recapTooFew")); return; }
+  closeDrawer();
+  buildRecap();
+  const r=$("#recap"); r.classList.add("open"); r.setAttribute("aria-hidden","false");
+  $("#recapScroll").scrollTop=0; $("#recapProgress").style.width="0%";
+  document.body.style.overflow="hidden";
+  trapFocus(r);
+}
+function closeRecap(){ const r=$("#recap"); if(!r.classList.contains("open")) return; r.classList.remove("open"); r.setAttribute("aria-hidden","true"); document.body.style.overflow=""; releaseFocus(); }
+$("#openRecap").addEventListener("click",openRecap);
+$("#closeRecap").addEventListener("click",closeRecap);
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ if($("#recap").classList.contains("open")) closeRecap(); else if($("#quiz").classList.contains("open")) closeQuiz(); else if(reader.classList.contains("open")) closeReader(); else closeDrawer(); }});
+
+/* ---------- stars ---------- */
+function toggleStar(meta){
+  if(state.stars[meta.title]){ delete state.stars[meta.title]; signalStar(meta,false); toast(t("starRemoved")); }
+  else{ state.stars[meta.title]={title:meta.title,url:meta.url,lang:meta.lang}; signalStar(meta,true); toast(t("starred")); }
+  LS.set("wf_stars",state.stars);
+}
+
+/* ---------- collections ---------- */
+function inAnyCollection(title){
+  return Object.values(state.collections).some(arr=>arr.some(m=>m.title===title));
+}
+function saveCollections(){ LS.set("wf_collections",state.collections); updateCollBadge(); renderCollections(); }
+function updateCollBadge(){
+  const n=Object.values(state.collections).reduce((s,a)=>s+a.length,0);
+  const b=$("#collBadge"); if(n>0){ b.hidden=false; b.textContent=n; } else b.hidden=true;
+}
+function openCollectionPicker(meta,after){ showCollMenu(meta,after); }
+let collMenuEl=null;
+function showCollMenu(meta,after){
+  closeCollMenu();
+  const wrap=document.createElement("div");
+  wrap.className="onb open"; wrap.id="collMenu";
+  const names=Object.keys(state.collections);
+  wrap.innerHTML=`<div class="sheet glass" style="max-width:420px">
+    <div class="row" style="justify-content:space-between;margin-bottom:10px">
+      <h2 class="bebas" style="font-size:1.5rem">${esc(t("inCollection"))}</h2>
+      <button class="iconbtn" id="cmClose">${svgIc("i-x")}</button>
+    </div>
+    <p class="muted" style="margin-bottom:12px">„${esc(meta.title)}“</p>
+    <div id="cmList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px"></div>
+    <div class="row">
+      <input class="field" id="cmNew" placeholder="${esc(t("newCollPh"))}" style="flex:1;min-width:140px">
+      <button class="btn alt" id="cmAdd">${svgIc("i-plus")}</button>
+    </div>
+  </div>`;
+  document.body.appendChild(wrap); collMenuEl=wrap; trapFocus(wrap);
+  const list=wrap.querySelector("#cmList");
+  function row(name){
+    const has=state.collections[name].some(m=>m.title===meta.title);
+    const b=document.createElement("button");
+    b.className="btn focusable"+(has?" alt":"");
+    b.style.justifyContent="space-between";
+    b.innerHTML=`<span>${esc(name)}</span>${has?svgIc("i-x"):svgIc("i-plus")}`;
+    b.addEventListener("click",()=>{
+      const arr=state.collections[name];
+      const idx=arr.findIndex(m=>m.title===meta.title);
+      if(idx>=0){ arr.splice(idx,1); toast(t("removedFrom",name)); }
+      else{ arr.push({title:meta.title,url:meta.url,lang:meta.lang}); toast(t("addedTo",name)); }
+      saveCollections(); if(after) after();
+      // refresh menu
+      list.innerHTML=""; Object.keys(state.collections).forEach(n=>list.appendChild(row(n)));
+    });
+    return b;
+  }
+  names.forEach(n=>list.appendChild(row(n)));
+  wrap.querySelector("#cmClose").addEventListener("click",closeCollMenu);
+  wrap.addEventListener("click",e=>{ if(e.target===wrap) closeCollMenu(); });
+  wrap.querySelector("#cmAdd").addEventListener("click",()=>{
+    const v=wrap.querySelector("#cmNew").value.trim(); if(!v) return;
+    if(!state.collections[v]) state.collections[v]=[];
+    wrap.querySelector("#cmNew").value="";
+    saveCollections();
+    list.innerHTML=""; Object.keys(state.collections).forEach(n=>list.appendChild(row(n)));
+  });
+}
+function closeCollMenu(){ if(collMenuEl){ collMenuEl.remove(); collMenuEl=null; releaseFocus(); } }
+
+/* ---------- drawer (collections + profile) ---------- */
+const drawer=$("#drawer"), scrim=$("#scrim");
+function openDrawer(){ if(drawer.classList.contains("open")) return; renderCollections(); renderProfile(); renderInterestChips(); drawer.classList.add("open"); scrim.classList.add("open"); drawer.setAttribute("aria-hidden","false"); trapFocus(drawer); }
+function closeDrawer(){ if(!drawer.classList.contains("open")) return; drawer.classList.remove("open"); scrim.classList.remove("open"); drawer.setAttribute("aria-hidden","true"); releaseFocus(); }
+$("#btnColl").addEventListener("click",openDrawer);
+$("#closeDrawer").addEventListener("click",closeDrawer);
+scrim.addEventListener("click",closeDrawer);
+$("#newColl").addEventListener("click",async ()=>{
+  const name=await modalPrompt({title:t("newColl"),placeholder:t("collNamePh"),confirm:t("create")});
+  if(!name) return;
+  if(!state.collections[name]) state.collections[name]=[];
+  saveCollections();
+});
+function renderCollections(){
+  const host=$("#collList");
+  const names=Object.keys(state.collections);
+  if(names.length===0){ host.innerHTML=`<p class="muted">${esc(t("noColls"))}</p>`; updateCollBadge(); return; }
+  host.innerHTML="";
+  names.forEach(name=>{
+    const sec=document.createElement("div"); sec.style.marginBottom="12px";
+    const head=document.createElement("div"); head.className="row"; head.style.justifyContent="space-between";
+    head.innerHTML=`<strong class="bebas" style="font-size:1.05rem">${name}</strong>`;
+    const del=document.createElement("button"); del.className="mini focusable"; del.innerHTML=svgIc("i-trash");
+    del.title=t("deleteCollTitle"); del.setAttribute("aria-label",t("deleteCollTitle"));
+    del.addEventListener("click",async ()=>{ if(await modalConfirm({title:t("deleteCollTitle"),message:t("deleteCollMsg",name),confirm:t("del"),danger:true})){ delete state.collections[name]; saveCollections(); }});
+    head.appendChild(del); sec.appendChild(head);
+    const arr=state.collections[name];
+    if(arr.length===0){ const e=document.createElement("p"); e.className="muted"; e.textContent=t("empty"); sec.appendChild(e); }
+    arr.forEach(m=>{
+      const it=document.createElement("div"); it.className="coll-item";
+      const t=document.createElement("span"); t.className="ttl"; t.textContent=m.title;
+      t.addEventListener("click",()=>{ closeDrawer(); openReader(m); });
+      const rm=document.createElement("button"); rm.className="mini focusable"; rm.innerHTML=svgIc("i-x");
+      rm.addEventListener("click",()=>{ const i=arr.findIndex(x=>x.title===m.title); if(i>=0)arr.splice(i,1); saveCollections(); });
+      it.append(t,rm); sec.appendChild(it);
+    });
+    host.appendChild(sec);
+  });
+  updateCollBadge();
+}
+function renderProfile(){
+  const host=$("#profileBody");
+  const s=state.stats;
+  const mins=Math.floor((s.todaySeconds||0)/60);
+  const statsHtml=`<div class="statline">
+    <span class="stat"><b>${currentStreak()}</b>${esc(t("statStreak"))}</span>
+    <span class="stat"><b>${mins}</b>${esc(t("statToday"))}</span>
+    <span class="stat"><b>${s.total||0}</b>${esc(t("statArticles"))}</span>
+  </div>`;
+  const top=topEntries(state.profile.cats,7).filter(([,v])=>v>0);
+  const starCount=Object.keys(state.stars).length;
+  let body;
+  if(top.length===0){
+    body=`<p class="muted">${esc(t("noTopics"))}</p>`;
+  }else{
+    const max=top[0][1];
+    body = top.map(([name,v])=>`
+      <div class="topic-row">
+        <span class="name" title="${esc(name)}">${esc(name)}</span>
+        <span class="bar"><i style="width:${Math.max(8,Math.round(v/max*100))}%"></i></span>
+      </div>`).join("") + `<p class="muted" style="margin-top:8px">${esc(t("profileSummary",starCount,Object.keys(state.profile.seeds).length))}</p>`;
+  }
+  host.innerHTML = statsHtml + body;
+}
+
+/* ---------- interests ---------- */
+function renderInterestChips(){
+  const host=$("#interestChips"); host.innerHTML="";
+  const presets=PRESET_TOPICS[state.lang];
+  const all=Array.from(new Set([...state.interests,...presets]));
+  all.forEach(topic=>{
+    const c=document.createElement("button"); c.className="chip focusable"+(state.interests.includes(topic)?" sel":"");
+    c.textContent=topic;
+    c.addEventListener("click",()=>{
+      const i=state.interests.indexOf(topic);
+      if(i>=0) state.interests.splice(i,1); else state.interests.push(topic);
+      LS.set("wf_interests",state.interests); renderInterestChips();
+    });
+    host.appendChild(c);
+  });
+}
+
+/* ---------- theme & lang ---------- */
+function applyTheme(){
+  document.documentElement.classList.toggle("dark",state.theme==="dark");
+  $("#btnTheme").querySelector("use").setAttribute("href",state.theme==="dark"?"#i-sun":"#i-moon");
+}
+$("#btnTheme").addEventListener("click",()=>{ state.theme=state.theme==="dark"?"light":"dark"; LS.set("wf_theme",state.theme); applyTheme(); });
+// Topbar switch = ARTICLE language (Wikipedia source). UI stays as is.
+document.querySelectorAll("#langSeg button").forEach(b=>{
+  b.addEventListener("click",()=>{
+    if(b.dataset.lang===state.lang) return;
+    state.lang=b.dataset.lang; LS.set("wf_lang",state.lang);
+    document.querySelectorAll("#langSeg button").forEach(x=>x.classList.toggle("active",x===b));
+    renderInterestChips();              // preset topics follow the content wiki
+    resetFeed();
+    toast(WIKI_NAMES[state.lang]);
+  });
+});
+// Drawer switch = INTERFACE language only. Article source stays as is.
+document.querySelectorAll("#uiLangSeg button").forEach(b=>{
+  b.addEventListener("click",()=>{
+    if(b.dataset.uilang===state.uiLang) return;
+    state.uiLang=b.dataset.uilang; LS.set("wf_uilang",state.uiLang);
+    document.querySelectorAll("#uiLangSeg button").forEach(x=>x.classList.toggle("active",x===b));
+    document.documentElement.lang=state.uiLang;
+    applyStaticI18n();
+    renderProfile(); renderCollections();
+  });
+});
+
+/* ---------- search / jump to topic (feed-app style: live suggestions + recents) ---------- */
+function addRecent(term){
+  term=(term||"").trim(); if(!term) return;
+  state.recent=[term,...(state.recent||[]).filter(t=>t.toLowerCase()!==term.toLowerCase())].slice(0,8);
+  LS.set("wf_recent",state.recent);
+}
+function openSearch(){
+  $("#searchBar").hidden=false;
+  const i=$("#searchInput"); i.focus(); i.select();
+  if(i.value.trim().length>=2) renderSuggest(i.value); else renderRecent();
+}
+function closeSearch(){ $("#searchBar").hidden=true; $("#searchResults").hidden=true; }
+function doSearch(term){
+  term=(term||"").trim(); if(!term) return;
+  addRecent(term);
+  state.pendingStrategies=[{type:"search",term},{type:"search",term}];
+  closeSearch();
+  resetFeed();
+  window.scrollTo({top:0,behavior:"smooth"});
+  toast(t("searchToast",term));
+}
+function renderRecent(){
+  const box=$("#searchResults"); const r=state.recent||[];
+  if(r.length===0){ box.hidden=true; box.innerHTML=""; return; }
+  box.hidden=false;
+  box.innerHTML=`<div class="search-head">${esc(t("recentSearches"))}</div><div class="search-recent"></div>`;
+  const wrap=box.querySelector(".search-recent");
+  r.forEach(t=>{
+    const c=document.createElement("button"); c.className="chip focusable"; c.textContent=t;
+    c.addEventListener("click",()=>{ $("#searchInput").value=t; renderSuggest(t); });
+    wrap.appendChild(c);
+  });
+}
+let suggestSeq=0, suggestTimer=null;
+async function renderSuggest(term){
+  term=(term||"").trim();
+  const box=$("#searchResults");
+  if(term.length<2){ renderRecent(); return; }
+  const my=++suggestSeq;
+  let res=[];
+  try{ res=await fetchSuggest(term); }catch(e){ return; }
+  if(my!==suggestSeq) return;            // a newer keystroke superseded this
+  box.hidden=false;
+  if(res.length===0){ box.innerHTML=`<div class="search-head">${esc(t("noResults"))}</div>`; return; }
+  box.innerHTML="";
+  res.forEach(meta=>{
+    const row=document.createElement("div"); row.className="sresult focusable"; row.tabIndex=0;
+    const thumb = meta.thumb ? `<img src="${esc(meta.thumb)}" alt="">` : `<div class="ph"></div>`;
+    const sub = meta.extract ? esc(meta.extract.slice(0,90)) : "";
+    row.innerHTML=`${thumb}<div class="st"><b>${esc(meta.title)}</b><span>${sub}</span></div>`;
+    const go=()=>{ addRecent(term); closeSearch(); openReader(meta); };
+    row.addEventListener("click",go);
+    row.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); go(); } });
+    box.appendChild(row);
+  });
+}
+$("#btnSearch").addEventListener("click",()=>{
+  if($("#searchBar").hidden) openSearch(); else closeSearch();
+});
+$("#searchGo").addEventListener("click",()=>doSearch($("#searchInput").value));
+$("#searchClose").addEventListener("click",closeSearch);
+$("#searchInput").addEventListener("input",e=>{
+  clearTimeout(suggestTimer);
+  const v=e.target.value;
+  suggestTimer=setTimeout(()=>renderSuggest(v),220);
+});
+$("#searchInput").addEventListener("keydown",e=>{
+  if(e.key==="Enter") doSearch(e.target.value);
+  if(e.key==="Escape") closeSearch();
+});
+
+/* ---------- onboarding ---------- */
+function renderOnbChips(){
+  const host=$("#onbChips"); host.innerHTML="";
+  const presets=PRESET_TOPICS[state.lang];
+  const all=Array.from(new Set([...state.interests,...presets]));
+  all.forEach(topic=>{
+    const c=document.createElement("button"); c.className="chip focusable"+(state.interests.includes(topic)?" sel":"");
+    c.textContent=topic;
+    c.addEventListener("click",()=>{
+      const i=state.interests.indexOf(topic);
+      if(i>=0) state.interests.splice(i,1); else state.interests.push(topic);
+      c.classList.toggle("sel");
+    });
+    host.appendChild(c);
+  });
+}
+$("#onbAdd").addEventListener("click",()=>{
+  const v=$("#onbCustom").value.trim(); if(!v) return;
+  if(!state.interests.includes(v)) state.interests.push(v);
+  $("#onbCustom").value=""; renderOnbChips();
+});
+$("#onbCustom").addEventListener("keydown",e=>{ if(e.key==="Enter") $("#onbAdd").click(); });
+function finishOnb(){
+  LS.set("wf_interests",state.interests);
+  LS.set("wf_onboarded",true);
+  $("#onb").classList.remove("open");
+  releaseFocus();
+  resetFeed();
+}
+$("#onbStart").addEventListener("click",finishOnb);
+$("#onbSkip").addEventListener("click",finishOnb);
+$("#resetProfile").addEventListener("click",async ()=>{
+  if(!await modalConfirm({title:t("resetProfile"),message:t("resetConfirm"),confirm:t("reset"),danger:true})) return;
+  state.profile={seeds:{},cats:{}}; state.stars={}; state.disliked={}; state.exploit=0.5;
+  Object.keys(dwellAccum).forEach(k=>delete dwellAccum[k]);
+  saveProfile(); LS.set("wf_stars",state.stars); LS.set("wf_disliked",state.disliked); LS.set("wf_exploit",state.exploit);
+  renderProfile(); toast(t("profileReset")); resetFeed();
+});
+
+/* ---------- infinite scroll ---------- */
+const sentinel=$("#sentinel");
+new IntersectionObserver((entries)=>{
+  if(entries[0].isIntersecting) loadMore();
+},{rootMargin:"800px 0px"}).observe(sentinel);
+
+/* ---------- init ---------- */
+function init(){
+  try{
+    console.log("%cWikiFeed","font:700 24px system-ui;color:#ff6b35");
+    console.log("%c"+t("consoleMsg"),"color:#1557ff;font-weight:600;font-size:13px");
+  }catch(e){}
+  applyTheme();
+  document.documentElement.lang=state.uiLang;
+  document.querySelectorAll("#langSeg button").forEach(x=>x.classList.toggle("active",x.dataset.lang===state.lang));
+  document.querySelectorAll("#uiLangSeg button").forEach(x=>x.classList.toggle("active",x.dataset.uilang===state.uiLang));
+  applyStaticI18n();
+  state.surpriseAt=randInt(4,8);
+  updateCollBadge();
+  if(!LS.get("wf_onboarded",false)){
+    renderOnbChips();
+    $("#onb").classList.add("open");
+    trapFocus($("#onb"));
+  }else{
+    resetFeed();
+  }
+}
+init();
+
+/* PWA: register service worker only on a real (https/localhost) origin — never from file:// */
+if(("serviceWorker" in navigator) && (location.protocol==="https:" || location.hostname==="localhost")){
+  window.addEventListener("load",()=>{ navigator.serviceWorker.register("sw.js").catch(()=>{}); });
+}
+</script>
+</body>
+</html>
