@@ -1,4 +1,4 @@
-# WikiFeed
+# Wikidoomia
 
 An endless, learning Wikipedia feed — abstracts first, the full article on tap. The feed adapts to your behaviour entirely on-device (no server, no accounts), with search, collections, an A/B/C/D quiz, a reading recap, and a gentle "had enough for today?" nudge.
 
