@@ -21,19 +21,6 @@ Alles läuft in einer einzigen `index.html` — kein Build, kein Backend. Person
 
 Einfach `index.html` im Browser öffnen — funktioniert direkt vom Dateisystem (Daten werden per JSONP geladen, daher kein CORS-Problem).
 
-Für PWA/Service-Worker einen lokalen Server nutzen:
-
-```bash
-python3 -m http.server 8000
-# dann http://localhost:8000 öffnen
-```
-
-## Auf GitHub Pages veröffentlichen
-
-1. Repo-Inhalt pushen (siehe unten).
-2. In den Repo-Einstellungen unter **Pages** als Quelle den `main`-Branch / Root wählen.
-3. Die App ist dann unter `https://<user>.github.io/<repo>/` erreichbar — inkl. Installierbarkeit.
-
 ## Datenschutz
 
 Es werden keine personenbezogenen Daten an einen Server gesendet. Alle Präferenzen bleiben lokal im Browser. Inhalte stammen direkt von der Wikipedia-API.
