@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>WikiFeed</title>
+<title>Wikidoomia</title>
 <meta name="description" content="Ein endloser, lernender Wikipedia-Feed.">
 <meta name="theme-color" content="#f4f4f2" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#15171d" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="WikiFeed">
+<meta name="apple-mobile-web-app-title" content="Wikidoomia">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -555,7 +555,7 @@
 
 <header class="topbar glass">
   <div class="brand">
-    <span class="logo bebas">Wiki<span class="ac">Feed</span></span>
+    <span class="logo bebas">Wiki<span class="ac">doomia</span></span>
     <span class="sub" data-i18n="brandSub">dein Wissens‑Feed</span>
   </div>
   <div class="seg" id="langSeg" role="group" data-i18n-aria="articleLang" data-i18n-title="articleLang" aria-label="Sprache" title="Artikelsprache">
@@ -593,7 +593,7 @@
 <div class="scrim" id="scrim"></div>
 <aside class="drawer glass" id="drawer" aria-hidden="true" data-i18n-aria="collProfile" aria-label="Sammlungen und Profil">
   <div class="drawer-head">
-    <h2 class="bebas" data-i18n="myFeed">Mein WikiFeed</h2>
+    <h2 class="bebas" data-i18n="myFeed">Mein Wikidoomia</h2>
     <button class="iconbtn focusable" id="closeDrawer" data-i18n-aria="close" aria-label="Schließen"><svg class="ic"><use href="#i-x"/></svg></button>
   </div>
   <div class="drawer-scroll">
@@ -667,7 +667,7 @@
 <!-- Onboarding -->
 <div class="onb" id="onb">
   <div class="sheet glass">
-    <h2 class="bebas" data-i18n="welcome">Willkommen bei WikiFeed</h2>
+    <h2 class="bebas" data-i18n="welcome">Willkommen bei Wikidoomia</h2>
     <p class="lead" data-i18n="onbLead">Wähle ein paar Themen für den Start.</p>
     <div class="chips" id="onbChips" style="margin-bottom:14px"></div>
     <div class="row" style="margin-bottom:14px">
@@ -686,7 +686,7 @@
 <script>
 "use strict";
 /* ============================================================
-   WikiFeed — Wikipedia endless feed with on-device personalization
+   Wikidoomia — Wikipedia endless feed with on-device personalization
    Signals: star (strongest) > open article (medium) > dwell (weakest)
    ============================================================ */
 
@@ -708,12 +708,12 @@ const I18N = {
     brandSub:"dein Wissens‑Feed", langGroup:"Sprache", articleLang:"Artikelsprache", uiLanguage:"Sprache der Oberfläche",
     startQuiz:"Quiz starten", search:"Suchen", collProfile:"Sammlungen & Profil",
     theme:"Hell/Dunkel", themeAria:"Theme wechseln", searchPh:"Auf Wikipedia suchen…", close:"Schließen",
-    myFeed:"Mein WikiFeed", topicProfile:"Dein Themenprofil", recapBtn:"Mein Lese-Rückblick",
+    myFeed:"Mein Wikidoomia", topicProfile:"Dein Themenprofil", recapBtn:"Mein Lese-Rückblick",
     collections:"Sammlungen", newColl:"Neue Sammlung", noColls:"Noch keine Sammlungen.",
     interests:"Interessen", resetProfile:"Profil zurücksetzen",
     backToFeed:"Zurück zum Feed", starMark:"Mit Stern markieren", toCollection:"Zu Sammlung",
     share:"Teilen", openWiki:"Auf Wikipedia öffnen", closeQuizAria:"Quiz schließen", quiz:"Quiz",
-    welcome:"Willkommen bei WikiFeed", onbLead:"Wähle ein paar Themen für den Start.",
+    welcome:"Willkommen bei Wikidoomia", onbLead:"Wähle ein paar Themen für den Start.",
     onbCustomPh:"Eigenes Thema hinzufügen…", skip:"Überspringen", startFeed:"Feed starten",
     readFull:"Ganzen Artikel lesen", forYou:"Für dich", forYouTitle:"Auf Basis deiner geöffneten und markierten Artikel",
     serendipity:"Zufallsfund", serendipityTitle:"Zufallsfund zum Stöbern", lessLikeThis:"Weniger davon",
@@ -756,12 +756,12 @@ const I18N = {
     brandSub:"your knowledge feed", langGroup:"Language", articleLang:"Article language", uiLanguage:"Interface language",
     startQuiz:"Start quiz", search:"Search", collProfile:"Collections & profile",
     theme:"Light/Dark", themeAria:"Toggle theme", searchPh:"Search Wikipedia…", close:"Close",
-    myFeed:"My WikiFeed", topicProfile:"Your topic profile", recapBtn:"My reading recap",
+    myFeed:"My Wikidoomia", topicProfile:"Your topic profile", recapBtn:"My reading recap",
     collections:"Collections", newColl:"New collection", noColls:"No collections yet.",
     interests:"Interests", resetProfile:"Reset profile",
     backToFeed:"Back to the feed", starMark:"Mark with a star", toCollection:"Add to collection",
     share:"Share", openWiki:"Open on Wikipedia", closeQuizAria:"Close quiz", quiz:"Quiz",
-    welcome:"Welcome to WikiFeed", onbLead:"Pick a few topics to start.",
+    welcome:"Welcome to Wikidoomia", onbLead:"Pick a few topics to start.",
     onbCustomPh:"Add your own topic…", skip:"Skip", startFeed:"Start the feed",
     readFull:"Read the full article", forYou:"For you", forYouTitle:"Based on the articles you open and star",
     serendipity:"Random find", serendipityTitle:"A random find to explore", lessLikeThis:"Less like this",
@@ -804,12 +804,12 @@ const I18N = {
     brandSub:"ton fil de savoir", langGroup:"Langue", articleLang:"Langue des articles", uiLanguage:"Langue de l'interface",
     startQuiz:"Lancer le quiz", search:"Rechercher", collProfile:"Collections et profil",
     theme:"Clair/Sombre", themeAria:"Changer de thème", searchPh:"Rechercher sur Wikipédia…", close:"Fermer",
-    myFeed:"Mon WikiFeed", topicProfile:"Ton profil thématique", recapBtn:"Mon bilan de lecture",
+    myFeed:"Mon Wikidoomia", topicProfile:"Ton profil thématique", recapBtn:"Mon bilan de lecture",
     collections:"Collections", newColl:"Nouvelle collection", noColls:"Pas encore de collections.",
     interests:"Centres d'intérêt", resetProfile:"Réinitialiser le profil",
     backToFeed:"Retour au fil", starMark:"Marquer d'une étoile", toCollection:"Ajouter à une collection",
     share:"Partager", openWiki:"Ouvrir sur Wikipédia", closeQuizAria:"Fermer le quiz", quiz:"Quiz",
-    welcome:"Bienvenue sur WikiFeed", onbLead:"Choisis quelques thèmes pour commencer.",
+    welcome:"Bienvenue sur Wikidoomia", onbLead:"Choisis quelques thèmes pour commencer.",
     onbCustomPh:"Ajouter ton propre thème…", skip:"Passer", startFeed:"Démarrer le fil",
     readFull:"Lire l'article complet", forYou:"Pour toi", forYouTitle:"D'après les articles que tu ouvres et marques",
     serendipity:"Trouvaille", serendipityTitle:"Une trouvaille à explorer", lessLikeThis:"Moins de ça",
@@ -2004,7 +2004,7 @@ new IntersectionObserver((entries)=>{
 /* ---------- init ---------- */
 function init(){
   try{
-    console.log("%cWikiFeed","font:700 24px system-ui;color:#ff6b35");
+    console.log("%cWikidoomia","font:700 24px system-ui;color:#ff6b35");
     console.log("%c"+t("consoleMsg"),"color:#1557ff;font-weight:600;font-size:13px");
   }catch(e){}
   applyTheme();

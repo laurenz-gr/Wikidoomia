@@ -49,6 +49,24 @@ python3 -m http.server 8000
 
 Being a static site, it can be hosted on any static host (e.g. GitHub Pages); the PWA/install support requires serving it over HTTPS.
 
+## Accessibility
+
+- Keyboard focus is trapped inside open overlays and restored on close; all controls are reachable and labelled.
+- Colour contrast meets WCAG 2.1 AA for text in both themes.
+- Motion (confetti, count-ups, transitions) is disabled under `prefers-reduced-motion`.
+
+## Project structure
+
+```
+.
+├── index.html      # the entire app
+├── manifest.json   # PWA manifest
+├── sw.js           # service worker (offline app shell)
+├── icons/          # app icons (192, 512, maskable, apple-touch)
+├── README.md
+└── LICENSE
+```
+
 ## Privacy
 
 No personal data is sent to any server. All preferences live in your browser. Article content is fetched directly from Wikipedia.
@@ -56,4 +74,4 @@ No personal data is sent to any server. All preferences live in your browser. Ar
 ## License & content
 
 - Code is released under the [MIT License](LICENSE).
-- Article content comes from Wikipedia and is licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). WikiFeed displays it and links back to the original article.
+- Article content comes from Wikipedia and is licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Wikidoomia displays it and links back to the original article.

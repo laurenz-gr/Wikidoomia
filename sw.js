@@ -1,4 +1,4 @@
-/* WikiFeed service worker — app-shell offline + font caching.
+/* Wikidoomia service worker — app-shell offline + font caching.
    Note: Wikipedia content is fetched via JSONP (unique callback per request),
    so it is intentionally never cached; offline shows the in-app retry state. */
 const VERSION = "wikifeed-v1";

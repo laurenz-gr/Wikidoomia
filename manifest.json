@@ -1,6 +1,6 @@
 {
-  "name": "WikiFeed",
-  "short_name": "WikiFeed",
+  "name": "Wikidoomia",
+  "short_name": "Wikidoomia",
   "description": "Ein endloser, lernender Wikipedia-Feed.",
   "start_url": ".",
   "scope": ".",
