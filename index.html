@@ -227,6 +227,19 @@
   .reason.explore{color:var(--accent2)}
   .reason.surprise{color:var(--gold-text)}
   .reason.trending{color:var(--accent2)}
+  .reason.tfa{color:var(--accent-text)}
+
+  .digest{padding:16px 18px}
+  .digest-head{display:flex;align-items:center;gap:8px;font-weight:900;font-size:13px;text-transform:uppercase;letter-spacing:.03em;color:var(--accent2);margin-bottom:12px}
+  .digest-head .ic{width:17px;height:17px}
+  .digest-sec{margin-bottom:14px}
+  .digest-sec:last-child{margin-bottom:0}
+  .digest-sec h3{font-size:1.05rem;margin:0 0 4px}
+  .digest-sec ul{list-style:none;margin:0;padding:0}
+  .digest-sec li{font-size:14px;line-height:1.45;padding:5px 0;border-bottom:1px solid color-mix(in srgb,var(--muted) 16%,transparent)}
+  .digest-sec li:last-child{border-bottom:0}
+  .digest-link{background:none;border:0;padding:0;text-align:left;color:var(--ink);font:inherit;font-size:14px;line-height:1.45;cursor:pointer}
+  .digest-link:hover{color:var(--accent2);text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:2px}
   .langtag{
     position:absolute; top:12px; right:12px; z-index:2;
     padding:4px 9px; border-radius:8px; font-size:11px; font-weight:900;
@@ -753,6 +766,7 @@ const I18N = {
     readFull:"Ganzen Artikel lesen", forYou:"Für dich", forYouTitle:"Auf Basis deiner geöffneten und markierten Artikel",
     serendipity:"Zufallsfund", serendipityTitle:"Zufallsfund zum Stöbern", lessLikeThis:"Weniger davon",
     trending:"Viel gelesen", trendingTitle:"Aktuell viel gelesen auf Wikipedia",
+    featuredToday:"Heute auf Wikipedia", tfaLabel:"Artikel des Tages", secNews:"In den Nachrichten", secOnThisDay:"Was geschah heute", secDyk:"Schon gewusst?",
     loadingArticle:"Lade Artikel…", loadFail:"Konnte den Artikel nicht laden.", loadErr:"Fehler beim Laden.",
     starRemoved:"Stern entfernt", starred:"★ Mit Stern markiert", linkCopied:"Link kopiert",
     removedFrom:n=>`Aus „${n}“ entfernt`, addedTo:n=>`Zu „${n}“ hinzugefügt`,
@@ -804,6 +818,7 @@ const I18N = {
     readFull:"Read the full article", forYou:"For you", forYouTitle:"Based on the articles you open and star",
     serendipity:"Random find", serendipityTitle:"A random find to explore", lessLikeThis:"Less like this",
     trending:"Trending", trendingTitle:"Currently most-read on Wikipedia",
+    featuredToday:"Today on Wikipedia", tfaLabel:"Featured article", secNews:"In the news", secOnThisDay:"On this day", secDyk:"Did you know?",
     loadingArticle:"Loading article…", loadFail:"Couldn't load the article.", loadErr:"Loading error.",
     starRemoved:"Star removed", starred:"★ Starred", linkCopied:"Link copied",
     removedFrom:n=>`Removed from “${n}”`, addedTo:n=>`Added to “${n}”`,
@@ -855,6 +870,7 @@ const I18N = {
     readFull:"Lire l'article complet", forYou:"Pour toi", forYouTitle:"D'après les articles que tu ouvres et marques",
     serendipity:"Trouvaille", serendipityTitle:"Une trouvaille à explorer", lessLikeThis:"Moins de ça",
     trending:"Populaire", trendingTitle:"Très lu en ce moment sur Wikipédia",
+    featuredToday:"Aujourd'hui sur Wikipédia", tfaLabel:"Article du jour", secNews:"Actualités", secOnThisDay:"Éphéméride", secDyk:"Le saviez-vous ?",
     loadingArticle:"Chargement de l'article…", loadFail:"Impossible de charger l'article.", loadErr:"Erreur de chargement.",
     starRemoved:"Étoile retirée", starred:"★ Marqué d'une étoile", linkCopied:"Lien copié",
     removedFrom:n=>`Retiré de « ${n} »`, addedTo:n=>`Ajouté à « ${n} »`,
@@ -934,6 +950,8 @@ const state = {
   trendingAt:16,
   trendingCache:[],                      // prefetched most-viewed articles
   wantTrendingFirst:false,               // show a trending hook as the first card
+  featuredCache:null,                    // REST feed/featured (TFA, news, on-this-day, did-you-know)
+  wantFeaturedFirst:false,               // show the "today on Wikipedia" cluster first
   sessionCards:0,                        // cards seen this session (pause nudge)
   nextPauseAt:30,
   queueBusy:false,
@@ -1217,6 +1235,59 @@ async function nextTrending(){
   }
   return null;
 }
+/* REST feed/featured — Wikipedia start-page content. CORS (no JSONP); works on http(s)
+   and from file:// in Chromium/Firefox. Fails gracefully (returns null) if blocked. */
+async function fetchFeatured(){
+  const lang=state.lang;
+  if(state.featuredCache && state.featuredCache.lang===lang) return state.featuredCache;
+  const n=new Date(), y=n.getFullYear(), m=String(n.getMonth()+1).padStart(2,"0"), dd=String(n.getDate()).padStart(2,"0");
+  let data;
+  try{
+    const r=await fetch(`https://${lang}.wikipedia.org/api/rest_v1/feed/featured/${y}/${m}/${dd}`,{headers:{Accept:"application/json"}});
+    if(!r.ok) throw 0; data=await r.json();
+  }catch(e){ return null; }
+  const tmp=document.createElement("div");
+  const txt=h=>{ tmp.innerHTML=h||""; return (tmp.textContent||"").trim(); };
+  const linkFromHtml=h=>{ tmp.innerHTML=h||""; const a=tmp.querySelector('a[href]'); if(!a) return null; let x=a.getAttribute("href")||""; x=x.replace(/^\.\//,"").replace(/^.*\/wiki\//,""); x=decodeURIComponent(x.split("#")[0]); return x?x.replace(/_/g," "):null; };
+  const pageTitle=p=>p && (p.normalizedtitle || (p.titles&&p.titles.normalized) || (p.title||"").replace(/_/g," ")) || null;
+  const tfa=data.tfa ? {
+    title: data.tfa.normalizedtitle || (data.tfa.title||"").replace(/_/g," "),
+    extract:(data.tfa.extract||"").trim(),
+    thumb:(data.tfa.thumbnail&&data.tfa.thumbnail.source)||null,
+    url:(data.tfa.content_urls&&data.tfa.content_urls.desktop&&data.tfa.content_urls.desktop.page)||`https://${lang}.wikipedia.org/wiki/${encodeURIComponent(data.tfa.title||"")}`,
+    lang
+  } : null;
+  const news=(data.news||[]).slice(0,4).map(it=>({ text:txt(it.story), title:(it.links&&it.links[0]&&pageTitle(it.links[0]))||linkFromHtml(it.story) }));
+  const onthisday=(data.onthisday||[]).slice(0,4).map(it=>({ text:`${it.year} — ${it.text}`, title:(it.pages&&it.pages[0]&&pageTitle(it.pages[0]))||null }));
+  const dyk=(data.dyk||[]).slice(0,4).map(it=>({ text:txt(it.html||it.text), title:linkFromHtml(it.html) }));
+  state.featuredCache={lang, tfa, news, onthisday, dyk};
+  return state.featuredCache;
+}
+function openByTitle(title,lang){
+  openReader({title, extract:"", url:`https://${lang}.wikipedia.org/wiki/${encodeURIComponent(title)}`, lang});
+}
+function buildDigestCard(f){
+  const card=document.createElement("article"); card.className="card glass digest";
+  card.innerHTML=`<div class="digest-head">${svgIc("i-ext")} ${esc(t("featuredToday"))}</div>`;
+  const secs=[[t("secNews"),f.news],[t("secOnThisDay"),f.onthisday],[t("secDyk"),f.dyk]].filter(s=>s[1]&&s[1].length);
+  secs.forEach(([label,items])=>{
+    const sec=document.createElement("div"); sec.className="digest-sec";
+    sec.innerHTML=`<h3 class="bebas">${esc(label)}</h3>`;
+    const ul=document.createElement("ul");
+    items.forEach(it=>{
+      if(!it.text) return;
+      const li=document.createElement("li");
+      if(it.title){
+        const a=document.createElement("button"); a.className="digest-link focusable"; a.textContent=it.text;
+        a.addEventListener("click",()=>openByTitle(it.title,f.lang));
+        li.appendChild(a);
+      }else li.textContent=it.text;
+      ul.appendChild(li);
+    });
+    sec.appendChild(ul); card.appendChild(sec);
+  });
+  return card;
+}
 async function fetchSuggest(term,n=8){
   const j=await apiGet({action:"query", generator:"prefixsearch", gpssearch:term, gpslimit:n,
     prop:"extracts|pageimages|info", exintro:1, explaintext:1, exlimit:"max",
@@ -1347,7 +1418,7 @@ function articleCard(meta, reason, seed){
   // Rhythm: feature (big, overlaid title) for serendipity finds with an image;
   // compact (no image) for thumbnail-less articles; standard otherwise.
   const starred=!!state.stars[meta.title];
-  const variant = ((reason==="serendipity"||reason==="trending") && meta.thumb) ? "feature" : (meta.thumb ? "standard" : "compact");
+  const variant = ((reason==="serendipity"||reason==="trending"||reason==="tfa") && meta.thumb) ? "feature" : (meta.thumb ? "standard" : "compact");
   card.className="card glass v-"+variant+(starred?" is-starred":"");
 
   // Subtle hints only — most cards carry no badge at all.
@@ -1355,6 +1426,7 @@ function articleCard(meta, reason, seed){
   if(reason==="foryou") reasonHtml=`<span class="reason foryou" title="${esc(t("forYouTitle"))}">${svgIc("i-sparkles")} ${esc(t("forYou"))}</span>`;
   else if(reason==="serendipity") reasonHtml=`<span class="reason surprise" title="${esc(t("serendipityTitle"))}">${svgIc("i-compass")} ${esc(t("serendipity"))}</span>`;
   else if(reason==="trending") reasonHtml=`<span class="reason trending" title="${esc(t("trendingTitle"))}">${svgIc("i-trend")} ${esc(t("trending"))}</span>`;
+  else if(reason==="tfa") reasonHtml=`<span class="reason tfa">${svgIc("i-sparkles")} ${esc(t("tfaLabel"))}</span>`;
   const langHtml=`<span class="langtag">${meta.lang.toUpperCase()}</span>`;
 
   if(variant!=="compact"){
@@ -1451,6 +1523,23 @@ async function loadMore(){
 
   let attempts=0, added=0;
   try{
+    // one-shot "Today on Wikipedia" cluster on a fresh feed (article of the day + digest)
+    if(state.wantFeaturedFirst && state.pendingStrategies.length===0 && feedEl.querySelectorAll(".card").length===0){
+      state.wantFeaturedFirst=false;
+      const f=await fetchFeatured();
+      if(gen!==state.feedGen){ skels.forEach(s=>s.remove()); state.queueBusy=false; return; }
+      if(f){
+        if(f.tfa && f.tfa.extract && !state.seen.has(f.tfa.title) && !state.disliked[f.tfa.title]){
+          state.seen.add(f.tfa.title);
+          feedEl.insertBefore(articleCard(f.tfa,"tfa",null), skels[0]||null);
+          added++; state.sessionCards++;
+        }
+        if((f.news&&f.news.length)||(f.onthisday&&f.onthisday.length)||(f.dyk&&f.dyk.length)){
+          feedEl.insertBefore(buildDigestCard(f), skels[0]||null);
+        }
+        state.wantTrendingFirst=false;   // avoid stacking another big hook right after
+      }
+    }
     while(added<4 && attempts<6){
       attempts++;
       const noPending = state.pendingStrategies.length===0;
@@ -1535,6 +1624,7 @@ function resetFeed(){
   state.cardsSinceSurprise=0; state.surpriseAt=randInt(4,8);
   state.cardsSinceTrending=0; state.trendingAt=randInt(14,22);
   state.trendingCache=[]; state.wantTrendingFirst=true;   // fresh hook each reset (language switch refetches)
+  state.featuredCache=null; state.wantFeaturedFirst=true; // "today on Wikipedia" cluster on fresh feed
   feedEl.innerHTML="";
   loadMore().then(()=>loadMore());
 }
