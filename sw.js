@@ -1,7 +1,7 @@
 /* Wikidoomia service worker — app-shell offline + font caching.
    Note: Wikipedia content is fetched via JSONP (unique callback per request),
    so it is intentionally never cached; offline shows the in-app retry state. */
-const VERSION = "wikifeed-v1";
+const VERSION = "wikifeed-v2";
 const SHELL = [
   "./",
   "index.html",
@@ -44,12 +44,17 @@ self.addEventListener("fetch", (e) => {
     return;
   }
 
-  // Same-origin app shell — cache-first, then network, then index.html for navigations.
+  // Same-origin: network-first for the HTML document (so updates always arrive when
+  // online), cache-first for other static assets, with an offline fallback to the shell.
   if (url.origin === self.location.origin) {
-    e.respondWith(
-      caches.match(req).then((c) =>
-        c || fetch(req).catch(() => (req.mode === "navigate" ? caches.match("index.html") : undefined))
-      )
-    );
+    if (req.mode === "navigate" || req.destination === "document") {
+      e.respondWith(
+        fetch(req)
+          .then((r) => { const cp = r.clone(); caches.open(VERSION).then((c) => c.put("index.html", cp)); return r; })
+          .catch(() => caches.match(req).then((c) => c || caches.match("index.html")))
+      );
+      return;
+    }
+    e.respondWith(caches.match(req).then((c) => c || fetch(req)));
   }
 });
