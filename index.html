@@ -108,11 +108,14 @@
     padding:10px max(14px,env(safe-area-inset-left));
     border-radius:0 0 16px 16px;
     margin:0 0 8px;
+    transition:transform .3s cubic-bezier(.2,.8,.2,1);
   }
-  .brand{display:flex; align-items:baseline; gap:8px; margin-right:auto; min-width:0}
+  .topbar.hidden{transform:translateY(-120%)}
+  .brand{display:flex; align-items:baseline; gap:8px; margin-right:auto; min-width:0; overflow:hidden}
   .brand .logo{
     font-size:1.9rem; line-height:.9;
     color:var(--ink);
+    white-space:nowrap;
   }
   .brand .logo .ac{color:var(--accent-text)}
   .brand .sub{font-size:11px; font-weight:700; color:var(--muted); white-space:nowrap}
@@ -223,6 +226,7 @@
   .reason.foryou{color:var(--accent-text)}
   .reason.explore{color:var(--accent2)}
   .reason.surprise{color:var(--gold-text)}
+  .reason.trending{color:var(--accent2)}
   .langtag{
     position:absolute; top:12px; right:12px; z-index:2;
     padding:4px 9px; border-radius:8px; font-size:11px; font-weight:900;
@@ -287,6 +291,10 @@
   @keyframes starpop{0%{transform:scale(1)}45%{transform:scale(1.35)}100%{transform:scale(1)}}
   .quiz-result .score{animation:popscore .55s cubic-bezier(.25,1,.5,1)}
   @keyframes popscore{0%{transform:scale(.5);opacity:0}60%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}
+
+  .card.read .hero img{opacity:.6}
+  .read-tag{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);margin-bottom:6px}
+  .read-tag .ic{width:13px;height:13px;color:#157a3f}
 
   .skeleton{height:300px;border-radius:16px;position:relative;overflow:hidden}
   .skeleton::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,var(--glass-hi),transparent);transform:translateX(-100%);animation:sweep 1.3s infinite}
@@ -376,7 +384,7 @@
 
   /* ---------- Full article ---------- */
   .reader{
-    position:fixed; inset:0; z-index:80;
+    position:fixed; inset:0; z-index:95;
     transform:translateY(100%);
     transition:transform .38s cubic-bezier(.2,.8,.2,1);
     display:flex; flex-direction:column;
@@ -394,7 +402,12 @@
     overflow-y:auto;-webkit-overflow-scrolling:touch;
     padding:18px max(16px,env(safe-area-inset-left)) calc(60px + env(safe-area-inset-bottom));
   }
+  .reader-progress{position:absolute;top:0;left:0;height:3px;width:0;background:var(--accent);z-index:3;transition:width .1s linear}
   .reader-inner{max-width:1080px;margin:0 auto}
+  .reader-tools{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+  .read-time{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.03em;color:var(--muted)}
+  .text-size{display:inline-flex;gap:6px}
+  .text-size .iconbtn{width:auto;min-width:42px;padding:6px 11px;font-weight:800;font-size:15px}
   .reader-inner h1.title{font-size:2.6rem;line-height:.95;margin-bottom:6px}
 
   .wiki-content{font-size:16px;line-height:1.65}
@@ -446,10 +459,13 @@
   .quiz-letter{flex:0 0 auto;width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;border-radius:8px;background:var(--glass-bg);border:1px solid var(--glass-brd);font-family:'Bebas Neue','Impact',sans-serif;font-size:1.05rem;color:var(--accent2)}
   .qopt-label{flex:1}
   .quiz-opt .mark{width:20px;height:20px;flex:0 0 auto;opacity:0;margin-left:auto}
-  .quiz-opt.correct .quiz-letter{background:#1f9d55;color:#fff;border-color:#1f9d55}
-  .quiz-opt.wrong .quiz-letter{background:var(--danger);color:#fff;border-color:var(--danger)}
-  .quiz-opt.correct{background:color-mix(in srgb,#1f9d55 22%,var(--paper));border-color:#1f9d55;color:var(--ink)}
-  .quiz-opt.correct .mark{opacity:1;color:#1f9d55}
+  .quiz-opt.correct .mark{opacity:1;color:#157a3f}
+  .quiz-opt.wrong .mark{opacity:1;color:#b3261e}
+  .quiz-opt.correct .quiz-letter{background:#157a3f;color:#fff;border-color:#157a3f}
+  .quiz-opt.wrong .quiz-letter{background:#b3261e;color:#fff;border-color:#b3261e}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+  .quiz-opt.correct{background:color-mix(in srgb,#157a3f 20%,var(--paper));border-color:#157a3f;color:var(--ink)}
+  .quiz-opt.correct .mark{opacity:1;color:#157a3f}
   .quiz-opt.wrong{background:color-mix(in srgb,var(--danger) 18%,var(--paper));border-color:var(--danger)}
   .quiz-actions{display:flex;justify-content:flex-end;margin-top:18px}
   .quiz-result{text-align:center;padding:32px 0}
@@ -499,6 +515,12 @@
     opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;
   }
   .toast.show{opacity:1;transform:translate(-50%,0)}
+  .toast{display:flex;align-items:center;gap:14px}
+  .toast-action{background:var(--accent2);color:var(--on-accent2);border:0;border-radius:9px;padding:6px 12px;font:inherit;font-weight:800;cursor:pointer;flex:0 0 auto;pointer-events:auto}
+
+  #ptr{position:fixed;top:6px;left:50%;transform:translateX(-50%);z-index:38;width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;background:var(--glass-bg-strong);border:1px solid var(--glass-brd);backdrop-filter:blur(12px) saturate(150%);-webkit-backdrop-filter:blur(12px) saturate(150%);box-shadow:0 6px 20px var(--glass-shadow)}
+  #ptr .ic{width:20px;height:20px;color:var(--accent);transition:transform .2s ease}
+  #ptr.ready .ic{transform:rotate(180deg)}
 
   /* ---------- Onboarding ---------- */
   .onb{
@@ -551,17 +573,13 @@
   <symbol id="i-share" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.59 13.51 6.83 3.98"/><path d="m15.41 6.51-6.82 3.98"/></symbol>
   <symbol id="i-quiz" viewBox="0 0 24 24"><path d="M21.42 10.92a1 1 0 0 0-.02-1.84L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.84l8.57 3.9a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/></symbol>
   <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-trend" viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></symbol>
 </defs></svg>
 
 <header class="topbar glass">
   <div class="brand">
     <span class="logo bebas">Wiki<span class="ac">doomia</span></span>
     <span class="sub" data-i18n="brandSub">dein Wissens‑Feed</span>
-  </div>
-  <div class="seg" id="langSeg" role="group" data-i18n-aria="articleLang" data-i18n-title="articleLang" aria-label="Sprache" title="Artikelsprache">
-    <button data-lang="de" class="active focusable">DE</button>
-    <button data-lang="en" class="focusable">EN</button>
-    <button data-lang="fr" class="focusable">FR</button>
   </div>
   <button class="iconbtn focusable" id="btnQuiz" data-i18n-title="startQuiz" data-i18n-aria="startQuiz" title="Quiz starten" aria-label="Quiz starten" hidden>
     <svg class="ic"><use href="#i-quiz"/></svg>
@@ -614,6 +632,14 @@
       <div class="chips" id="interestChips"></div>
     </div>
     <div class="panel">
+      <h3 class="bebas" data-i18n="articleLang">Artikelsprache</h3>
+      <div class="seg" id="langSeg" role="group" data-i18n-aria="articleLang" aria-label="Artikelsprache" style="margin-top:4px">
+        <button data-lang="de" class="active focusable">DE</button>
+        <button data-lang="en" class="focusable">EN</button>
+        <button data-lang="fr" class="focusable">FR</button>
+      </div>
+    </div>
+    <div class="panel">
       <h3 class="bebas" data-i18n="uiLanguage">Sprache der Oberfläche</h3>
       <div class="seg" id="uiLangSeg" role="group" data-i18n-aria="uiLanguage" aria-label="Sprache der Oberfläche" style="margin-top:4px">
         <button data-uilang="de" class="focusable">DE</button>
@@ -629,6 +655,7 @@
 
 <!-- Reader -->
 <div class="reader glass" id="reader" aria-hidden="true">
+  <div class="reader-progress" id="readerProgress"></div>
   <div class="reader-bar">
     <button class="iconbtn focusable" id="closeReader" data-i18n-aria="backToFeed" aria-label="Zurück zum Feed"><svg class="ic"><use href="#i-x"/></svg></button>
     <span class="rttl bebas" id="readerTitle"></span>
@@ -639,6 +666,13 @@
   </div>
   <div class="reader-scroll" id="readerScroll">
     <div class="reader-inner">
+      <div class="reader-tools">
+        <span class="read-time" id="readerTime"></span>
+        <span class="text-size">
+          <button class="iconbtn focusable" id="readerSmaller" data-i18n-title="textSmaller" data-i18n-aria="textSmaller" title="Schrift kleiner" aria-label="Schrift kleiner">A−</button>
+          <button class="iconbtn focusable" id="readerBigger" data-i18n-title="textBigger" data-i18n-aria="textBigger" title="Schrift größer" aria-label="Schrift größer">A+</button>
+        </span>
+      </div>
       <h1 class="title bebas" id="readerH1"></h1>
       <div class="wiki-content" id="readerContent"></div>
     </div>
@@ -661,6 +695,7 @@
   </div>
   <div class="reader-scroll">
     <div class="quiz-inner" id="quizBody"></div>
+    <div id="quizLive" class="sr-only" aria-live="assertive"></div>
   </div>
 </div>
 
@@ -717,6 +752,7 @@ const I18N = {
     onbCustomPh:"Eigenes Thema hinzufügen…", skip:"Überspringen", startFeed:"Feed starten",
     readFull:"Ganzen Artikel lesen", forYou:"Für dich", forYouTitle:"Auf Basis deiner geöffneten und markierten Artikel",
     serendipity:"Zufallsfund", serendipityTitle:"Zufallsfund zum Stöbern", lessLikeThis:"Weniger davon",
+    trending:"Viel gelesen", trendingTitle:"Aktuell viel gelesen auf Wikipedia",
     loadingArticle:"Lade Artikel…", loadFail:"Konnte den Artikel nicht laden.", loadErr:"Fehler beim Laden.",
     starRemoved:"Stern entfernt", starred:"★ Mit Stern markiert", linkCopied:"Link kopiert",
     removedFrom:n=>`Aus „${n}“ entfernt`, addedTo:n=>`Zu „${n}“ hinzugefügt`,
@@ -736,6 +772,8 @@ const I18N = {
     keepReading:"Weiterlesen", enoughToday:"Für heute genug", seeYouLater:"Bis später — schön, dass du da warst.",
     quizKicker:"Welcher Artikel wird beschrieben?", next:"Weiter", result:"Ergebnis",
     quizPerfect:"Perfekt!", quizGood:"Stark gelesen!", quizMeh:"Dranbleiben lohnt sich.",
+    aRight:"Richtig", aWrong:"Falsch", correctAnswerIs:tt=>`Falsch. Richtig: ${tt}`, openArticle:"Artikel öffnen",
+    undo:"Rückgängig", refreshed:"Aktualisiert", read:"Gelesen", minRead:n=>`~${n} Min`, textSmaller:"Schrift kleiner", textBigger:"Schrift größer",
     rkUmfang:"Dein Lese-Rückblick", rArticlesOpened:"Artikel geöffnet",
     rSub1:d=>`Dazu <strong>${d}</strong> konzentrierte Lesezeit — gezählt nur, während du wirklich dabei warst.`,
     rkRhythm:"Dranbleiben", rDay:"Tag", rDays:"Tage", rInARow:"in Folge",
@@ -765,6 +803,7 @@ const I18N = {
     onbCustomPh:"Add your own topic…", skip:"Skip", startFeed:"Start the feed",
     readFull:"Read the full article", forYou:"For you", forYouTitle:"Based on the articles you open and star",
     serendipity:"Random find", serendipityTitle:"A random find to explore", lessLikeThis:"Less like this",
+    trending:"Trending", trendingTitle:"Currently most-read on Wikipedia",
     loadingArticle:"Loading article…", loadFail:"Couldn't load the article.", loadErr:"Loading error.",
     starRemoved:"Star removed", starred:"★ Starred", linkCopied:"Link copied",
     removedFrom:n=>`Removed from “${n}”`, addedTo:n=>`Added to “${n}”`,
@@ -784,6 +823,8 @@ const I18N = {
     keepReading:"Keep reading", enoughToday:"Enough for today", seeYouLater:"See you later — glad you stopped by.",
     quizKicker:"Which article is described?", next:"Next", result:"Result",
     quizPerfect:"Perfect!", quizGood:"Well read!", quizMeh:"Worth sticking with it.",
+    aRight:"Correct", aWrong:"Wrong", correctAnswerIs:tt=>`Wrong. Correct: ${tt}`, openArticle:"Open article",
+    undo:"Undo", refreshed:"Refreshed", read:"Read", minRead:n=>`~${n} min`, textSmaller:"Smaller text", textBigger:"Larger text",
     rkUmfang:"Your reading recap", rArticlesOpened:"articles opened",
     rSub1:d=>`Plus <strong>${d}</strong> of focused reading — counted only while you were really there.`,
     rkRhythm:"Staying consistent", rDay:"day", rDays:"days", rInARow:"in a row",
@@ -813,6 +854,7 @@ const I18N = {
     onbCustomPh:"Ajouter ton propre thème…", skip:"Passer", startFeed:"Démarrer le fil",
     readFull:"Lire l'article complet", forYou:"Pour toi", forYouTitle:"D'après les articles que tu ouvres et marques",
     serendipity:"Trouvaille", serendipityTitle:"Une trouvaille à explorer", lessLikeThis:"Moins de ça",
+    trending:"Populaire", trendingTitle:"Très lu en ce moment sur Wikipédia",
     loadingArticle:"Chargement de l'article…", loadFail:"Impossible de charger l'article.", loadErr:"Erreur de chargement.",
     starRemoved:"Étoile retirée", starred:"★ Marqué d'une étoile", linkCopied:"Lien copié",
     removedFrom:n=>`Retiré de « ${n} »`, addedTo:n=>`Ajouté à « ${n} »`,
@@ -832,6 +874,8 @@ const I18N = {
     keepReading:"Continuer", enoughToday:"Assez pour aujourd'hui", seeYouLater:"À bientôt — merci d'être passé.",
     quizKicker:"Quel article est décrit ?", next:"Suivant", result:"Résultat",
     quizPerfect:"Parfait !", quizGood:"Bien lu !", quizMeh:"Ça vaut la peine de persévérer.",
+    aRight:"Correct", aWrong:"Faux", correctAnswerIs:tt=>`Faux. Bonne réponse : ${tt}`, openArticle:"Ouvrir l'article",
+    undo:"Annuler", refreshed:"Actualisé", read:"Lu", minRead:n=>`~${n} min`, textSmaller:"Texte plus petit", textBigger:"Texte plus grand",
     rkUmfang:"Ton bilan de lecture", rArticlesOpened:"articles ouverts",
     rSub1:d=>`Et <strong>${d}</strong> de lecture attentive — comptée uniquement quand tu étais vraiment là.`,
     rkRhythm:"La régularité", rDay:"jour", rDays:"jours", rInARow:"d'affilée",
@@ -874,6 +918,8 @@ const state = {
   stars: LS.get("wf_stars",{}),          // title -> article meta
   collections: LS.get("wf_collections",{}), // name -> [meta]
   disliked: LS.get("wf_disliked",{}),    // title -> 1 (never reshow, negative signal)
+  read: new Set(LS.get("wf_read",[])),   // titles whose article was opened (for "already read" marker)
+  readerScale: LS.get("wf_readerscale",100), // reader font size in %
   recent: LS.get("wf_recent",[]),        // recent search terms
   readPool: LS.get("wf_readpool",[]),    // recently opened articles (quiz material)
   openedSinceQuiz:0,                     // counts opens toward next quiz offer
@@ -884,6 +930,10 @@ const state = {
   pendingStrategies:[],                  // forced strategies (e.g. from search)
   cardsSinceSurprise:0,                  // variable-ratio serendipity counter
   surpriseAt:5,
+  cardsSinceTrending:0,                  // occasional "most-read" injection
+  trendingAt:16,
+  trendingCache:[],                      // prefetched most-viewed articles
+  wantTrendingFirst:false,               // show a trending hook as the first card
   sessionCards:0,                        // cards seen this session (pause nudge)
   nextPauseAt:30,
   queueBusy:false,
@@ -993,6 +1043,15 @@ let toastT;
 function toast(msg){
   const t=$("#toast"); t.textContent=msg; t.classList.add("show");
   clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("show"),2200);
+}
+function toastAction(msg, actionLabel, fn){
+  const el=$("#toast"); el.innerHTML="";
+  const span=document.createElement("span"); span.textContent=msg;
+  const btn=document.createElement("button"); btn.className="toast-action focusable"; btn.textContent=actionLabel;
+  let done=false;
+  btn.addEventListener("click",()=>{ if(done)return; done=true; el.classList.remove("show"); fn(); });
+  el.append(span,btn); el.classList.add("show");
+  clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove("show"),5000);
 }
 function weightedPick(obj){
   const keys=Object.keys(obj); if(!keys.length) return null;
@@ -1135,6 +1194,29 @@ async function fetchSearch(term,n=6){
   const j=await apiGet({...COMMON, generator:"search", gsrsearch:term, gsrnamespace:0, gsrlimit:n});
   return normalizePages(j);
 }
+async function fetchTrending(n=20){
+  let items=[];
+  try{
+    const j=await apiGet({action:"query", list:"mostviewed", pvimmetric:"pageviews", pvimlimit:50});
+    items=(j?.query?.mostviewed||[]).filter(p=>p && p.ns===0 && p.title && !/[:/]/.test(p.title));
+  }catch(e){ return []; }
+  const titles=items.slice(0,n).map(p=>p.title);
+  if(!titles.length) return [];
+  const d=await apiGet({...COMMON, titles:titles.join("|")});
+  const arr=normalizePages(d);
+  const order=new Map(titles.map((tt,i)=>[tt,i]));   // keep most-viewed ranking
+  arr.sort((a,b)=>(order.get(a.title)??999)-(order.get(b.title)??999));
+  return arr;
+}
+async function nextTrending(){
+  for(let i=0;i<2;i++){
+    state.trendingCache=state.trendingCache.filter(a=>!state.seen.has(a.title)&&!state.disliked[a.title]);
+    if(state.trendingCache.length) return state.trendingCache.shift();
+    state.trendingCache=await fetchTrending(20);
+    if(!state.trendingCache.length) return null;
+  }
+  return null;
+}
 async function fetchSuggest(term,n=8){
   const j=await apiGet({action:"query", generator:"prefixsearch", gpssearch:term, gpslimit:n,
     prop:"extracts|pageimages|info", exintro:1, explaintext:1, exlimit:"max",
@@ -1187,6 +1269,24 @@ function signalOpen(meta){
   nudgeExploit(+0.04);   // engaged → lean a bit more into the working vein
   registerOpen();        // streak + reading stats
   noteRead(meta);        // build quiz material, offer quiz after ~10 reads
+  markRead(meta.title);  // "already read" marker
+}
+function addReadTag(card){
+  const body=card.querySelector(".body");
+  if(body && !body.querySelector(".read-tag")){
+    const tag=document.createElement("span"); tag.className="read-tag";
+    tag.innerHTML=`${svgIc("i-check")} ${esc(t("read"))}`;
+    body.insertBefore(tag, body.firstChild);
+  }
+}
+function markRead(title){
+  if(!state.read.has(title)){
+    state.read.add(title);
+    if(state.read.size>800){ const arr=[...state.read]; state.read=new Set(arr.slice(arr.length-800)); }
+    LS.set("wf_read",[...state.read]);
+  }
+  let card; try{ card=feedEl.querySelector(`.card[data-title="${CSS.escape(title)}"]`); }catch(e){}
+  if(card && !card.classList.contains("read")){ card.classList.add("read"); addReadTag(card); }
 }
 function signalStar(meta,on){
   bumpSeed(meta.title, on?WEIGHTS.star:-WEIGHTS.star);
@@ -1247,13 +1347,14 @@ function articleCard(meta, reason, seed){
   // Rhythm: feature (big, overlaid title) for serendipity finds with an image;
   // compact (no image) for thumbnail-less articles; standard otherwise.
   const starred=!!state.stars[meta.title];
-  const variant = (reason==="serendipity" && meta.thumb) ? "feature" : (meta.thumb ? "standard" : "compact");
+  const variant = ((reason==="serendipity"||reason==="trending") && meta.thumb) ? "feature" : (meta.thumb ? "standard" : "compact");
   card.className="card glass v-"+variant+(starred?" is-starred":"");
 
   // Subtle hints only — most cards carry no badge at all.
   let reasonHtml="";
   if(reason==="foryou") reasonHtml=`<span class="reason foryou" title="${esc(t("forYouTitle"))}">${svgIc("i-sparkles")} ${esc(t("forYou"))}</span>`;
   else if(reason==="serendipity") reasonHtml=`<span class="reason surprise" title="${esc(t("serendipityTitle"))}">${svgIc("i-compass")} ${esc(t("serendipity"))}</span>`;
+  else if(reason==="trending") reasonHtml=`<span class="reason trending" title="${esc(t("trendingTitle"))}">${svgIc("i-trend")} ${esc(t("trending"))}</span>`;
   const langHtml=`<span class="langtag">${meta.lang.toUpperCase()}</span>`;
 
   if(variant!=="compact"){
@@ -1309,11 +1410,20 @@ function articleCard(meta, reason, seed){
   downBtn.title=t("lessLikeThis"); downBtn.setAttribute("aria-label",t("lessLikeThis"));
   downBtn.innerHTML=svgIc("i-down");
   downBtn.addEventListener("click",()=>{
+    const sib=card.nextSibling;
+    const prevSeed=state.profile.seeds[meta.title];
+    const prevExploit=state.exploit;
     signalDislike(meta,seed);
     card.style.transition="opacity .25s, transform .25s";
     card.style.opacity="0"; card.style.transform="scale(.96)";
     setTimeout(()=>{ card.remove(); if(feedEl.querySelectorAll(".card").length<3) loadMore(); },240);
-    toast(t("lessLikeThis"));
+    toastAction(t("lessLikeThis"), t("undo"), ()=>{
+      delete state.disliked[meta.title]; LS.set("wf_disliked",state.disliked);
+      if(prevSeed!=null) state.profile.seeds[meta.title]=prevSeed; else delete state.profile.seeds[meta.title];
+      state.exploit=prevExploit; LS.set("wf_exploit",state.exploit); saveProfile();
+      const fresh=articleCard(meta,reason,seed);
+      feedEl.insertBefore(fresh,(sib && sib.parentNode===feedEl)?sib:null);
+    });
   });
 
   const shareBtn=document.createElement("button");
@@ -1324,6 +1434,8 @@ function articleCard(meta, reason, seed){
 
   actions.append(starBtn,collBtn,downBtn,shareBtn);
   card.appendChild(actions);
+
+  if(state.read.has(meta.title)){ card.classList.add("read"); addReadTag(card); }
 
   observeDwell(card,meta.title);
   return card;
@@ -1341,18 +1453,30 @@ async function loadMore(){
   try{
     while(added<4 && attempts<6){
       attempts++;
-      // Variable-ratio serendipity: every 4–8 cards, drop in a surprise random find.
-      const surprise = state.pendingStrategies.length===0 && state.cardsSinceSurprise>=state.surpriseAt;
-      const strat = surprise ? {type:"serendipity"}
-                  : (state.pendingStrategies.length ? state.pendingStrategies.shift() : pickStrategy());
+      const noPending = state.pendingStrategies.length===0;
+      // Hook: a "most-read today" article as the very first card of a fresh feed,
+      // and occasionally (every 14–22 cards) thereafter. Variable-ratio serendipity in between.
+      const trendingFirst = noPending && state.wantTrendingFirst && feedEl.querySelectorAll(".card").length===0;
+      const surprise = noPending && !trendingFirst && state.cardsSinceSurprise>=state.surpriseAt;
+      const trendingMix = noPending && !trendingFirst && !surprise && state.cardsSinceTrending>=state.trendingAt;
+      let strat;
+      if(trendingFirst||trendingMix) strat={type:"trending"};
+      else if(surprise) strat={type:"serendipity"};
+      else strat = state.pendingStrategies.length ? state.pendingStrategies.shift() : pickStrategy();
       let batch=[];
       if(strat.type==="morelike") batch=await fetchMoreLike(strat.seed);
       else if(strat.type==="search") batch=await fetchSearch(strat.term);
+      else if(strat.type==="trending"){
+        const a=await nextTrending();
+        if(a) batch=[a]; else { strat={type:"random"}; batch=await fetchRandom(); }
+      }
       else batch=await fetchRandom();
       if(gen!==state.feedGen) return;     // a reset happened mid-fetch → drop this stale batch
       if(strat.type==="morelike" && batch.length===0){ batch=await fetchRandom(); if(gen!==state.feedGen) return; }
-      // Only morelike → "Für dich"; serendipity → "Zufallsfund"; search/random unlabelled.
-      const reason = strat.type==="morelike" ? "foryou" : (strat.type==="serendipity" ? "serendipity" : "none");
+      // morelike → "Für dich"; serendipity → "Zufallsfund"; trending → "Viel gelesen"; else unlabelled.
+      const reason = strat.type==="morelike" ? "foryou"
+                   : strat.type==="serendipity" ? "serendipity"
+                   : strat.type==="trending" ? "trending" : "none";
       const seed = strat.type==="morelike" ? strat.seed : null;
       for(const a of batch){
         if(state.seen.has(a.title) || state.disliked[a.title]) continue;
@@ -1361,7 +1485,8 @@ async function loadMore(){
         feedEl.insertBefore(articleCard(a,reason,seed), ref);
         added++; state.sessionCards++;
         if(strat.type==="serendipity"){ state.cardsSinceSurprise=0; state.surpriseAt=randInt(4,8); break; }
-        state.cardsSinceSurprise++;
+        if(strat.type==="trending"){ state.wantTrendingFirst=false; state.cardsSinceTrending=0; state.trendingAt=randInt(14,22); break; }
+        state.cardsSinceSurprise++; state.cardsSinceTrending++;
       }
     }
   }catch(e){
@@ -1408,6 +1533,8 @@ function resetFeed(){
   state.feedGen=(state.feedGen||0)+1;    // invalidate any in-flight loadMore
   state.seen=new Set(); state.endReached=false; state.queueBusy=false;
   state.cardsSinceSurprise=0; state.surpriseAt=randInt(4,8);
+  state.cardsSinceTrending=0; state.trendingAt=randInt(14,22);
+  state.trendingCache=[]; state.wantTrendingFirst=true;   // fresh hook each reset (language switch refetches)
   feedEl.innerHTML="";
   loadMore().then(()=>loadMore());
 }
@@ -1442,6 +1569,9 @@ async function openReader(meta){
   $("#readerStar").classList.toggle("on",!!state.stars[meta.title]);
   const c=$("#readerContent");
   c.innerHTML=`<p class="muted">${esc(t("loadingArticle"))}</p>`;
+  $("#readerTime").textContent="";
+  $("#readerProgress").style.width="0%";
+  applyReaderScale();
   const wasOpen=reader.classList.contains("open");
   reader.classList.add("open"); reader.setAttribute("aria-hidden","false");
   $("#readerScroll").scrollTop=0;
@@ -1449,14 +1579,31 @@ async function openReader(meta){
   if(!wasOpen) trapFocus(reader);
   try{
     const html=await fetchFull(meta.title);
+    if(meta!==currentReaderMeta) return;     // user navigated away while loading
     if(!html){ c.innerHTML=`<p class="muted">${esc(t("loadFail"))} <a href="${meta.url}" target="_blank" rel="noopener">${esc(t("openWiki"))}</a>.</p>`; return; }
     c.innerHTML=html;
     fixMedia(c);
     rewriteWikiLinks(c);
+    const words=(c.textContent||"").trim().split(/\s+/).length;
+    $("#readerTime").textContent = t("minRead", Math.max(1, Math.round(words/200)));
   }catch(e){
     c.innerHTML=`<p class="muted">${esc(t("loadErr"))} <a href="${meta.url}" target="_blank" rel="noopener">${esc(t("openWiki"))}</a>.</p>`;
   }
 }
+function applyReaderScale(){
+  $("#readerContent").style.fontSize=(state.readerScale/100*16).toFixed(1)+"px";
+}
+function setReaderScale(delta){
+  state.readerScale=Math.max(80,Math.min(150,(state.readerScale||100)+delta));
+  LS.set("wf_readerscale",state.readerScale);
+  applyReaderScale();
+}
+$("#readerSmaller").addEventListener("click",()=>setReaderScale(-10));
+$("#readerBigger").addEventListener("click",()=>setReaderScale(+10));
+$("#readerScroll").addEventListener("scroll",function(){
+  const max=this.scrollHeight-this.clientHeight;
+  $("#readerProgress").style.width=(max>0 ? this.scrollTop/max*100 : 0)+"%";
+},{passive:true});
 function closeReader(){
   if(!reader.classList.contains("open")) return;
   reader.classList.remove("open"); reader.setAttribute("aria-hidden","true");
@@ -1513,7 +1660,7 @@ function noteRead(meta){
     LS.set("wf_readpool",state.readPool);
   }
   state.openedSinceQuiz++;
-  if(state.openedSinceQuiz>=10 && state.readPool.filter(a=>a.extract&&a.extract.length>80).length>=4) offerQuiz();
+  if(state.openedSinceQuiz>=10 && buildQuiz().length>=3) offerQuiz();   // only offer when a real quiz is possible
 }
 function offerQuiz(){
   state.openedSinceQuiz=0;
@@ -1521,21 +1668,40 @@ function offerQuiz(){
   toast(t("quizReady"));
 }
 function maskTitle(text,title){
-  const safe=title.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
-  let t=text.replace(new RegExp(safe,"gi"),"…");
-  t=t.replace(/\s*\([^)]*\)/g," ").replace(/\s{2,}/g," ").trim();   // strip parentheticals
+  // Mask the full title AND each significant word (with an inflection suffix \w*),
+  // so partial names / declensions ("Einstein", "Klaviers") can't leak the answer.
+  const terms=[title, ...title.split(/[\s,()·:–-]+/)].filter(w=>w.length>3);
+  terms.sort((a,b)=>b.length-a.length);
+  let t=text;
+  for(const term of terms){
+    const safe=term.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+    t=t.replace(new RegExp(safe+"\\w*","gi"),"…");
+  }
+  t=t.replace(/(?:…[\s,;]*){2,}/g,"… ");                 // collapse runs of masks
+  t=t.replace(/\s*\([^)]*\)/g," ").replace(/\s{2,}/g," ").trim();
   return t.length>240 ? t.slice(0,240).trim()+"…" : t;
 }
+function shuffle(arr){ return arr.map(v=>[Math.random(),v]).sort((a,b)=>a[0]-b[0]).map(p=>p[1]); }
 function buildQuiz(){
   const pool=state.readPool.filter(a=>a.extract&&a.extract.length>80);
-  const allTitles=[...new Set([...pool.map(a=>a.title),...Array.from(state.seen)])];
-  const picks=[...pool].sort(()=>Math.random()-0.5).slice(0,5);
+  const poolTitles=pool.map(a=>a.title);
+  const seenTitles=Array.from(state.seen);
+  const picks=shuffle([...pool]).slice(0,5);
   const qs=[];
   for(const a of picks){
-    const distract=allTitles.filter(t=>t!==a.title).sort(()=>Math.random()-0.5).slice(0,3);
+    // Prefer distractors from other read articles (topically closer = more plausible),
+    // then fall back to the wider set of seen titles.
+    const near=shuffle(poolTitles.filter(t=>t!==a.title));
+    const far=shuffle(seenTitles.filter(t=>t!==a.title && !near.includes(t)));
+    const distract=[...near,...far].slice(0,3);
     if(distract.length<3) continue;
-    qs.push({desc:maskTitle(a.extract,a.title), answer:a.title,
-      options:[a.title,...distract].sort(()=>Math.random()-0.5)});
+    const options=shuffle([a.title,...distract]);
+    qs.push({
+      desc:maskTitle(a.extract,a.title),
+      options,
+      correctIdx:options.indexOf(a.title),
+      meta:{title:a.title,url:a.url,lang:a.lang,extract:a.extract}
+    });
   }
   return qs;
 }
@@ -1560,34 +1726,51 @@ function renderQuizQ(){
   $("#quizProgress").textContent=`${idx+1} / ${qs.length}`;
   const q=qs[idx];
   $("#quizBody").innerHTML=`<div class="quiz-kicker">${esc(t("quizKicker"))}</div>
-    <p class="quiz-desc">${esc(q.desc)}</p><div id="quizOpts"></div>
+    <p class="quiz-desc">${esc(q.desc)}</p>
+    <div id="quizOpts" role="group" aria-label="${esc(t("quizKicker"))}"></div>
     <div class="quiz-actions" id="quizNextWrap"></div>`;
   const opts=$("#quizOpts");
   q.options.forEach((opt,i)=>{
-    const b=document.createElement("button"); b.className="quiz-opt focusable";
-    b.innerHTML=`<span class="quiz-letter">${"ABCD"[i]}</span><span class="qopt-label">${esc(opt)}</span><svg class="ic mark"><use href="#i-check"/></svg>`;
-    b.addEventListener("click",()=>answerQuiz(opt));
+    const b=document.createElement("button"); b.className="quiz-opt focusable"; b.dataset.i=i;
+    b.innerHTML=`<span class="quiz-letter">${"ABCD"[i]}</span><span class="qopt-label">${esc(opt)}</span><svg class="ic mark" aria-hidden="true"><use href="#i-check"/></svg><span class="sr-only" data-sr></span>`;
+    b.addEventListener("click",()=>answerQuiz(i));
     opts.appendChild(b);
   });
+  const live=$("#quizLive"); if(live) live.textContent="";
   $("#quiz .reader-scroll").scrollTop=0;
+  const first=opts.querySelector("button"); if(first) first.focus();
 }
-function answerQuiz(opt){
+function answerQuiz(i){
   const opts=$("#quizOpts"); if(opts.dataset.done) return; opts.dataset.done="1";
   const q=quizState.qs[quizState.idx];
-  [...opts.children].forEach(b=>{
+  [...opts.children].forEach((b,j)=>{
     b.disabled=true;
-    const label=b.querySelector(".qopt-label").textContent;
-    if(label===q.answer) b.classList.add("correct");
-    else if(label===opt) b.classList.add("wrong");
+    const sr=b.querySelector("[data-sr]");
+    if(j===q.correctIdx){
+      b.classList.add("correct");
+      b.querySelector(".mark use").setAttribute("href","#i-check");
+      if(sr) sr.textContent=" – "+t("aRight");
+    }else if(j===i){
+      b.classList.add("wrong");
+      b.querySelector(".mark use").setAttribute("href","#i-x");
+      if(sr) sr.textContent=" – "+t("aWrong");
+    }
   });
-  if(opt===q.answer) quizState.score++;
+  const right = i===q.correctIdx;
+  if(right) quizState.score++;
+  const live=$("#quizLive"); if(live) live.textContent = right ? t("aRight") : t("correctAnswerIs", q.options[q.correctIdx]);
+  const wrap=$("#quizNextWrap");
+  const art=document.createElement("button"); art.className="btn focusable";
+  art.innerHTML=`${svgIc("i-book")} ${esc(t("openArticle"))}`;
+  art.addEventListener("click",()=>openReader(q.meta));
   const next=document.createElement("button"); next.className="btn primary focusable";
   next.textContent = quizState.idx<quizState.qs.length-1 ? t("next") : t("result");
   next.addEventListener("click",()=>{
     if(quizState.idx<quizState.qs.length-1){ quizState.idx++; renderQuizQ(); }
     else renderQuizResult();
   });
-  $("#quizNextWrap").appendChild(next);
+  wrap.append(art,next);
+  next.focus();
 }
 function renderQuizResult(){
   const {score,qs}=quizState;
@@ -1705,7 +1888,13 @@ function openRecap(){
 function closeRecap(){ const r=$("#recap"); if(!r.classList.contains("open")) return; r.classList.remove("open"); r.setAttribute("aria-hidden","true"); document.body.style.overflow=""; releaseFocus(); }
 $("#openRecap").addEventListener("click",openRecap);
 $("#closeRecap").addEventListener("click",closeRecap);
-document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ if($("#recap").classList.contains("open")) closeRecap(); else if($("#quiz").classList.contains("open")) closeQuiz(); else if(reader.classList.contains("open")) closeReader(); else closeDrawer(); }});
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"){
+  // close the top-most overlay first (reader sits above quiz/recap)
+  if(reader.classList.contains("open")) closeReader();
+  else if($("#quiz").classList.contains("open")) closeQuiz();
+  else if($("#recap").classList.contains("open")) closeRecap();
+  else closeDrawer();
+}});
 
 /* ---------- stars ---------- */
 function toggleStar(meta){
@@ -1753,7 +1942,14 @@ function showCollMenu(meta,after){
     b.addEventListener("click",()=>{
       const arr=state.collections[name];
       const idx=arr.findIndex(m=>m.title===meta.title);
-      if(idx>=0){ arr.splice(idx,1); toast(t("removedFrom",name)); }
+      if(idx>=0){
+        const removed=arr[idx]; arr.splice(idx,1);
+        toastAction(t("removedFrom",name), t("undo"), ()=>{
+          if(!state.collections[name]) state.collections[name]=[];
+          state.collections[name].push(removed); saveCollections(); if(after) after();
+          list.innerHTML=""; Object.keys(state.collections).forEach(n=>list.appendChild(row(n)));
+        });
+      }
       else{ arr.push({title:meta.title,url:meta.url,lang:meta.lang}); toast(t("addedTo",name)); }
       saveCollections(); if(after) after();
       // refresh menu
@@ -1807,7 +2003,7 @@ function renderCollections(){
       const t=document.createElement("span"); t.className="ttl"; t.textContent=m.title;
       t.addEventListener("click",()=>{ closeDrawer(); openReader(m); });
       const rm=document.createElement("button"); rm.className="mini focusable"; rm.innerHTML=svgIc("i-x");
-      rm.addEventListener("click",()=>{ const i=arr.findIndex(x=>x.title===m.title); if(i>=0)arr.splice(i,1); saveCollections(); });
+      rm.addEventListener("click",()=>{ const i=arr.findIndex(x=>x.title===m.title); if(i<0)return; const removed=arr[i]; arr.splice(i,1); saveCollections(); toastAction(t("removedFrom",name),t("undo"),()=>{ arr.splice(Math.min(i,arr.length),0,removed); saveCollections(); }); });
       it.append(t,rm); sec.appendChild(it);
     });
     host.appendChild(sec);
@@ -2000,6 +2196,74 @@ const sentinel=$("#sentinel");
 new IntersectionObserver((entries)=>{
   if(entries[0].isIntersecting) loadMore();
 },{rootMargin:"800px 0px"}).observe(sentinel);
+
+/* ---------- mobile QOL: auto-hiding top bar + swipe gestures ---------- */
+const topbar=document.querySelector(".topbar");
+let lastScrollY=window.scrollY;
+window.addEventListener("scroll",()=>{
+  const y=window.scrollY;
+  if(y<64){ topbar.classList.remove("hidden"); lastScrollY=y; return; }
+  const dy=y-lastScrollY;
+  if(dy>6) topbar.classList.add("hidden");           // scrolling down → hide
+  else if(dy<-6) topbar.classList.remove("hidden");  // a little up → reveal
+  lastScrollY=y;
+},{passive:true});
+
+// swipe-to-close for full-screen overlays: down from the top, or a horizontal "back" swipe
+function addSwipeClose(el, scrollEl, closeFn){
+  let sx=0,sy=0,sTop=0,ok=false;
+  el.addEventListener("touchstart",e=>{ if(e.touches.length!==1){ok=false;return;} const t=e.touches[0]; sx=t.clientX; sy=t.clientY; sTop=(scrollEl()&&scrollEl().scrollTop)||0; ok=true; },{passive:true});
+  el.addEventListener("touchend",e=>{ if(!ok)return; ok=false; const t=e.changedTouches[0]; const dx=t.clientX-sx, dy=t.clientY-sy;
+    if(Math.abs(dx)>90 && Math.abs(dx)>Math.abs(dy)*1.5){ closeFn(); return; }
+    if(sTop<=2 && dy>80 && dy>Math.abs(dx)*1.5){ closeFn(); }
+  },{passive:true});
+}
+addSwipeClose(reader, ()=>$("#readerScroll"), closeReader);
+addSwipeClose($("#quiz"), ()=>$("#quiz .reader-scroll"), closeQuiz);
+addSwipeClose($("#recap"), ()=>$("#recapScroll"), closeRecap);
+
+// global horizontal swipe on the feed surface: left → open profile drawer, right → close it
+(function(){
+  let sx=0,sy=0,ok=false;
+  document.addEventListener("touchstart",e=>{ if(e.touches.length!==1){ok=false;return;} const t=e.touches[0]; sx=t.clientX; sy=t.clientY; ok=true; },{passive:true});
+  document.addEventListener("touchend",e=>{
+    if(!ok)return; ok=false;
+    if(reader.classList.contains("open")||$("#quiz").classList.contains("open")||$("#recap").classList.contains("open")) return;
+    if(collMenuEl || document.querySelector(".onb.open")) return;
+    const t=e.changedTouches[0]; const dx=t.clientX-sx, dy=t.clientY-sy;
+    if(Math.abs(dx)<70 || Math.abs(dx)<Math.abs(dy)*1.5) return;   // require a clear horizontal swipe
+    const open=drawer.classList.contains("open");
+    if(dx<0 && !open) openDrawer();          // swipe left → profile
+    else if(dx>0 && open) closeDrawer();     // swipe right → close
+  },{passive:true});
+})();
+
+// pull-to-refresh at the top of the feed
+function anyOverlayOpen(){
+  return reader.classList.contains("open")||$("#quiz").classList.contains("open")||$("#recap").classList.contains("open")||drawer.classList.contains("open")||!!collMenuEl||!!document.querySelector(".onb.open");
+}
+(function(){
+  const ptr=document.createElement("div"); ptr.id="ptr"; ptr.innerHTML=`<svg class="ic"><use href="#i-refresh"/></svg>`;
+  document.body.appendChild(ptr);
+  let pStart=-1, pReady=false;
+  const reset=()=>{ ptr.style.opacity="0"; ptr.style.transform="translateX(-50%)"; ptr.classList.remove("ready"); };
+  document.addEventListener("touchstart",e=>{ pReady=false; pStart=(window.scrollY<=0 && e.touches.length===1 && !anyOverlayOpen()) ? e.touches[0].clientY : -1; },{passive:true});
+  document.addEventListener("touchmove",e=>{
+    if(pStart<0) return;
+    const dist=e.touches[0].clientY-pStart;
+    if(dist<=0 || window.scrollY>0){ reset(); return; }
+    if(e.cancelable) e.preventDefault();
+    const d=Math.min(dist,130);
+    ptr.style.opacity=String(Math.min(1,d/80));
+    ptr.style.transform=`translateX(-50%) translateY(${d*0.45}px)`;
+    pReady=d>=80; ptr.classList.toggle("ready",pReady);
+  },{passive:false});
+  document.addEventListener("touchend",()=>{
+    if(pStart<0) return;
+    const ready=pReady; pStart=-1; pReady=false; reset();
+    if(ready){ window.scrollTo({top:0}); resetFeed(); toast(t("refreshed")); }
+  },{passive:true});
+})();
 
 /* ---------- init ---------- */
 function init(){
