@@ -142,6 +142,7 @@
     transition:transform .14s ease;
     position:relative;
   }
+  .iconbtn[hidden]{display:none}
   .iconbtn:hover{transform:translateY(-1px)}
   .iconbtn:active{transform:translateY(1px)}
   .iconbtn .ic{width:20px;height:20px}
@@ -190,12 +191,24 @@
   .sresult .st span{display:block;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
   /* ---------- Feed ---------- */
+  .shell{max-width:680px;margin:0 auto}
   .feed{
-    max-width:680px;
-    margin:0 auto;
     padding:6px 14px calc(40px + env(safe-area-inset-bottom));
     display:flex; flex-direction:column; gap:20px;
   }
+  .rail{display:none}
+  @media (min-width:1100px){
+    .shell{max-width:1080px;display:flex;gap:24px;align-items:flex-start;padding:0 16px}
+    .feed{flex:1 1 0;min-width:0;padding-left:0;padding-right:0}
+    .rail{display:flex;flex-direction:column;gap:16px;flex:0 0 330px;position:sticky;top:74px;max-height:calc(100vh - 88px);overflow-y:auto;padding-bottom:24px}
+  }
+  .rail-card{border-radius:16px;padding:16px}
+  .rail-card h3{font-size:1.1rem;margin:0 0 10px}
+  .rail-list{list-style:none;margin:0;padding:0}
+  .rail-list li{border-bottom:1px solid color-mix(in srgb,var(--muted) 16%,transparent)}
+  .rail-list li:last-child{border-bottom:0}
+  .rail-link{background:none;border:0;padding:8px 0;width:100%;text-align:left;color:var(--ink);font:inherit;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .rail-link:hover{color:var(--accent2)}
 
   .card{
     border-radius:16px;
@@ -210,7 +223,7 @@
     cursor:pointer;
     background:color-mix(in srgb,var(--accent2) 12%, var(--paper));
   }
-  .card .hero img{display:block; width:100%; height:220px; object-fit:cover}
+  .card .hero img{display:block; width:100%; height:220px; object-fit:cover; object-position:top center}
   .card .hero.noimg{height:120px; display:flex; align-items:flex-end}
   .reason{
     position:absolute; top:12px; left:12px; z-index:2;
@@ -240,6 +253,11 @@
   .digest-sec li:last-child{border-bottom:0}
   .digest-link{background:none;border:0;padding:0;text-align:left;color:var(--ink);font:inherit;font-size:14px;line-height:1.45;cursor:pointer}
   .digest-link:hover{color:var(--accent2);text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:2px}
+  @media (min-width:1100px){
+    .digest{column-count:2;column-gap:26px}
+    .digest .digest-head{column-span:all}
+    .digest-sec{break-inside:avoid}
+  }
   .langtag{
     position:absolute; top:12px; right:12px; z-index:2;
     padding:4px 9px; border-radius:8px; font-size:11px; font-weight:900;
@@ -617,7 +635,10 @@
 </div>
 <div class="search-results" id="searchResults" hidden></div>
 
-<main class="feed" id="feed" aria-live="polite"></main>
+<div class="shell">
+  <main class="feed" id="feed" aria-live="polite"></main>
+  <aside class="rail" id="rail" aria-label="Kontext"></aside>
+</div>
 <div class="sentinel" id="sentinel"></div>
 
 <!-- Collections / profile drawer -->
@@ -780,7 +801,7 @@ const I18N = {
     resetConfirm:"Themenprofil, Sterne und Verlauf zurücksetzen? Sammlungen bleiben erhalten.", reset:"Zurücksetzen",
     inCollection:"In Sammlung", newCollPh:"Neue Sammlung…",
     statStreak:"Tage Serie", statToday:"Min heute", statArticles:"Artikel",
-    noData:"Noch keine Daten.", noTopics:"Noch keine Themen erfasst.",
+    noData:"Noch keine Daten.", noTopics:"Noch keine Themen erfasst.", profileEmpty:"Öffne ein paar Artikel — dein Leseprofil wächst dann hier.",
     profileSummary:(s,a)=>`${s} markiert · ${a} Artikel im Profil`, empty:"leer",
     pauseTitle:"Schon viel entdeckt heute", pauseMsg:n=>`Du hast rund ${n} Artikel durchgesehen. Eine kurze Pause hilft beim Behalten.`,
     keepReading:"Weiterlesen", enoughToday:"Für heute genug", seeYouLater:"Bis später — schön, dass du da warst.",
@@ -832,7 +853,7 @@ const I18N = {
     resetConfirm:"Reset topic profile, stars and history? Collections are kept.", reset:"Reset",
     inCollection:"To collection", newCollPh:"New collection…",
     statStreak:"day streak", statToday:"min today", statArticles:"articles",
-    noData:"No data yet.", noTopics:"No topics captured yet.",
+    noData:"No data yet.", noTopics:"No topics captured yet.", profileEmpty:"Open a few articles — your reading profile grows here.",
     profileSummary:(s,a)=>`${s} starred · ${a} articles in profile`, empty:"empty",
     pauseTitle:"You've explored a lot today", pauseMsg:n=>`You've gone through about ${n} articles. A short break helps you remember.`,
     keepReading:"Keep reading", enoughToday:"Enough for today", seeYouLater:"See you later — glad you stopped by.",
@@ -884,7 +905,7 @@ const I18N = {
     resetConfirm:"Réinitialiser le profil thématique, les étoiles et l'historique ? Les collections sont conservées.", reset:"Réinitialiser",
     inCollection:"Vers une collection", newCollPh:"Nouvelle collection…",
     statStreak:"jours d'affilée", statToday:"min aujourd'hui", statArticles:"articles",
-    noData:"Pas encore de données.", noTopics:"Aucun thème enregistré.",
+    noData:"Pas encore de données.", noTopics:"Aucun thème enregistré.", profileEmpty:"Ouvre quelques articles — ton profil de lecture grandira ici.",
     profileSummary:(s,a)=>`${s} marqués · ${a} articles dans le profil`, empty:"vide",
     pauseTitle:"Déjà beaucoup exploré aujourd'hui", pauseMsg:n=>`Tu as parcouru environ ${n} articles. Une courte pause aide à mémoriser.`,
     keepReading:"Continuer", enoughToday:"Assez pour aujourd'hui", seeYouLater:"À bientôt — merci d'être passé.",
@@ -1257,9 +1278,9 @@ async function fetchFeatured(){
     url:(data.tfa.content_urls&&data.tfa.content_urls.desktop&&data.tfa.content_urls.desktop.page)||`https://${lang}.wikipedia.org/wiki/${encodeURIComponent(data.tfa.title||"")}`,
     lang
   } : null;
-  const news=(data.news||[]).slice(0,4).map(it=>({ text:txt(it.story), title:(it.links&&it.links[0]&&pageTitle(it.links[0]))||linkFromHtml(it.story) }));
-  const onthisday=(data.onthisday||[]).slice(0,4).map(it=>({ text:`${it.year} — ${it.text}`, title:(it.pages&&it.pages[0]&&pageTitle(it.pages[0]))||null }));
-  const dyk=(data.dyk||[]).slice(0,4).map(it=>({ text:txt(it.html||it.text), title:linkFromHtml(it.html) }));
+  const news=(data.news||[]).slice(0,3).map(it=>({ text:txt(it.story), title:(it.links&&it.links[0]&&pageTitle(it.links[0]))||linkFromHtml(it.story) }));
+  const onthisday=(data.onthisday||[]).slice(0,3).map(it=>({ text:`${it.year} — ${it.text}`, title:(it.pages&&it.pages[0]&&pageTitle(it.pages[0]))||null }));
+  const dyk=(data.dyk||[]).slice(0,3).map(it=>({ text:txt(it.html||it.text), title:linkFromHtml(it.html) }));
   state.featuredCache={lang, tfa, news, onthisday, dyk};
   return state.featuredCache;
 }
@@ -1625,8 +1646,9 @@ function resetFeed(){
   state.cardsSinceTrending=0; state.trendingAt=randInt(14,22);
   state.trendingCache=[]; state.wantTrendingFirst=true;   // fresh hook each reset (language switch refetches)
   state.featuredCache=null; state.wantFeaturedFirst=true; // "today on Wikipedia" cluster on fresh feed
+  state._railFetching=false;
   feedEl.innerHTML="";
-  loadMore().then(()=>loadMore());
+  loadMore().then(()=>loadMore()).then(renderRail);
 }
 
 /* ---------- dwell tracking ---------- */
@@ -2100,9 +2122,12 @@ function renderCollections(){
   });
   updateCollBadge();
 }
-function renderProfile(){
-  const host=$("#profileBody");
+function profileSummaryHTML(){
   const s=state.stats;
+  const topsAll=topEntries(state.profile.cats,7).filter(([,v])=>v>0);
+  if((s.total||0)===0 && topsAll.length===0){
+    return `<p class="muted">${esc(t("profileEmpty"))}</p>`;
+  }
   const mins=Math.floor((s.todaySeconds||0)/60);
   const statsHtml=`<div class="statline">
     <span class="stat"><b>${currentStreak()}</b>${esc(t("statStreak"))}</span>
@@ -2122,7 +2147,28 @@ function renderProfile(){
         <span class="bar"><i style="width:${Math.max(8,Math.round(v/max*100))}%"></i></span>
       </div>`).join("") + `<p class="muted" style="margin-top:8px">${esc(t("profileSummary",starCount,Object.keys(state.profile.seeds).length))}</p>`;
   }
-  host.innerHTML = statsHtml + body;
+  return statsHtml + body;
+}
+function renderProfile(){
+  $("#profileBody").innerHTML = profileSummaryHTML();
+  renderRail();
+}
+/* desktop-only context panel beside the feed (hidden on mobile via CSS) */
+function renderRail(){
+  const rail=$("#rail"); if(!rail) return;
+  const visible = getComputedStyle(rail).display!=="none";
+  const tr=(state.trendingCache||[]).filter(a=>a&&a.title).slice(0,7);
+  let html="";
+  if(tr.length) html+=`<section class="rail-card glass"><h3 class="bebas">${esc(t("trending"))}</h3><ul class="rail-list"></ul></section>`;
+  html+=`<section class="rail-card glass"><h3 class="bebas">${esc(t("topicProfile"))}</h3>${profileSummaryHTML()}</section>`;
+  rail.innerHTML=html;
+  const ul=rail.querySelector(".rail-list");
+  if(ul) tr.forEach(a=>{ const li=document.createElement("li"); const btn=document.createElement("button"); btn.className="rail-link focusable"; btn.textContent=a.title; btn.addEventListener("click",()=>openReader(a)); li.appendChild(btn); ul.appendChild(li); });
+  // populate trending for the panel on demand (desktop only)
+  if(visible && !tr.length && !state._railFetching){
+    state._railFetching=true;
+    fetchTrending(20).then(arr=>{ state._railFetching=false; if(arr&&arr.length){ state.trendingCache=arr; renderRail(); } }).catch(()=>{ state._railFetching=false; });
+  }
 }
 
 /* ---------- interests ---------- */
@@ -2368,6 +2414,7 @@ function init(){
   applyStaticI18n();
   state.surpriseAt=randInt(4,8);
   updateCollBadge();
+  renderRail();
   if(!LS.get("wf_onboarded",false)){
     renderOnbChips();
     $("#onb").classList.add("open");
