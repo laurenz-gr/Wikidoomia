@@ -40,6 +40,12 @@
     --glass-hi:rgba(255,255,255,.9);
     --glass-shadow:rgba(20,30,60,.18);
     --dot:rgba(20,30,60,.10);
+    --safe-top:env(safe-area-inset-top,0px);
+    --safe-right:env(safe-area-inset-right,0px);
+    --safe-bottom:env(safe-area-inset-bottom,0px);
+    --safe-left:env(safe-area-inset-left,0px);
+    --topbar-pad-block:10px;
+    --topbar-block-size:calc(var(--topbar-pad-block) * 2 + 42px);
   }
   .dark{
     --bg:#15171d;
@@ -105,7 +111,7 @@
   .topbar{
     position:sticky; top:0; z-index:40;
     display:flex; align-items:center; gap:12px;
-    padding:10px max(14px,env(safe-area-inset-left));
+    padding:calc(var(--topbar-pad-block) + var(--safe-top)) max(14px,var(--safe-right)) var(--topbar-pad-block) max(14px,var(--safe-left));
     border-radius:0 0 16px 16px;
     margin:0 0 8px;
     transition:transform .3s cubic-bezier(.2,.8,.2,1);
@@ -159,7 +165,7 @@
 
   /* ---------- Search bar ---------- */
   .searchbar{
-    position:sticky; top:64px; z-index:35;
+    position:sticky; top:calc(var(--topbar-block-size) + var(--safe-top)); z-index:35;
     max-width:680px; margin:0 auto 8px;
     display:flex; gap:8px; align-items:center;
     padding:8px; border-radius:16px;
@@ -200,7 +206,7 @@
   @media (min-width:1100px){
     .shell{max-width:1080px;display:flex;gap:24px;align-items:flex-start;padding:0 16px}
     .feed{flex:1 1 0;min-width:0;padding-left:0;padding-right:0}
-    .rail{display:flex;flex-direction:column;gap:16px;flex:0 0 330px;position:sticky;top:74px;max-height:calc(100vh - 88px);overflow-y:auto;padding-bottom:24px}
+    .rail{display:flex;flex-direction:column;gap:16px;flex:0 0 330px;position:sticky;top:calc(var(--topbar-block-size) + var(--safe-top) + 10px);max-height:calc(100vh - var(--topbar-block-size) - var(--safe-top) - var(--safe-bottom) - 24px);overflow-y:auto;padding-bottom:24px}
   }
   .rail-card{border-radius:16px;padding:16px}
   .rail-card h3{font-size:1.1rem;margin:0 0 10px}
@@ -353,7 +359,7 @@
     transition:transform .32s cubic-bezier(.2,.8,.2,1);
     border-radius:18px 0 0 18px;
     display:flex; flex-direction:column;
-    padding:18px 16px calc(18px + env(safe-area-inset-bottom));
+    padding:calc(18px + var(--safe-top)) max(16px,var(--safe-right)) calc(18px + var(--safe-bottom)) max(16px,var(--safe-left));
   }
   .drawer.open{transform:none}
   .drawer-head{display:flex;align-items:center;gap:10px;margin-bottom:14px}
@@ -425,7 +431,7 @@
   .reader.open{transform:none}
   .reader-bar{
     display:flex;align-items:center;gap:10px;
-    padding:12px max(14px,env(safe-area-inset-left));
+    padding:calc(12px + var(--safe-top)) max(14px,var(--safe-right)) 12px max(14px,var(--safe-left));
     border-bottom:1px solid var(--glass-brd);
   }
   .reader-bar .rttl{flex:1;font-size:1.2rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -433,7 +439,7 @@
     overflow-y:auto;-webkit-overflow-scrolling:touch;
     padding:18px max(16px,env(safe-area-inset-left)) calc(60px + env(safe-area-inset-bottom));
   }
-  .reader-progress{position:absolute;top:0;left:0;height:3px;width:0;background:var(--accent);z-index:3;transition:width .1s linear}
+  .reader-progress{position:absolute;top:var(--safe-top);left:0;height:3px;width:0;background:var(--accent);z-index:3;transition:width .1s linear}
   .reader-inner{max-width:1080px;margin:0 auto}
   .reader-tools{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
   .read-time{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.03em;color:var(--muted)}
@@ -512,7 +518,7 @@
   }
   .recap.open{transform:none}
   .recap-close{position:fixed; top:max(14px,env(safe-area-inset-top)); right:14px; z-index:4}
-  .recap-progress{position:fixed; left:0; top:0; height:3px; width:0; background:var(--accent); z-index:4}
+  .recap-progress{position:fixed; left:0; top:var(--safe-top); height:3px; width:0; background:var(--accent); z-index:4}
   .recap-scroll{height:100%; overflow-y:auto; -webkit-overflow-scrolling:touch}
   .recap-scene{
     min-height:100svh; box-sizing:border-box;
@@ -549,13 +555,14 @@
   .toast{display:flex;align-items:center;gap:14px}
   .toast-action{background:var(--accent2);color:var(--on-accent2);border:0;border-radius:9px;padding:6px 12px;font:inherit;font-weight:800;cursor:pointer;flex:0 0 auto;pointer-events:auto}
 
-  #ptr{position:fixed;top:6px;left:50%;transform:translateX(-50%);z-index:38;width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;background:var(--glass-bg-strong);border:1px solid var(--glass-brd);backdrop-filter:blur(12px) saturate(150%);-webkit-backdrop-filter:blur(12px) saturate(150%);box-shadow:0 6px 20px var(--glass-shadow)}
+  #ptr{position:fixed;top:calc(6px + var(--safe-top));left:50%;transform:translateX(-50%);z-index:38;width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;background:var(--glass-bg-strong);border:1px solid var(--glass-brd);backdrop-filter:blur(12px) saturate(150%);-webkit-backdrop-filter:blur(12px) saturate(150%);box-shadow:0 6px 20px var(--glass-shadow)}
   #ptr .ic{width:20px;height:20px;color:var(--accent);transition:transform .2s ease}
   #ptr.ready .ic{transform:rotate(180deg)}
 
   /* ---------- Onboarding ---------- */
   .onb{
-    position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:18px;
+    position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;
+    padding:calc(18px + var(--safe-top)) max(18px,var(--safe-right)) calc(18px + var(--safe-bottom)) max(18px,var(--safe-left));
     background:rgba(10,12,20,.5);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
   }
   .onb.open{display:flex}
@@ -569,16 +576,47 @@
     .v-feature .hero img{height:240px}
     .v-feature h2{font-size:1.9rem}
     .actbtn span.lbl{display:none}
-    .topbar{gap:7px; padding:8px 10px}
+    :root{--topbar-pad-block:8px; --topbar-block-size:calc(var(--topbar-pad-block) * 2 + 40px)}
+    .topbar{gap:7px; padding:calc(var(--topbar-pad-block) + var(--safe-top)) max(10px,var(--safe-right)) var(--topbar-pad-block) max(10px,var(--safe-left))}
     .brand .logo{font-size:1.5rem}
     .iconbtn{width:40px;height:40px}
     .seg button{padding:8px 10px}
-    .searchbar{top:56px}
     .actbtn.icon{width:auto; flex:1 1 0}
   }
   @media (prefers-reduced-motion:reduce){
     *,*::before,*::after{animation:none!important;transition:none!important}
   }
+
+  /* ---------- Power-app UX ---------- */
+  .reader-nav{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+  .reader-nav .btn{flex:1 1 0;min-width:0;padding:9px 12px;font-size:13px}
+  .reader-toc{margin:0 0 14px;padding:12px 14px;border-radius:14px;max-height:42vh;overflow-y:auto}
+  .reader-toc h3{font-size:1rem;margin:0 0 8px}
+  .reader-toc ul{list-style:none;margin:0;padding:0}
+  .reader-toc li{margin:4px 0}
+  .reader-toc button{background:none;border:0;padding:4px 0;color:var(--accent2);font:inherit;font-weight:800;cursor:pointer;text-align:left;width:100%}
+  .reader-toc li.l2{padding-left:14px}
+  .read-resume{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;color:var(--accent2);margin:0 0 10px;background:none;border:0;padding:0;cursor:pointer}
+  .related-block{margin:24px 0 8px;padding-top:18px;border-top:1px solid color-mix(in srgb,var(--muted) 24%,transparent)}
+  .related-block h3{font-size:1.2rem;margin:0 0 10px}
+  .related-item{display:block;width:100%;text-align:left;margin:8px 0;padding:12px 14px;border-radius:14px;border:1px solid var(--glass-brd);background:var(--glass-bg);color:var(--ink);font:inherit;font-weight:800;cursor:pointer}
+  .fab-top{position:fixed;right:max(16px,var(--safe-right));bottom:calc(22px + var(--safe-bottom));z-index:36;width:46px;height:46px;border-radius:50%;opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .2s,transform .2s}
+  .fab-top.show{opacity:1;pointer-events:auto;transform:none}
+  .reason{cursor:pointer}
+  .settings-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:10px 0}
+  .toggle{position:relative;width:46px;height:26px;border-radius:999px;border:1px solid var(--glass-brd);background:var(--glass-bg);cursor:pointer;flex:0 0 auto}
+  .toggle.on{background:var(--accent2);border-color:transparent}
+  .toggle i{position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--paper);transition:transform .18s ease;display:block}
+  .toggle.on i{transform:translateX(20px)}
+  .onb-steps{display:flex;gap:8px;margin-bottom:10px}
+  .onb-dot{width:8px;height:8px;border-radius:50%;background:color-mix(in srgb,var(--muted) 35%,transparent)}
+  .onb-dot.active{background:var(--accent2)}
+  .lang-hint{font-size:12px;color:var(--muted);margin:6px 0 0;line-height:1.45}
+  .goal-bar{height:8px;border-radius:999px;background:color-mix(in srgb,var(--muted) 25%,transparent);overflow:hidden;margin-top:8px}
+  .goal-bar i{display:block;height:100%;background:var(--accent2);width:0;transition:width .25s ease}
+  .wiki-content.textonly img,.wiki-content.textonly video,.wiki-content.textonly .thumb,.wiki-content.textonly .infobox{display:none!important}
+  .card.textonly .hero{display:none}
+
   .focusable:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
 </style>
 </head>
@@ -605,6 +643,12 @@
   <symbol id="i-quiz" viewBox="0 0 24 24"><path d="M21.42 10.92a1 1 0 0 0-.02-1.84L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.84l8.57 3.9a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/></symbol>
   <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
   <symbol id="i-trend" viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></symbol>
+
+  <symbol id="i-chevron-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></symbol>
+  <symbol id="i-up" viewBox="0 0 24 24"><path d="m18 15-6-6-6 6"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></symbol>
 </defs></svg>
 
 <header class="topbar glass">
@@ -681,6 +725,22 @@
         <button data-uilang="fr" class="focusable">FR</button>
       </div>
     </div>
+
+    <div class="panel">
+      <h3 class="bebas" data-i18n="settings">Einstellungen</h3>
+      <div class="settings-row">
+        <span data-i18n="dataSaver">Datensparmodus</span>
+        <button class="toggle" id="toggleDataSaver" type="button" aria-pressed="false"><i></i></button>
+      </div>
+      <p class="lang-hint" data-i18n="langHint">Artikelsprache steuert Wikipedia-Inhalte. Die Oberfläche kann separat gewählt werden.</p>
+      <h4 class="bebas" style="font-size:1rem;margin:14px 0 6px" data-i18n="dailyGoal">Tagesziel</h4>
+      <div class="row"><input type="number" min="1" max="50" class="field focusable" id="dailyGoalInput" style="width:88px"><span class="muted" data-i18n="articlesPerDay">Artikel pro Tag</span></div>
+      <div class="goal-bar" id="goalBar"><i id="goalFill"></i></div>
+      <p class="muted" id="goalLabel" style="margin-top:6px"></p>
+      <p class="muted" id="quizBestLabel" style="margin-top:10px"></p>
+      <button class="btn focusable" id="drawerQuiz" style="margin-top:12px;width:100%" type="button"><svg class="ic"><use href="#i-quiz"/></svg><span data-i18n="startQuiz">Quiz starten</span></button>
+    </div>
+
     <div class="row" style="justify-content:space-between;margin-top:4px">
       <button class="btn focusable" id="resetProfile"><svg class="ic"><use href="#i-refresh"/></svg><span data-i18n="resetProfile">Profil zurücksetzen</span></button>
     </div>
@@ -700,6 +760,12 @@
   </div>
   <div class="reader-scroll" id="readerScroll">
     <div class="reader-inner">
+      <div class="reader-nav" id="readerNav">
+        <button class="btn focusable" id="readerPrev" type="button" hidden><svg class="ic"><use href="#i-chevron-left"/></svg><span data-i18n="prevArticle">Vorheriger</span></button>
+        <button class="btn focusable" id="readerTocBtn" type="button"><svg class="ic"><use href="#i-list"/></svg><span data-i18n="toc">Inhalt</span></button>
+        <button class="btn focusable" id="readerNext" type="button" hidden><span data-i18n="nextArticle">Nächster</span><svg class="ic"><use href="#i-chevron-right"/></svg></button>
+      </div>
+      <nav class="reader-toc glass" id="readerToc" hidden aria-label="Inhaltsverzeichnis"></nav>
       <div class="reader-tools">
         <span class="read-time" id="readerTime"></span>
         <span class="text-size">
@@ -707,8 +773,10 @@
           <button class="iconbtn focusable" id="readerBigger" data-i18n-title="textBigger" data-i18n-aria="textBigger" title="Schrift größer" aria-label="Schrift größer">A+</button>
         </span>
       </div>
+      <button class="read-resume focusable" id="readerResume" type="button" hidden></button>
       <h1 class="title bebas" id="readerH1"></h1>
       <div class="wiki-content" id="readerContent"></div>
+      <section class="related-block" id="readerRelated" hidden aria-label="Verwandte Artikel"></section>
     </div>
   </div>
 </div>
@@ -736,21 +804,38 @@
 <!-- Onboarding -->
 <div class="onb" id="onb">
   <div class="sheet glass">
-    <h2 class="bebas" data-i18n="welcome">Willkommen bei Wikidoomia</h2>
-    <p class="lead" data-i18n="onbLead">Wähle ein paar Themen für den Start.</p>
-    <div class="chips" id="onbChips" style="margin-bottom:14px"></div>
-    <div class="row" style="margin-bottom:14px">
-      <input class="field focusable" id="onbCustom" data-i18n-ph="onbCustomPh" placeholder="Eigenes Thema hinzufügen…" style="flex:1;min-width:160px">
-      <button class="btn focusable" id="onbAdd"><svg class="ic"><use href="#i-plus"/></svg></button>
+    <div class="onb-steps"><span class="onb-dot active" id="onbDot1"></span><span class="onb-dot" id="onbDot2"></span></div>
+    <div id="onbStep1">
+      <h2 class="bebas" data-i18n="welcome">Willkommen bei Wikidoomia</h2>
+      <p class="lead" data-i18n="onbLead">Wähle ein paar Themen für den Start.</p>
+      <div class="chips" id="onbChips" style="margin-bottom:14px"></div>
+      <div class="row" style="margin-bottom:14px">
+        <input class="field focusable" id="onbCustom" data-i18n-ph="onbCustomPh" placeholder="Eigenes Thema hinzufügen…" style="flex:1;min-width:160px">
+        <button class="btn focusable" id="onbAdd" type="button"><svg class="ic"><use href="#i-plus"/></svg></button>
+      </div>
+      <div class="row" style="justify-content:space-between">
+        <button class="btn focusable" id="onbSkip" type="button" data-i18n="skip">Überspringen</button>
+        <button class="btn primary focusable" id="onbNext" type="button"><span data-i18n="onbContinue">Weiter</span></button>
+      </div>
     </div>
-    <div class="row" style="justify-content:space-between">
-      <button class="btn focusable" id="onbSkip" data-i18n="skip">Überspringen</button>
-      <button class="btn primary focusable" id="onbStart"><svg class="ic"><use href="#i-sparkles"/></svg><span data-i18n="startFeed">Feed starten</span></button>
+    <div id="onbStep2" hidden>
+      <h2 class="bebas" data-i18n="onbTitle2">So lernt dein Feed</h2>
+      <p class="lead" data-i18n="onbLead2">Sterne, geöffnete Artikel und Lesezeit formen dein Profil — alles nur lokal auf deinem Gerät.</p>
+      <ul class="muted" style="margin:0 0 16px;padding-left:18px;line-height:1.55;font-size:14px">
+        <li data-i18n="onbTip1">Stern = stärkstes Signal</li>
+        <li data-i18n="onbTip2">Artikel öffnen = mittleres Signal</li>
+        <li data-i18n="onbTip3">Lesezeit = leichtes Signal</li>
+      </ul>
+      <div class="row" style="justify-content:space-between">
+        <button class="btn focusable" id="onbBack" type="button" data-i18n="back">Zurück</button>
+        <button class="btn primary focusable" id="onbStart" type="button"><svg class="ic"><use href="#i-sparkles"/></svg><span data-i18n="startFeed">Feed starten</span></button>
+      </div>
     </div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
+<button class="fab-top glass iconbtn focusable" id="btnTop" type="button" hidden data-i18n-aria="backToTop" aria-label="Nach oben"><svg class="ic"><use href="#i-up"/></svg></button>
 
 <script>
 "use strict";
@@ -822,6 +907,17 @@ const I18N = {
     rSubRecent:"Tipp: Mit dem Stern hältst du fest, was dich packt — dann erscheint es künftig hier.",
     rkNext:"Weiter geht's", rMore:t=>`Mehr ${t}?`, rRound2:"Bereit für Runde zwei?",
     rSub5:has=>`Dein Feed hat ${has?"schon nachgelegt":"noch viel für dich"}. Oder prüf, was hängengeblieben ist.`,
+
+    settings:"Einstellungen", dataSaver:"Datensparmodus", langHint:"Artikelsprache steuert Wikipedia-Inhalte. Die Oberfläche kann separat gewählt werden.",
+    dailyGoal:"Tagesziel", articlesPerDay:"Artikel pro Tag", goalProgress:(c,g)=>`${c} / ${g} heute`,
+    quizBest:n=>`Quiz-Rekord: ${n}%`, prevArticle:"Vorheriger", nextArticle:"Nächster", toc:"Inhalt",
+    resumeRead:"Weiterlesen ab letzter Stelle", relatedTitle:"Verwandte Artikel", backToTop:"Nach oben",
+    whyCard:"Warum dieser Artikel?", whyForyou:"Basierend auf Artikeln, die du geöffnet oder markiert hast.",
+    whySerendipity:"Ein Zufallsfund, damit du Neues entdeckst.", whyTrending:"Gerade besonders viel gelesen auf Wikipedia.",
+    whyTfa:"Der Wikipedia-Artikel des Tages.", onbContinue:"Weiter", onbTitle2:"So lernt dein Feed",
+    onbLead2:"Sterne, geöffnete Artikel und Lesezeit formen dein Profil — alles nur lokal auf deinem Gerät.",
+    onbTip1:"Stern = stärkstes Signal", onbTip2:"Artikel öffnen = mittleres Signal", onbTip3:"Lesezeit = leichtes Signal",
+    back:"Zurück", renameColl:"Sammlung umbenennen", topicFeed:t=>`Themen-Feed: ${t}`,
     consoleMsg:"Neugierig, wie der Feed lernt? Tippe  state.profile  ein – das ist dein lokales Themenprofil. Nichts verlässt deinen Browser. Viel Entdeckerfreude."
   },
   en:{
@@ -874,6 +970,17 @@ const I18N = {
     rSubRecent:"Tip: star what grabs you — then it shows up here.",
     rkNext:"What's next", rMore:t=>`More ${t}?`, rRound2:"Ready for round two?",
     rSub5:has=>`Your feed has ${has?"already lined more up":"plenty more for you"}. Or check what stuck.`,
+
+    settings:"Settings", dataSaver:"Data saver", langHint:"Article language controls Wikipedia content. Interface language is separate.",
+    dailyGoal:"Daily goal", articlesPerDay:"articles per day", goalProgress:(c,g)=>`${c} / ${g} today`,
+    quizBest:n=>`Quiz best: ${n}%`, prevArticle:"Previous", nextArticle:"Next", toc:"Contents",
+    resumeRead:"Resume from last position", relatedTitle:"Related articles", backToTop:"Back to top",
+    whyCard:"Why this article?", whyForyou:"Based on articles you opened or starred.",
+    whySerendipity:"A random find to help you discover something new.", whyTrending:"Currently popular on Wikipedia.",
+    whyTfa:"Today's featured Wikipedia article.", onbContinue:"Continue", onbTitle2:"How your feed learns",
+    onbLead2:"Stars, opened articles, and reading time shape your profile — all stored locally on your device.",
+    onbTip1:"Star = strongest signal", onbTip2:"Open article = medium signal", onbTip3:"Reading time = light signal",
+    back:"Back", renameColl:"Rename collection", topicFeed:t=>`Topic feed: ${t}`,
     consoleMsg:"Curious how the feed learns? Type  state.profile  — that's your local topic profile. Nothing leaves your browser. Happy exploring."
   },
   fr:{
@@ -926,6 +1033,17 @@ const I18N = {
     rSubRecent:"Astuce : marque d'une étoile ce qui te plaît — ça apparaîtra ici.",
     rkNext:"La suite", rMore:t=>`Encore ${t} ?`, rRound2:"Prêt pour un deuxième tour ?",
     rSub5:has=>`Ton fil a ${has?"déjà prévu la suite":"encore beaucoup pour toi"}. Ou vérifie ce qui est resté.`,
+
+    settings:"Réglages", dataSaver:"Économie de données", langHint:"La langue des articles contrôle le contenu Wikipédia. L'interface peut être séparée.",
+    dailyGoal:"Objectif du jour", articlesPerDay:"articles par jour", goalProgress:(c,g)=>`${c} / ${g} aujourd'hui`,
+    quizBest:n=>`Record quiz : ${n}%`, prevArticle:"Précédent", nextArticle:"Suivant", toc:"Sommaire",
+    resumeRead:"Reprendre à la dernière position", relatedTitle:"Articles liés", backToTop:"Haut de page",
+    whyCard:"Pourquoi cet article ?", whyForyou:"Basé sur les articles que tu ouvres ou marques.",
+    whySerendipity:"Une trouvaille aléatoire pour découvrir autre chose.", whyTrending:"Très lu en ce moment sur Wikipédia.",
+    whyTfa:"L'article du jour sur Wikipédia.", onbContinue:"Continuer", onbTitle2:"Comment ton fil apprend",
+    onbLead2:"Étoiles, articles ouverts et temps de lecture façonnent ton profil — tout reste local sur ton appareil.",
+    onbTip1:"Étoile = signal le plus fort", onbTip2:"Ouvrir un article = signal moyen", onbTip3:"Temps de lecture = signal léger",
+    back:"Retour", renameColl:"Renommer la collection", topicFeed:t=>`Fil thématique : ${t}`,
     consoleMsg:"Curieux de voir comment le fil apprend ? Tape  state.profile  — c'est ton profil thématique local. Rien ne quitte ton navigateur. Bonne exploration."
   }
 };
@@ -976,7 +1094,13 @@ const state = {
   sessionCards:0,                        // cards seen this session (pause nudge)
   nextPauseAt:30,
   queueBusy:false,
-  endReached:false
+  endReached:false,
+  dataSaver: LS.get("wf_datasaver",false),
+  readPos: LS.get("wf_readpos",{}),
+  dailyGoal: LS.get("wf_dailygoal",5),
+  quizBest: LS.get("wf_quizbest",0),
+  readerQueue: [],
+  readerQueueIdx: -1
 };
 
 function saveProfile(){ LS.set("wf_profile",state.profile); }
@@ -1399,13 +1523,19 @@ function signalDislike(meta,seed){
   saveProfile();
 }
 async function shareArticle(meta){
-  const data={title:meta.title,text:meta.title,url:meta.url};
+  const link=appLinkFor(meta);
+  const snippet=(meta.extract&&meta.extract.length>40)?meta.extract.slice(0,160).trim()+"…":meta.title;
+  const data={title:meta.title,text:`${meta.title}
+
+${snippet}
+
+${link}`,url:link};
   if(navigator.share){
     try{ await navigator.share(data); return; }
     catch(e){ if(e&&e.name==="AbortError") return; }
   }
-  try{ await navigator.clipboard.writeText(meta.url); toast(t("linkCopied")); }
-  catch(e){ toast(meta.url); }
+  try{ await navigator.clipboard.writeText(link); toast(t("linkCopied")); }
+  catch(e){ toast(link); }
 }
 const dwellAccum={};
 function signalDwell(title,seconds){
@@ -1530,6 +1660,9 @@ function articleCard(meta, reason, seed){
 
   if(state.read.has(meta.title)){ card.classList.add("read"); addReadTag(card); }
 
+  const reasonEl=card.querySelector(".reason");
+  if(reasonEl && reason) reasonEl.addEventListener("click",ev=>{ ev.stopPropagation(); explainReason(reason); });
+  if(state.dataSaver) card.classList.add("textonly");
   observeDwell(card,meta.title);
   return card;
 }
@@ -1669,11 +1802,181 @@ window.addEventListener("visibilitychange",()=>{
   if(document.hidden){ dwellTimers.forEach((start,title)=>signalDwell(title,(Date.now()-start)/1000)); dwellTimers.clear(); }
 });
 
+/* ---------- shareable deep links (hash routing) ----------
+   Hybrid model: articles, searches and topics get shareable in-app URLs. */
+const ROUTE_LANGS=["de","en","fr"];
+function slugTitle(title){ return encodeURIComponent(String(title).replace(/ /g,"_")); }
+function articleRoute(meta){ return `#/${meta.lang}/article/${slugTitle(meta.title)}`; }
+function searchRoute(lang,term){ return `#/${lang}/search/${encodeURIComponent(term)}`; }
+function topicRoute(lang,topic){ return `#/${lang}/topic/${encodeURIComponent(topic)}`; }
+function appLinkFor(meta){
+  if(location.protocol==="http:"||location.protocol==="https:"){
+    return location.origin+location.pathname+location.search+articleRoute(meta);
+  }
+  return meta.url;
+}
+function parseHash(){
+  const h=location.hash||"";
+  let m=h.match(/^#\/([a-z]{2})\/article\/(.+)$/);
+  if(m){ let title; try{ title=decodeURIComponent(m[2]); }catch(e){ title=m[2]; } return {type:"article",lang:m[1],title:title.replace(/_/g," ")}; }
+  m=h.match(/^#\/([a-z]{2})\/search\/(.+)$/);
+  if(m){ let term; try{ term=decodeURIComponent(m[2]); }catch(e){ term=m[2]; } return {type:"search",lang:m[1],term}; }
+  m=h.match(/^#\/([a-z]{2})\/topic\/(.+)$/);
+  if(m){ let topic; try{ topic=decodeURIComponent(m[2]); }catch(e){ topic=m[2]; } return {type:"topic",lang:m[1],topic}; }
+  return null;
+}
+function setLangIfNeeded(lang){
+  if(!ROUTE_LANGS.includes(lang) || lang===state.lang) return;
+  state.lang=lang; LS.set("wf_lang",state.lang);
+  document.querySelectorAll("#langSeg button").forEach(x=>x.classList.toggle("active",x.dataset.lang===state.lang));
+  renderInterestChips();
+}
+function runSearchRoute(term, fromHash){
+  term=(term||"").trim(); if(!term) return;
+  addRecent(term);
+  state.pendingStrategies=[{type:"search",term},{type:"search",term}];
+  if(!fromHash) history.replaceState(null,"",location.pathname+location.search+searchRoute(state.lang,term));
+  closeSearch(); closeDrawer();
+  resetFeed();
+  window.scrollTo({top:0,behavior:"smooth"});
+  toast(t("searchToast",term));
+}
+function runTopicRoute(topic, fromHash){
+  topic=(topic||"").trim(); if(!topic) return;
+  if(!state.interests.includes(topic)) state.interests.push(topic);
+  LS.set("wf_interests",state.interests);
+  state.pendingStrategies=[{type:"search",term:topic},{type:"search",term:topic}];
+  if(!fromHash) history.replaceState(null,"",location.pathname+location.search+topicRoute(state.lang,topic));
+  closeSearch(); closeDrawer();
+  resetFeed();
+  window.scrollTo({top:0,behavior:"smooth"});
+  toast(t("topicFeed",topic));
+}
+function syncFromHash(){
+  const route=parseHash();
+  if(!route){
+    if(reader.classList.contains("open")) closeReader({fromHash:true});
+    return;
+  }
+  setLangIfNeeded(route.lang);
+  if(route.type==="article"){
+    if(currentReaderMeta && currentReaderMeta.title===route.title) return;
+    openReader({title:route.title, extract:"", thumb:null,
+      url:`https://${state.lang}.wikipedia.org/wiki/${slugTitle(route.title)}`, lang:state.lang}, {fromHash:true});
+  }else if(route.type==="search"){
+    runSearchRoute(route.term, true);
+  }else if(route.type==="topic"){
+    runTopicRoute(route.topic, true);
+  }
+}
+window.addEventListener("hashchange",syncFromHash);
+
+
+function explainReason(reason){
+  const msg = reason==="foryou"?t("whyForyou"):reason==="serendipity"?t("whySerendipity"):reason==="trending"?t("whyTrending"):reason==="tfa"?t("whyTfa"):t("whyCard");
+  toast(msg);
+}
+function posKey(meta){ return `${meta.lang||state.lang}::${meta.title}`; }
+function getSavedScroll(meta){ return (state.readPos||{})[posKey(meta)]||0; }
+function saveReadScroll(meta, scrollTop){
+  if(!meta||!meta.title) return;
+  state.readPos=state.readPos||{}; state.readPos[posKey(meta)]=Math.max(0,scrollTop|0);
+  LS.set("wf_readpos",state.readPos);
+}
+function buildReaderQueue(title){
+  const q=[...feedEl.querySelectorAll(".card[data-title]")].map(c=>c.dataset.title);
+  state.readerQueue=q; state.readerQueueIdx=q.indexOf(title);
+}
+function readerMetaFromTitle(title){
+  return {title, extract:"", thumb:null, lang:state.lang,
+    url:`https://${state.lang}.wikipedia.org/wiki/${slugTitle(title)}`};
+}
+function updateReaderNav(){
+  const prev=$("#readerPrev"), next=$("#readerNext");
+  const has=state.readerQueue && state.readerQueue.length>1 && state.readerQueueIdx>=0;
+  if(prev) prev.hidden=!has || state.readerQueueIdx<=0;
+  if(next) next.hidden=!has || state.readerQueueIdx>=state.readerQueue.length-1;
+}
+function openReaderNeighbor(delta){
+  if(!currentReaderMeta) return;
+  buildReaderQueue(currentReaderMeta.title);
+  const idx=state.readerQueueIdx+delta;
+  if(idx<0||idx>=state.readerQueue.length) return;
+  openReader(readerMetaFromTitle(state.readerQueue[idx]));
+}
+function slugHeading(text){
+  return String(text||"").trim().toLowerCase().replace(/[^\w\s-]/g,"").replace(/\s+/g,"-").replace(/-+/g,"-");
+}
+function buildReaderToc(container){
+  const toc=$("#readerToc"); if(!toc) return;
+  const heads=[...container.querySelectorAll("h2,h3")].filter(h=>h.textContent.trim());
+  if(!heads.length){ toc.hidden=true; toc.innerHTML=""; return; }
+  const ul=document.createElement("ul");
+  heads.forEach((h,i)=>{
+    if(!h.id) h.id=`sec-${slugHeading(h.textContent)||"part"}-${i}`;
+    const li=document.createElement("li"); if(h.tagName==="H3") li.className="l2";
+    const b=document.createElement("button"); b.type="button"; b.className="focusable"; b.textContent=h.textContent.trim();
+    b.addEventListener("click",()=>{ h.scrollIntoView({behavior:"smooth",block:"start"}); toc.hidden=true; });
+    li.appendChild(b); ul.appendChild(li);
+  });
+  toc.innerHTML=`<h3 class="bebas">${esc(t("toc"))}</h3>`;
+  toc.appendChild(ul);
+}
+async function renderRelatedArticles(meta){
+  const host=$("#readerRelated"); if(!host) return;
+  host.hidden=true; host.innerHTML="";
+  try{
+    const related=await fetchMoreLike(meta.title,4);
+    if(meta!==currentReaderMeta) return;
+    const items=related.filter(a=>a.title!==meta.title).slice(0,4);
+    if(!items.length) return;
+    host.hidden=false;
+    host.innerHTML=`<h3 class="bebas">${esc(t("relatedTitle"))}</h3>`;
+    items.forEach(a=>{
+      const b=document.createElement("button"); b.type="button"; b.className="related-item focusable"; b.textContent=a.title;
+      b.addEventListener("click",()=>openReader(a));
+      host.appendChild(b);
+    });
+  }catch(e){}
+}
+function applyDataSaver(){
+  document.documentElement.classList.toggle("textonly",!!state.dataSaver);
+  const btn=$("#toggleDataSaver");
+  if(btn){ btn.classList.toggle("on",!!state.dataSaver); btn.setAttribute("aria-pressed",state.dataSaver?"true":"false"); }
+  feedEl.querySelectorAll(".card").forEach(c=>c.classList.toggle("textonly",!!state.dataSaver));
+  const rc=$("#readerContent"); if(rc) rc.classList.toggle("textonly",!!state.dataSaver);
+}
+function renderGoalUI(){
+  const goal=Math.max(1,Math.min(50,+(state.dailyGoal||5)));
+  const cur=state.stats.openedToday||0;
+  const pct=Math.min(100,Math.round(cur/goal*100));
+  const fill=$("#goalFill"), label=$("#goalLabel"), input=$("#dailyGoalInput");
+  if(fill) fill.style.width=pct+"%";
+  if(label) label.textContent=t("goalProgress",cur,goal);
+  if(input && document.activeElement!==input) input.value=goal;
+  const qb=$("#quizBestLabel");
+  if(qb) qb.textContent=state.quizBest? t("quizBest",state.quizBest):"";
+}
+function closeTopOverlay(){
+  if(reader.classList.contains("open")) closeReader();
+  else if($("#quiz").classList.contains("open")) closeQuiz();
+  else if($("#recap").classList.contains("open")) closeRecap();
+  else if(!$("#searchBar").hidden) closeSearch();
+  else closeDrawer();
+}
+
 /* ---------- reader ---------- */
 let currentReaderMeta=null;
 const reader=$("#reader");
-async function openReader(meta){
+async function openReader(meta, opts){
+  opts=opts||{};
   currentReaderMeta=meta;
+  buildReaderQueue(meta.title);
+  updateReaderNav();
+  if(!opts.fromHash){
+    const h=articleRoute(meta);
+    if(location.hash!==h) location.hash=h;
+  }
   signalOpen(meta);
   $("#readerTitle").textContent=meta.title;
   $("#readerH1").textContent=meta.title;
@@ -1681,23 +1984,36 @@ async function openReader(meta){
   $("#readerStar").classList.toggle("on",!!state.stars[meta.title]);
   const c=$("#readerContent");
   c.innerHTML=`<p class="muted">${esc(t("loadingArticle"))}</p>`;
+  c.classList.toggle("textonly",!!state.dataSaver);
+  $("#readerRelated").hidden=true; $("#readerRelated").innerHTML="";
+  $("#readerToc").hidden=true; $("#readerToc").innerHTML="";
   $("#readerTime").textContent="";
   $("#readerProgress").style.width="0%";
   applyReaderScale();
+  const saved=getSavedScroll(meta);
+  const resume=$("#readerResume");
+  if(resume){
+    if(saved>120){ resume.hidden=false; resume.textContent=t("resumeRead"); resume.onclick=()=>{ $("#readerScroll").scrollTop=saved; resume.hidden=true; }; }
+    else { resume.hidden=true; resume.onclick=null; }
+  }
   const wasOpen=reader.classList.contains("open");
   reader.classList.add("open"); reader.setAttribute("aria-hidden","false");
-  $("#readerScroll").scrollTop=0;
+  $("#readerScroll").scrollTop= saved>120 ? saved : 0;
   document.body.style.overflow="hidden";
   if(!wasOpen) trapFocus(reader);
   try{
     const html=await fetchFull(meta.title);
-    if(meta!==currentReaderMeta) return;     // user navigated away while loading
+    if(meta!==currentReaderMeta) return;
     if(!html){ c.innerHTML=`<p class="muted">${esc(t("loadFail"))} <a href="${meta.url}" target="_blank" rel="noopener">${esc(t("openWiki"))}</a>.</p>`; return; }
     c.innerHTML=html;
     fixMedia(c);
     rewriteWikiLinks(c);
+    buildReaderToc(c);
+    c.classList.toggle("textonly",!!state.dataSaver);
     const words=(c.textContent||"").trim().split(/\s+/).length;
     $("#readerTime").textContent = t("minRead", Math.max(1, Math.round(words/200)));
+    if(saved>120) $("#readerScroll").scrollTop=saved;
+    renderRelatedArticles(meta);
   }catch(e){
     c.innerHTML=`<p class="muted">${esc(t("loadErr"))} <a href="${meta.url}" target="_blank" rel="noopener">${esc(t("openWiki"))}</a>.</p>`;
   }
@@ -1715,11 +2031,18 @@ $("#readerBigger").addEventListener("click",()=>setReaderScale(+10));
 $("#readerScroll").addEventListener("scroll",function(){
   const max=this.scrollHeight-this.clientHeight;
   $("#readerProgress").style.width=(max>0 ? this.scrollTop/max*100 : 0)+"%";
+  if(currentReaderMeta){ clearTimeout(this._saveT); this._saveT=setTimeout(()=>saveReadScroll(currentReaderMeta,this.scrollTop),180); }
 },{passive:true});
-function closeReader(){
+function closeReader(opts){
+  opts=opts||{};
   if(!reader.classList.contains("open")) return;
+  if(currentReaderMeta) saveReadScroll(currentReaderMeta, $("#readerScroll").scrollTop||0);
   reader.classList.remove("open"); reader.setAttribute("aria-hidden","true");
   document.body.style.overflow=""; currentReaderMeta=null; releaseFocus();
+  // Drop the article route without adding a new history entry (avoids a back-button loop).
+  if(!opts.fromHash && parseHash()){
+    history.replaceState(null,"",location.pathname+location.search+"#/");
+  }
 }
 function fixMedia(container){
   // Wikipedia parse output uses protocol-relative (//upload…) and root-relative (/w/…)
@@ -1886,6 +2209,8 @@ function answerQuiz(i){
 }
 function renderQuizResult(){
   const {score,qs}=quizState;
+  const pct=Math.round(score/qs.length*100);
+  if(pct>(state.quizBest||0)){ state.quizBest=pct; LS.set("wf_quizbest",state.quizBest); renderGoalUI(); }
   $("#quizProgress").textContent="";
   const msg = score===qs.length ? t("quizPerfect") : (score>=Math.ceil(qs.length*0.6) ? t("quizGood") : t("quizMeh"));
   $("#quizBody").innerHTML=`<div class="quiz-result">
@@ -2000,13 +2325,7 @@ function openRecap(){
 function closeRecap(){ const r=$("#recap"); if(!r.classList.contains("open")) return; r.classList.remove("open"); r.setAttribute("aria-hidden","true"); document.body.style.overflow=""; releaseFocus(); }
 $("#openRecap").addEventListener("click",openRecap);
 $("#closeRecap").addEventListener("click",closeRecap);
-document.addEventListener("keydown",e=>{ if(e.key==="Escape"){
-  // close the top-most overlay first (reader sits above quiz/recap)
-  if(reader.classList.contains("open")) closeReader();
-  else if($("#quiz").classList.contains("open")) closeQuiz();
-  else if($("#recap").classList.contains("open")) closeRecap();
-  else closeDrawer();
-}});
+document.addEventListener("keydown",e=>{ if(e.key==="Escape") closeTopOverlay(); });
 
 /* ---------- stars ---------- */
 function toggleStar(meta){
@@ -2084,7 +2403,7 @@ function closeCollMenu(){ if(collMenuEl){ collMenuEl.remove(); collMenuEl=null; 
 
 /* ---------- drawer (collections + profile) ---------- */
 const drawer=$("#drawer"), scrim=$("#scrim");
-function openDrawer(){ if(drawer.classList.contains("open")) return; renderCollections(); renderProfile(); renderInterestChips(); drawer.classList.add("open"); scrim.classList.add("open"); drawer.setAttribute("aria-hidden","false"); trapFocus(drawer); }
+function openDrawer(){ if(drawer.classList.contains("open")) return; renderCollections(); renderProfile(); renderInterestChips(); renderGoalUI(); drawer.classList.add("open"); scrim.classList.add("open"); drawer.setAttribute("aria-hidden","false"); trapFocus(drawer); }
 function closeDrawer(){ if(!drawer.classList.contains("open")) return; drawer.classList.remove("open"); scrim.classList.remove("open"); drawer.setAttribute("aria-hidden","true"); releaseFocus(); }
 $("#btnColl").addEventListener("click",openDrawer);
 $("#closeDrawer").addEventListener("click",closeDrawer);
@@ -2104,10 +2423,13 @@ function renderCollections(){
     const sec=document.createElement("div"); sec.style.marginBottom="12px";
     const head=document.createElement("div"); head.className="row"; head.style.justifyContent="space-between";
     head.innerHTML=`<strong class="bebas" style="font-size:1.05rem">${name}</strong>`;
+    const ren=document.createElement("button"); ren.className="mini focusable"; ren.innerHTML=svgIc("i-bookmark");
+    ren.title=t("renameColl"); ren.setAttribute("aria-label",t("renameColl"));
+    ren.addEventListener("click",async ()=>{ const nn=await modalPrompt({title:t("renameColl"),value:name,confirm:t("create")}); if(!nn||nn===name||state.collections[nn]) return; state.collections[nn]=state.collections[name]; delete state.collections[name]; saveCollections(); });
     const del=document.createElement("button"); del.className="mini focusable"; del.innerHTML=svgIc("i-trash");
     del.title=t("deleteCollTitle"); del.setAttribute("aria-label",t("deleteCollTitle"));
     del.addEventListener("click",async ()=>{ if(await modalConfirm({title:t("deleteCollTitle"),message:t("deleteCollMsg",name),confirm:t("del"),danger:true})){ delete state.collections[name]; saveCollections(); }});
-    head.appendChild(del); sec.appendChild(head);
+    head.append(ren,del); sec.appendChild(head);
     const arr=state.collections[name];
     if(arr.length===0){ const e=document.createElement("p"); e.className="muted"; e.textContent=t("empty"); sec.appendChild(e); }
     arr.forEach(m=>{
@@ -2151,6 +2473,7 @@ function profileSummaryHTML(){
 }
 function renderProfile(){
   $("#profileBody").innerHTML = profileSummaryHTML();
+  renderGoalUI();
   renderRail();
 }
 /* desktop-only context panel beside the feed (hidden on mobile via CSS) */
@@ -2184,6 +2507,8 @@ function renderInterestChips(){
       if(i>=0) state.interests.splice(i,1); else state.interests.push(topic);
       LS.set("wf_interests",state.interests); renderInterestChips();
     });
+    c.addEventListener("dblclick",()=>{ runTopicRoute(topic,false); if(location.protocol==="http:"||location.protocol==="https:") history.replaceState(null,"",location.pathname+location.search+topicRoute(state.lang,topic)); });
+    c.title=state.interests.includes(topic)? `${topic} — ${t("topicFeed",topic)} (Doppelklick)` : topic;
     host.appendChild(c);
   });
 }
@@ -2231,12 +2556,8 @@ function openSearch(){
 function closeSearch(){ $("#searchBar").hidden=true; $("#searchResults").hidden=true; }
 function doSearch(term){
   term=(term||"").trim(); if(!term) return;
-  addRecent(term);
-  state.pendingStrategies=[{type:"search",term},{type:"search",term}];
-  closeSearch();
-  resetFeed();
-  window.scrollTo({top:0,behavior:"smooth"});
-  toast(t("searchToast",term));
+  runSearchRoute(term,false);
+  if(location.protocol==="http:"||location.protocol==="https:") history.replaceState(null,"",location.pathname+location.search+searchRoute(state.lang,term));
 }
 function renderRecent(){
   const box=$("#searchResults"); const r=state.recent||[];
@@ -2317,6 +2638,8 @@ function finishOnb(){
   releaseFocus();
   resetFeed();
 }
+$("#onbNext").addEventListener("click",()=>{ $("#onbStep1").hidden=true; $("#onbStep2").hidden=false; $("#onbDot1").classList.remove("active"); $("#onbDot2").classList.add("active"); });
+$("#onbBack").addEventListener("click",()=>{ $("#onbStep2").hidden=true; $("#onbStep1").hidden=false; $("#onbDot2").classList.remove("active"); $("#onbDot1").classList.add("active"); });
 $("#onbStart").addEventListener("click",finishOnb);
 $("#onbSkip").addEventListener("click",finishOnb);
 $("#resetProfile").addEventListener("click",async ()=>{
@@ -2376,7 +2699,7 @@ addSwipeClose($("#recap"), ()=>$("#recapScroll"), closeRecap);
 
 // pull-to-refresh at the top of the feed
 function anyOverlayOpen(){
-  return reader.classList.contains("open")||$("#quiz").classList.contains("open")||$("#recap").classList.contains("open")||drawer.classList.contains("open")||!!collMenuEl||!!document.querySelector(".onb.open");
+  return reader.classList.contains("open")||$("#quiz").classList.contains("open")||$("#recap").classList.contains("open")||drawer.classList.contains("open")||!$("#searchBar").hidden||!!collMenuEl||!!document.querySelector(".onb.open");
 }
 (function(){
   const ptr=document.createElement("div"); ptr.id="ptr"; ptr.innerHTML=`<svg class="ic"><use href="#i-refresh"/></svg>`;
@@ -2415,6 +2738,16 @@ function init(){
   state.surpriseAt=randInt(4,8);
   updateCollBadge();
   renderRail();
+  applyDataSaver();
+  renderGoalUI();
+  if($("#readerPrev")) $("#readerPrev").addEventListener("click",()=>openReaderNeighbor(-1));
+  if($("#readerNext")) $("#readerNext").addEventListener("click",()=>openReaderNeighbor(1));
+  if($("#readerTocBtn")) $("#readerTocBtn").addEventListener("click",()=>{ const toc=$("#readerToc"); if(toc) toc.hidden=!toc.hidden; });
+  if($("#toggleDataSaver")) $("#toggleDataSaver").addEventListener("click",()=>{ state.dataSaver=!state.dataSaver; LS.set("wf_datasaver",state.dataSaver); applyDataSaver(); });
+  if($("#dailyGoalInput")) $("#dailyGoalInput").addEventListener("change",e=>{ state.dailyGoal=Math.max(1,Math.min(50,+e.target.value||5)); LS.set("wf_dailygoal",state.dailyGoal); renderGoalUI(); });
+  if($("#drawerQuiz")) $("#drawerQuiz").addEventListener("click",()=>{ closeDrawer(); startQuiz(); });
+  if($("#btnTop")) $("#btnTop").addEventListener("click",()=>window.scrollTo({top:0,behavior:"smooth"}));
+  window.addEventListener("scroll",()=>{ const b=$("#btnTop"); if(!b) return; b.classList.toggle("show", window.scrollY>480 && !anyOverlayOpen()); },{passive:true});
   if(!LS.get("wf_onboarded",false)){
     renderOnbChips();
     $("#onb").classList.add("open");
@@ -2422,6 +2755,7 @@ function init(){
   }else{
     resetFeed();
   }
+  syncFromHash();   // open a shared deep link (#/<lang>/article/<title>) on first load
 }
 init();
 
