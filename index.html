@@ -631,8 +631,9 @@
   .lang-hint{font-size:12px;color:var(--muted);margin:6px 0 0;line-height:1.45}
   .goal-bar{height:8px;border-radius:999px;background:color-mix(in srgb,var(--muted) 25%,transparent);overflow:hidden;margin-top:8px}
   .goal-bar i{display:block;height:100%;width:100%;transform:scaleX(0);transform-origin:left;background:var(--accent2);transition:transform .25s ease}
-  .wiki-content.textonly img,.wiki-content.textonly video,.wiki-content.textonly .thumb,.wiki-content.textonly .infobox{display:none!important}
-  .card.textonly .hero{display:none}
+  .wiki-content.textonly img,.wiki-content.textonly video,.wiki-content.textonly .thumb,.wiki-content.textonly .infobox,
+  .textonly .wiki-content img,.textonly .wiki-content video,.textonly .wiki-content .thumb,.textonly .wiki-content .infobox{display:none!important}
+  .card.textonly .hero,.textonly .card .hero{display:none}
   .reason-info{width:12px;height:12px;opacity:.65;margin-left:1px}
   .reader-toc li.active > button{color:var(--accent);font-weight:900}
   .related-loading{display:flex;flex-direction:column;gap:8px}
@@ -762,7 +763,7 @@
       <h3 class="bebas" data-i18n="settings">Einstellungen</h3>
       <div class="settings-row">
         <span id="dataSaverLabel" data-i18n="dataSaver">Datensparmodus</span>
-        <button class="toggle focusable" id="toggleDataSaver" type="button" role="switch" aria-pressed="false" aria-labelledby="dataSaverLabel"><i></i></button>
+        <button class="toggle focusable" id="toggleDataSaver" type="button" role="switch" aria-checked="false" aria-labelledby="dataSaverLabel"><i></i></button>
       </div>
       <p class="lang-hint" data-i18n="langHint">Artikelsprache steuert Wikipedia-Inhalte. Die Oberfläche kann separat gewählt werden.</p>
       <h4 class="bebas" id="dailyGoalHeading" style="font-size:1rem;margin:14px 0 6px" data-i18n="dailyGoal">Tagesziel</h4>
@@ -2012,8 +2013,9 @@ async function renderRelatedArticles(meta){
 }
 function applyDataSaver(){
   document.documentElement.classList.toggle("textonly",!!state.dataSaver);
+  document.body.classList.toggle("textonly",!!state.dataSaver);
   const btn=$("#toggleDataSaver");
-  if(btn){ btn.classList.toggle("on",!!state.dataSaver); btn.setAttribute("aria-pressed",state.dataSaver?"true":"false"); }
+  if(btn){ btn.classList.toggle("on",!!state.dataSaver); btn.setAttribute("aria-checked",state.dataSaver?"true":"false"); btn.removeAttribute("aria-pressed"); }
   feedEl.querySelectorAll(".card").forEach(c=>c.classList.toggle("textonly",!!state.dataSaver));
   const rc=$("#readerContent"); if(rc) rc.classList.toggle("textonly",!!state.dataSaver);
 }
