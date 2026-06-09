@@ -269,8 +269,12 @@
   .digest-sec li:last-child{border-bottom:0}
   .digest-link{background:none;border:0;padding:0;text-align:left;color:var(--ink);font:inherit;font-size:14px;line-height:1.45;cursor:pointer}
   .digest-link:hover{color:var(--accent2);text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:2px}
+  .continue-row{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+  .continue-row .digest-link{flex:1}
+  .continue-pct{flex:none;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.03em;color:var(--accent2);white-space:nowrap}
   @media (min-width:1100px){
     .digest{column-count:2;column-gap:26px}
+    .digest.continue{column-count:1}
     .digest .digest-head{column-span:all}
     .digest-sec{break-inside:avoid}
   }
@@ -609,12 +613,24 @@
   /* ---------- Power-app UX ---------- */
   .reader-nav{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
   .reader-nav .btn{flex:1 1 0;min-width:0;padding:9px 12px;font-size:13px}
-  .reader-toc{margin:0 0 14px;padding:12px 14px;border-radius:14px;max-height:42vh;overflow-y:auto}
   .reader-toc h3{font-size:1rem;margin:0 0 8px}
   .reader-toc ul{list-style:none;margin:0;padding:0}
   .reader-toc li{margin:4px 0}
-  .reader-toc button{background:none;border:0;padding:4px 0;color:var(--accent2);font:inherit;font-weight:800;cursor:pointer;text-align:left;width:100%}
+  .reader-toc button{background:none;border:0;padding:8px 0;color:var(--accent2);font:inherit;font-weight:800;cursor:pointer;text-align:left;width:100%;min-height:40px}
   .reader-toc li.l2{padding-left:14px}
+  /* floating, anywhere-reachable contents sheet */
+  .reader-toc-sheet{
+    position:fixed;z-index:97;left:50%;transform:translate(-50%,12px);
+    bottom:calc(84px + var(--safe-bottom));width:min(460px,calc(100vw - 28px));
+    margin:0;padding:14px 16px;border-radius:18px;max-height:60vh;overflow-y:auto;
+    box-shadow:0 18px 48px rgba(0,0,0,.32);opacity:0;pointer-events:none;
+    transition:opacity .2s,transform .2s}
+  .reader-toc-sheet.open{opacity:1;pointer-events:auto;transform:translateX(-50%)}
+  .reader-toc-bg{position:fixed;inset:0;z-index:96;background:rgba(0,0,0,.32);opacity:0;pointer-events:none;transition:opacity .2s}
+  .reader-toc-bg.open{opacity:1;pointer-events:auto}
+  .reader-fab{position:fixed;z-index:96;right:max(16px,var(--safe-right));bottom:calc(22px + var(--safe-bottom));width:50px;height:50px;border-radius:50%;opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .2s,transform .2s}
+  .reader-fab .ic{width:22px;height:22px}
+  .reader-fab.show{opacity:1;pointer-events:auto;transform:none}
   .read-resume{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;color:var(--accent2);margin:0 0 10px;background:none;border:0;padding:0;cursor:pointer}
   .related-block{margin:24px 0 8px;padding-top:18px;border-top:1px solid color-mix(in srgb,var(--muted) 24%,transparent)}
   .related-block h3{font-size:1.2rem;margin:0 0 10px}
@@ -800,7 +816,6 @@
         <button class="btn focusable" id="readerTocBtn" type="button"><svg class="ic"><use href="#i-list"/></svg><span data-i18n="toc">Inhalt</span></button>
         <button class="btn focusable" id="readerNext" type="button" hidden><span data-i18n="nextArticle">Nächster</span><svg class="ic"><use href="#i-chevron-right"/></svg></button>
       </div>
-      <nav class="reader-toc glass" id="readerToc" hidden aria-label="Inhaltsverzeichnis"></nav>
       <div class="reader-tools">
         <span class="read-time" id="readerTime"></span>
         <span class="text-size">
@@ -814,6 +829,9 @@
       <section class="related-block" id="readerRelated" hidden aria-label="Verwandte Artikel"></section>
     </div>
   </div>
+  <div class="reader-toc-bg" id="readerTocBg" hidden></div>
+  <nav class="reader-toc reader-toc-sheet glass" id="readerToc" hidden aria-label="Inhaltsverzeichnis"></nav>
+  <button class="reader-fab glass iconbtn focusable" id="readerTocFab" type="button" hidden data-i18n-aria="toc" aria-label="Inhalt"><svg class="ic"><use href="#i-list"/></svg></button>
 </div>
 
 <!-- Lese-Rückblick (scrollytelling) -->
@@ -908,6 +926,7 @@ const I18N = {
     serendipity:"Zufallsfund", serendipityTitle:"Zufallsfund zum Stöbern", lessLikeThis:"Weniger davon",
     trending:"Viel gelesen", trendingTitle:"Aktuell viel gelesen auf Wikipedia",
     featuredToday:"Heute auf Wikipedia", tfaLabel:"Artikel des Tages", secNews:"In den Nachrichten", secOnThisDay:"Was geschah heute", secDyk:"Schon gewusst?",
+    continueTitle:"Weiterlesen",
     loadingArticle:"Lade Artikel…", loadFail:"Konnte den Artikel nicht laden.", loadErr:"Fehler beim Laden.",
     starRemoved:"Stern entfernt", starred:"★ Mit Stern markiert", linkCopied:"Link kopiert",
     removedFrom:n=>`Aus „${n}“ entfernt`, addedTo:n=>`Zu „${n}“ hinzugefügt`,
@@ -971,6 +990,7 @@ const I18N = {
     serendipity:"Random find", serendipityTitle:"A random find to explore", lessLikeThis:"Less like this",
     trending:"Trending", trendingTitle:"Currently most-read on Wikipedia",
     featuredToday:"Today on Wikipedia", tfaLabel:"Featured article", secNews:"In the news", secOnThisDay:"On this day", secDyk:"Did you know?",
+    continueTitle:"Continue reading",
     loadingArticle:"Loading article…", loadFail:"Couldn't load the article.", loadErr:"Loading error.",
     starRemoved:"Star removed", starred:"★ Starred", linkCopied:"Link copied",
     removedFrom:n=>`Removed from “${n}”`, addedTo:n=>`Added to “${n}”`,
@@ -1034,6 +1054,7 @@ const I18N = {
     serendipity:"Trouvaille", serendipityTitle:"Une trouvaille à explorer", lessLikeThis:"Moins de ça",
     trending:"Populaire", trendingTitle:"Très lu en ce moment sur Wikipédia",
     featuredToday:"Aujourd'hui sur Wikipédia", tfaLabel:"Article du jour", secNews:"Actualités", secOnThisDay:"Éphéméride", secDyk:"Le saviez-vous ?",
+    continueTitle:"Reprendre la lecture",
     loadingArticle:"Chargement de l'article…", loadFail:"Impossible de charger l'article.", loadErr:"Erreur de chargement.",
     starRemoved:"Étoile retirée", starred:"★ Marqué d'une étoile", linkCopied:"Lien copié",
     removedFrom:n=>`Retiré de « ${n} »`, addedTo:n=>`Ajouté à « ${n} »`,
@@ -1133,6 +1154,8 @@ const state = {
   dataSaver: LS.get("wf_datasaver",false),
   readPos: LS.get("wf_readpos",{}),
   readProg: LS.get("wf_readprog",{}),
+  readOrder: LS.get("wf_readorder",[]),  // posKeys, most-recently-read first (for "continue reading")
+  wantContinueFirst:false,               // show a "continue reading" cluster on a fresh feed
   dailyGoal: LS.get("wf_dailygoal",5),
   quizBest: LS.get("wf_quizbest",0),
   readerQueue: [],
@@ -1145,6 +1168,14 @@ function api(){ return `https://${state.lang}.wikipedia.org/w/api.php`; }
 /* ---------- helpers ---------- */
 const $ = s => document.querySelector(s);
 function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function truncateAtWord(text,lim){
+  text=(text||"").trim();
+  if(text.length<=lim) return text;
+  let cut=text.slice(0,lim);
+  const sp=cut.lastIndexOf(" ");
+  if(sp>lim*0.6) cut=cut.slice(0,sp);
+  return cut.replace(/[\s.,;:–—-]+$/,"")+"…";
+}
 
 /* ---------- accessibility: focus trap for overlays (stack-aware, restores focus) ---------- */
 const FOCUS_SEL='a[href],button:not([disabled]),input:not([disabled]),select,textarea,[tabindex]:not([tabindex="-1"])';
@@ -1549,7 +1580,41 @@ function saveReadProg(meta, frac){
   frac=Math.max(0,Math.min(1,frac||0));
   state.readProg=state.readProg||{};
   const key=posKey(meta);
-  if(frac>(state.readProg[key]||0)){ state.readProg[key]=frac; LS.set("wf_readprog",state.readProg); }
+  if(frac>(state.readProg[key]||0)){
+    state.readProg[key]=frac; LS.set("wf_readprog",state.readProg);
+    state.readOrder=[key,...(state.readOrder||[]).filter(k=>k!==key)].slice(0,80);
+    LS.set("wf_readorder",state.readOrder);
+  }
+}
+/* in-progress articles (1–89%) for the current article language, most-recent first */
+function continueReadingItems(limit=6){
+  const lang=state.lang, out=[];
+  for(const key of (state.readOrder||[])){
+    const i=key.indexOf("::"); if(i<0) continue;
+    if(key.slice(0,i)!==lang) continue;
+    const title=key.slice(i+2), frac=(state.readProg||{})[key];
+    if(frac==null) continue;
+    const pct=Math.round(Math.max(0,Math.min(1,frac))*100);
+    if(pct<1 || pct>=90) continue;
+    out.push({title, lang, pct});
+    if(out.length>=limit) break;
+  }
+  return out;
+}
+function buildContinueCard(items){
+  const card=document.createElement("article"); card.className="card glass digest continue";
+  card.innerHTML=`<div class="digest-head">${svgIc("i-book")} ${esc(t("continueTitle"))}</div>`;
+  const sec=document.createElement("div"); sec.className="digest-sec";
+  const ul=document.createElement("ul");
+  items.forEach(it=>{
+    const li=document.createElement("li"); li.className="continue-row";
+    const a=document.createElement("button"); a.className="digest-link focusable"; a.textContent=it.title;
+    a.addEventListener("click",()=>openByTitle(it.title,it.lang));
+    const pctEl=document.createElement("span"); pctEl.className="continue-pct"; pctEl.textContent=t("readPct",it.pct);
+    li.append(a,pctEl); ul.appendChild(li);
+  });
+  sec.appendChild(ul); card.appendChild(sec);
+  return card;
 }
 function refreshReadTag(meta){
   let card; try{ card=feedEl.querySelector(`.card[data-title="${CSS.escape(meta.title)}"]`); }catch(e){}
@@ -1661,8 +1726,8 @@ function articleCard(meta, reason, seed){
   h2.appendChild(titleBtn);
   body.appendChild(h2);
   const ex=document.createElement("p"); ex.className="extract";
-  const lim = variant==="feature"?170 : (variant==="compact"?280 : 340);
-  ex.textContent = meta.extract.length>lim ? meta.extract.slice(0,lim).trim()+"…" : meta.extract;
+  const lim = variant==="feature"?300 : (variant==="compact"?380 : 540);
+  ex.textContent = truncateAtWord(meta.extract,lim);
   const rm=document.createElement("button"); rm.className="readmore focusable";
   rm.innerHTML=`${svgIc("i-book")} ${esc(t("readFull"))}`;
   rm.addEventListener("click",()=>openReader(meta));
@@ -1750,6 +1815,12 @@ async function loadMore(){
 
   let attempts=0, added=0;
   try{
+    // one-shot "Continue reading" cluster on a fresh feed (in-progress articles)
+    if(state.wantContinueFirst && state.pendingStrategies.length===0 && feedEl.querySelectorAll(".card").length===0){
+      state.wantContinueFirst=false;
+      const items=continueReadingItems();
+      if(items.length) feedEl.insertBefore(buildContinueCard(items), skels[0]||null);
+    }
     // one-shot "Today on Wikipedia" cluster on a fresh feed (article of the day + digest)
     if(state.wantFeaturedFirst && state.pendingStrategies.length===0 && feedEl.querySelectorAll(".card").length===0){
       state.wantFeaturedFirst=false;
@@ -1853,6 +1924,7 @@ function resetFeed(){
   state.cardsSinceTrending=0; state.trendingAt=randInt(14,22);
   state.trendingCache=[]; state.wantTrendingFirst=true;   // fresh hook each reset (language switch refetches)
   state.featuredCache=null; state.wantFeaturedFirst=true; // "today on Wikipedia" cluster on fresh feed
+  state.wantContinueFirst=true;                           // "continue reading" cluster on fresh feed
   state._railFetching=false;
   feedEl.querySelectorAll(":scope > :not(h1)").forEach(n=>n.remove());  // keep the sr-only page heading
   loadMore().then(()=>loadMore()).then(renderRail);
@@ -1991,22 +2063,50 @@ function slugHeading(text){
   return String(text||"").trim().toLowerCase().replace(/[^\w\s-]/g,"").replace(/\s+/g,"-").replace(/-+/g,"-");
 }
 let tocMap=[];
+function tocAvailable(){ return tocMap.length>0; }
+function setTocControlsVisible(){
+  const has=tocAvailable();
+  const btn=$("#readerTocBtn"); if(btn) btn.hidden=!has;
+  const fab=$("#readerTocFab"); if(fab){ fab.hidden=!has; if(!has) fab.classList.remove("show"); }
+  if(!has) closeReaderToc();
+}
+function openReaderToc(){
+  if(!tocAvailable()) return;
+  const toc=$("#readerToc"), bg=$("#readerTocBg"); if(!toc) return;
+  toc.hidden=false; if(bg) bg.hidden=false;
+  requestAnimationFrame(()=>{ toc.classList.add("open"); if(bg) bg.classList.add("open"); });
+  updateTocActive();
+  const cur=toc.querySelector("li.active > button") || toc.querySelector("button");
+  if(cur) cur.focus();
+}
+function closeReaderToc(){
+  const toc=$("#readerToc"), bg=$("#readerTocBg"); if(!toc) return;
+  if(!toc.classList.contains("open") && toc.hidden) return;
+  toc.classList.remove("open"); if(bg) bg.classList.remove("open");
+  setTimeout(()=>{ toc.hidden=true; if(bg) bg.hidden=true; },200);
+}
+function toggleReaderToc(){
+  const toc=$("#readerToc"); if(!toc) return;
+  if(toc.classList.contains("open")) closeReaderToc(); else openReaderToc();
+}
+function tocSheetOpen(){ const toc=$("#readerToc"); return !!(toc && toc.classList.contains("open")); }
 function buildReaderToc(container){
   const toc=$("#readerToc"); if(!toc) return;
   tocMap=[];
   const heads=[...container.querySelectorAll("h2,h3")].filter(h=>h.textContent.trim());
-  if(!heads.length){ toc.hidden=true; toc.replaceChildren(); return; }
+  if(!heads.length){ toc.hidden=true; toc.replaceChildren(); setTocControlsVisible(); return; }
   const head=document.createElement("h3"); head.className="bebas"; head.textContent=t("toc");
   const ul=document.createElement("ul");
   heads.forEach((h,i)=>{
     if(!h.id) h.id=`sec-${slugHeading(h.textContent)||"part"}-${i}`;
     const li=document.createElement("li"); if(h.tagName==="H3") li.className="l2";
     const b=document.createElement("button"); b.type="button"; b.className="focusable"; b.textContent=h.textContent.trim();
-    b.addEventListener("click",()=>{ h.scrollIntoView({behavior:"smooth",block:"start"}); toc.hidden=true; });
+    b.addEventListener("click",()=>{ h.scrollIntoView({behavior:"smooth",block:"start"}); closeReaderToc(); });
     li.appendChild(b); ul.appendChild(li);
     tocMap.push({h, li});
   });
   toc.replaceChildren(head, ul);
+  setTocControlsVisible();
 }
 function updateTocActive(){
   if(!tocMap.length) return;
@@ -2087,7 +2187,10 @@ async function openReader(meta, opts){
   c.innerHTML=`<p class="muted">${esc(t("loadingArticle"))}</p>`;
   c.classList.toggle("textonly",!!state.dataSaver);
   $("#readerRelated").hidden=true; $("#readerRelated").replaceChildren();
-  $("#readerToc").hidden=true; $("#readerToc").replaceChildren(); tocMap=[];
+  $("#readerToc").hidden=true; $("#readerToc").classList.remove("open"); $("#readerToc").replaceChildren(); tocMap=[];
+  $("#readerTocBg").hidden=true; $("#readerTocBg").classList.remove("open");
+  $("#readerTocFab").classList.remove("show");
+  setTocControlsVisible();
   $("#readerTime").textContent="";
   $("#readerProgress").style.transform="scaleX(0)";
   applyReaderScale();
@@ -2147,12 +2250,14 @@ $("#readerScroll").addEventListener("scroll",function(){
   const max=this.scrollHeight-this.clientHeight;
   $("#readerProgress").style.transform="scaleX("+(max>0 ? this.scrollTop/max : 0)+")";
   if(currentReaderMeta){ clearTimeout(this._saveT); this._saveT=setTimeout(()=>{ saveReadScroll(currentReaderMeta,this.scrollTop); saveReadProg(currentReaderMeta,readerSeenFraction()); },180); }
+  const fab=$("#readerTocFab"); if(fab) fab.classList.toggle("show", tocAvailable() && this.scrollTop>300 && !tocSheetOpen());
   updateTocActive();
 },{passive:true});
 function closeReader(opts){
   opts=opts||{};
   if(!reader.classList.contains("open")) return;
   if(currentReaderMeta){ saveReadScroll(currentReaderMeta, $("#readerScroll").scrollTop||0); saveReadProg(currentReaderMeta, readerSeenFraction()); refreshReadTag(currentReaderMeta); }
+  closeReaderToc(); $("#readerTocFab").classList.remove("show");
   reader.classList.remove("open"); reader.setAttribute("aria-hidden","true");
   document.body.style.overflow=""; currentReaderMeta=null; releaseFocus();
   // Drop the article route without adding a new history entry (avoids a back-button loop).
@@ -2441,7 +2546,7 @@ function openRecap(){
 function closeRecap(){ const r=$("#recap"); if(!r.classList.contains("open")) return; r.classList.remove("open"); r.setAttribute("aria-hidden","true"); document.body.style.overflow=""; releaseFocus(); }
 $("#openRecap").addEventListener("click",openRecap);
 $("#closeRecap").addEventListener("click",closeRecap);
-document.addEventListener("keydown",e=>{ if(e.key==="Escape") closeTopOverlay(); });
+document.addEventListener("keydown",e=>{ if(e.key!=="Escape") return; if(tocSheetOpen()){ closeReaderToc(); return; } closeTopOverlay(); });
 
 /* ---------- stars ---------- */
 function toggleStar(meta){
@@ -2857,6 +2962,10 @@ function init(){
     console.log("%c"+t("consoleMsg"),"color:#1557ff;font-weight:600;font-size:13px");
   }catch(e){}
   applyTheme();
+  // migrate: seed read order from existing progress data (pre-readOrder installs)
+  if((!state.readOrder||!state.readOrder.length) && state.readProg && Object.keys(state.readProg).length){
+    state.readOrder=Object.keys(state.readProg).slice(0,80); LS.set("wf_readorder",state.readOrder);
+  }
   document.documentElement.lang=state.uiLang;
   document.querySelectorAll("#langSeg button").forEach(x=>x.classList.toggle("active",x.dataset.lang===state.lang));
   document.querySelectorAll("#uiLangSeg button").forEach(x=>x.classList.toggle("active",x.dataset.uilang===state.uiLang));
@@ -2868,7 +2977,9 @@ function init(){
   renderGoalUI();
   if($("#readerPrev")) $("#readerPrev").addEventListener("click",()=>openReaderNeighbor(-1));
   if($("#readerNext")) $("#readerNext").addEventListener("click",()=>openReaderNeighbor(1));
-  if($("#readerTocBtn")) $("#readerTocBtn").addEventListener("click",()=>{ const toc=$("#readerToc"); if(toc) toc.hidden=!toc.hidden; });
+  if($("#readerTocBtn")) $("#readerTocBtn").addEventListener("click",toggleReaderToc);
+  if($("#readerTocFab")) $("#readerTocFab").addEventListener("click",toggleReaderToc);
+  if($("#readerTocBg")) $("#readerTocBg").addEventListener("click",closeReaderToc);
   if($("#toggleDataSaver")) $("#toggleDataSaver").addEventListener("click",()=>{ state.dataSaver=!state.dataSaver; LS.set("wf_datasaver",state.dataSaver); applyDataSaver(); });
   if($("#dailyGoalInput")) $("#dailyGoalInput").addEventListener("change",e=>{ state.dailyGoal=Math.max(1,Math.min(50,+e.target.value||5)); LS.set("wf_dailygoal",state.dailyGoal); renderGoalUI(); });
   if($("#drawerQuiz")) $("#drawerQuiz").addEventListener("click",()=>{ closeDrawer(); startQuiz(); });
