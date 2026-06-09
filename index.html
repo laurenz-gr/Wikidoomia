@@ -5,6 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Wikidoomia</title>
 <meta name="description" content="Ein endloser, lernender Wikipedia-Feed.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Wikidoomia">
+<meta property="og:title" content="Wikidoomia – dein Wissens-Feed">
+<meta property="og:description" content="Ein endloser, lernender Wikipedia-Feed. Personalisierung, Sammlungen und Quiz – alles lokal in deinem Browser.">
+<meta property="og:image" content="icons/icon-512.png">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Wikidoomia – dein Wissens-Feed">
+<meta name="twitter:description" content="Ein endloser, lernender Wikipedia-Feed. Personalisierung, Sammlungen und Quiz – alles lokal in deinem Browser.">
+<meta name="twitter:image" content="icons/icon-512.png">
 <meta name="theme-color" content="#f4f4f2" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#15171d" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -641,7 +650,8 @@
   /* ---------- view toggle (Feed / Discover) ---------- */
   .view-seg button{display:inline-flex;align-items:center;gap:6px;font-weight:800;font-size:13px;white-space:nowrap}
   .view-seg .ic{width:16px;height:16px}
-  @media (max-width:560px){ .view-seg button span{display:none} .view-seg button{padding:9px 11px} }
+  /* small screens: icon-only for the inactive tab, the active one keeps its label */
+  @media (max-width:560px){ .view-seg button span{display:none} .view-seg button.active span{display:inline} .view-seg button{padding:9px 11px} }
 
   /* ---------- topic chip filter bar ---------- */
   .topicbar{
@@ -692,6 +702,11 @@
   .deck-hint{font-size:12.5px;text-align:center;max-width:42ch;margin:0}
   .deck-empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:24px;border-radius:26px;border:1px dashed var(--glass-brd)}
   .deck-empty .ic{width:34px;height:34px;color:var(--muted)}
+  /* desktop: bigger card, vertically centered in the leftover viewport */
+  @media (min-width:760px){
+    .deck{max-width:620px;justify-content:center;min-height:calc(100svh - var(--topbar-block-size) - var(--safe-top) - 130px)}
+    .deck-stack{height:min(70vh,680px)}
+  }
   @media (prefers-reduced-motion:reduce){
     .deck-card.top,.deck-card.fly-left,.deck-card.fly-right,.deck-card.fly-up{transition:none}
   }
@@ -2078,6 +2093,8 @@ function slugTitle(title){ return encodeURIComponent(String(title).replace(/ /g,
 function articleRoute(meta){ return `#/${meta.lang}/article/${slugTitle(meta.title)}`; }
 function searchRoute(lang,term){ return `#/${lang}/search/${encodeURIComponent(term)}`; }
 function topicRoute(lang,topic){ return `#/${lang}/topic/${encodeURIComponent(topic)}`; }
+function deckRoute(lang){ return `#/${lang}/deck/`; }
+function setDocTitle(part){ document.title = part ? `${part} – Wikidoomia` : "Wikidoomia"; }
 function appLinkFor(meta){
   if(location.protocol==="http:"||location.protocol==="https:"){
     return location.origin+location.pathname+location.search+articleRoute(meta);
@@ -2092,6 +2109,8 @@ function parseHash(){
   if(m){ let term; try{ term=decodeURIComponent(m[2]); }catch(e){ term=m[2]; } return {type:"search",lang:m[1],term}; }
   m=h.match(/^#\/([a-z]{2})\/topic\/(.+)$/);
   if(m){ let topic; try{ topic=decodeURIComponent(m[2]); }catch(e){ topic=m[2]; } return {type:"topic",lang:m[1],topic}; }
+  m=h.match(/^#\/([a-z]{2})\/deck\/?$/);
+  if(m) return {type:"deck",lang:m[1]};
   return null;
 }
 function setLangIfNeeded(lang){
@@ -2105,6 +2124,7 @@ function runSearchRoute(term, fromHash){
   addRecent(term);
   state.pendingStrategies=[{type:"search",term},{type:"search",term}];
   if(!fromHash) history.replaceState(null,"",location.pathname+location.search+searchRoute(state.lang,term));
+  setDocTitle(term);
   closeSearch(); closeDrawer();
   resetFeed();
   window.scrollTo({top:0,behavior:"smooth"});
@@ -2116,6 +2136,7 @@ function runTopicRoute(topic, fromHash){
   LS.set("wf_interests",state.interests);
   state.pendingStrategies=[{type:"search",term:topic},{type:"search",term:topic}];
   if(!fromHash) history.replaceState(null,"",location.pathname+location.search+topicRoute(state.lang,topic));
+  setDocTitle(topic);
   closeSearch(); closeDrawer();
   resetFeed();
   window.scrollTo({top:0,behavior:"smooth"});
@@ -2136,6 +2157,9 @@ function syncFromHash(){
     runSearchRoute(route.term, true);
   }else if(route.type==="topic"){
     runTopicRoute(route.topic, true);
+  }else if(route.type==="deck"){
+    if(reader.classList.contains("open")) closeReader({fromHash:true});
+    setView("deck");
   }
 }
 window.addEventListener("hashchange",syncFromHash);
@@ -2293,6 +2317,7 @@ async function openReader(meta, opts){
     if(location.hash!==h) location.hash=h;
   }
   signalOpen(meta);
+  setDocTitle(meta.title);
   $("#readerTitle").textContent=meta.title;
   $("#readerH1").textContent=meta.title;
   $("#readerExt").href=meta.url;
@@ -2376,8 +2401,9 @@ function closeReader(opts){
   document.body.style.overflow=""; currentReaderMeta=null; releaseFocus();
   // Drop the article route without adding a new history entry (avoids a back-button loop).
   if(!opts.fromHash && parseHash()){
-    history.replaceState(null,"",location.pathname+location.search+"#/");
+    history.replaceState(null,"",location.pathname+location.search+(state.view==="deck"?deckRoute(state.lang):"#/"));
   }
+  setDocTitle(state.view==="deck" ? t("viewDeck") : (state.activeTopic||null));
 }
 function fixMedia(container){
   // Wikipedia parse output uses protocol-relative (//upload…) and root-relative (/w/…)
@@ -3054,6 +3080,15 @@ function setView(view){
   $("#viewDeckBtn").classList.toggle("active",deck);
   $("#viewFeedBtn").setAttribute("aria-selected",String(!deck));
   $("#viewDeckBtn").setAttribute("aria-selected",String(deck));
+  // keep the shareable route + tab title in sync (never clobber an open article route)
+  const r=parseHash();
+  if(deck){
+    if(!r || r.type!=="article") history.replaceState(null,"",location.pathname+location.search+deckRoute(state.lang));
+    setDocTitle(t("viewDeck"));
+  }else{
+    if(r && r.type==="deck") history.replaceState(null,"",location.pathname+location.search+"#/");
+    setDocTitle(state.activeTopic||null);
+  }
   if(deck){
     updateDeckUndo();
     if(!state.deckQueue.length){ const p=refillDeck(); renderDeck(); p.then(()=>{ if(state.view==="deck") renderDeck(); }); }
