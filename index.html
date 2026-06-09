@@ -31,6 +31,11 @@
     --accent-text:#c2410c;   /* accessible orange for text on light surfaces (≥4.5:1) */
     --gold-text:#8a6500;     /* accessible gold for text on light surfaces */
     --on-accent2:#ffffff;    /* text on filled accent2 backgrounds */
+    --success:#157a3f;       /* state colors (tokenized, see .dark for variants) */
+    --success-ink:#ffffff;
+    --wrong:#b3261e;
+    --wrong-ink:#ffffff;
+    --plate:rgba(255,255,255,.86);
     --focus:#0f62ff;
 
     /* Liquid Glass */
@@ -62,6 +67,11 @@
     --accent-text:#ff7a47;   /* orange on dark surfaces already meets contrast */
     --gold-text:#ffc23d;
     --on-accent2:#0b1020;    /* dark text on lighter accent2 in dark mode (≥4.5:1) */
+    --success:#3fae6b;
+    --success-ink:#0b1020;
+    --wrong:#ff6b6b;
+    --wrong-ink:#0b1020;
+    --plate:rgba(20,22,28,.82);
     --focus:#9dc0ff;
 
     --glass-bg:rgba(40,44,55,.50);
@@ -134,12 +144,12 @@
   .seg button{
     border:0; background:transparent; color:var(--ink);
     font:inherit; font-weight:800; cursor:pointer;
-    padding:8px 13px; min-height:40px; font-size:13px;
+    padding:8px 13px; min-height:44px; font-size:13px;
   }
   .seg button.active{background:var(--accent2); color:var(--on-accent2)}
 
   .iconbtn{
-    width:42px; height:42px; flex:0 0 auto;
+    width:44px; height:44px; flex:0 0 auto;
     display:inline-flex; align-items:center; justify-content:center;
     border-radius:14px; cursor:pointer; color:var(--ink);
     border:1px solid var(--glass-brd); background:var(--glass-bg);
@@ -236,10 +246,10 @@
     display:inline-flex; align-items:center; gap:6px;
     padding:5px 11px; border-radius:999px;
     font-size:11px; font-weight:900; letter-spacing:.02em;
-    background:var(--glass-bg-strong);
+    background:var(--plate);
     backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
     border:1px solid var(--glass-brd);
-    box-shadow:inset 0 1px 0 var(--glass-hi);
+    box-shadow:0 1px 4px rgba(0,0,0,.18), inset 0 1px 0 var(--glass-hi);
   }
   .reason .ic{width:13px;height:13px}
   .reason.foryou{color:var(--accent-text)}
@@ -267,12 +277,14 @@
   .langtag{
     position:absolute; top:12px; right:12px; z-index:2;
     padding:4px 9px; border-radius:8px; font-size:11px; font-weight:900;
-    background:var(--glass-bg-strong); border:1px solid var(--glass-brd);
+    background:var(--plate); border:1px solid var(--glass-brd);
     backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+    box-shadow:0 1px 4px rgba(0,0,0,.18);
   }
 
   .card .body{padding:16px 18px 14px}
-  .card h2{font-size:1.7rem; line-height:1; cursor:pointer}
+  .card h2{font-size:1.7rem; line-height:1}
+  .card h2 .title-btn{background:none;border:0;padding:0;margin:0;font:inherit;color:inherit;letter-spacing:inherit;text-transform:inherit;text-align:left;display:block;width:100%;cursor:pointer}
   .card h2:hover{color:var(--accent)}
   .desc{margin:4px 0 0; color:var(--muted); font-size:12.5px; font-weight:700}
   .extract{margin:10px 0 0; font-size:15px; color:var(--ink)}
@@ -302,7 +314,7 @@
   .actbtn .ic{width:18px;height:18px}
   .actbtn.icon{padding:9px;width:44px;min-width:44px;justify-content:center}
   .actbtn.icon .ic{width:20px;height:20px}
-  .actbtn.star.on{background:color-mix(in srgb,var(--gold) 26%,var(--paper)); color:#7a5500; border-color:color-mix(in srgb,var(--gold) 60%,var(--border))}
+  .actbtn.star.on{background:color-mix(in srgb,var(--gold) 26%,var(--paper)); color:var(--gold-text); border-color:color-mix(in srgb,var(--gold) 60%,var(--border))}
   .actbtn.star.on .ic{fill:var(--gold); stroke:var(--gold)}
   .dark .actbtn.star.on{color:var(--gold)}
   .actbtn.coll.on{background:color-mix(in srgb,var(--accent2) 22%,var(--paper)); color:var(--accent2)}
@@ -331,7 +343,7 @@
 
   .card.read .hero img{opacity:.6}
   .read-tag{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);margin-bottom:6px}
-  .read-tag .ic{width:13px;height:13px;color:#157a3f}
+  .read-tag .ic{width:13px;height:13px;color:var(--success)}
 
   .skeleton{height:300px;border-radius:16px;position:relative;overflow:hidden}
   .skeleton::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,var(--glass-hi),transparent);transform:translateX(-100%);animation:sweep 1.3s infinite}
@@ -374,7 +386,7 @@
   .chips{display:flex;flex-wrap:wrap;gap:8px}
   .chip{
     display:inline-flex;align-items:center;gap:7px;
-    padding:7px 12px;border-radius:999px;cursor:pointer;
+    padding:8px 14px;min-height:44px;border-radius:999px;cursor:pointer;
     border:1px solid var(--glass-brd);background:var(--glass-bg);
     backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
     color:var(--ink);font-weight:800;font-size:13px;user-select:none;
@@ -397,8 +409,8 @@
   .coll-item:last-child{border-bottom:0}
   .coll-item .ttl{flex:1;font-weight:800;font-size:14px;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .coll-item .ttl:hover{color:var(--accent)}
-  .mini{width:34px;height:34px;border-radius:9px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--glass-brd);background:var(--glass-bg);color:var(--ink)}
-  .mini .ic{width:16px;height:16px}
+  .mini{width:44px;height:44px;border-radius:11px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--glass-brd);background:var(--glass-bg);color:var(--ink)}
+  .mini .ic{width:18px;height:18px}
 
   .field{
     width:100%; font:inherit; font-weight:700; font-size:15px;
@@ -439,12 +451,12 @@
     overflow-y:auto;-webkit-overflow-scrolling:touch;
     padding:18px max(16px,env(safe-area-inset-left)) calc(60px + env(safe-area-inset-bottom));
   }
-  .reader-progress{position:absolute;top:var(--safe-top);left:0;height:3px;width:0;background:var(--accent);z-index:3;transition:width .1s linear}
+  .reader-progress{position:absolute;top:var(--safe-top);left:0;height:3px;width:100%;transform:scaleX(0);transform-origin:left;background:var(--accent);z-index:3;transition:transform .1s linear}
   .reader-inner{max-width:1080px;margin:0 auto}
   .reader-tools{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
   .read-time{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.03em;color:var(--muted)}
   .text-size{display:inline-flex;gap:6px}
-  .text-size .iconbtn{width:auto;min-width:42px;padding:6px 11px;font-weight:800;font-size:15px}
+  .text-size .iconbtn{width:auto;min-width:44px;padding:6px 12px;font-weight:800;font-size:15px}
   .reader-inner h1.title{font-size:2.6rem;line-height:.95;margin-bottom:6px}
 
   .wiki-content{font-size:16px;line-height:1.65}
@@ -496,13 +508,13 @@
   .quiz-letter{flex:0 0 auto;width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;border-radius:8px;background:var(--glass-bg);border:1px solid var(--glass-brd);font-family:'Bebas Neue','Impact',sans-serif;font-size:1.05rem;color:var(--accent2)}
   .qopt-label{flex:1}
   .quiz-opt .mark{width:20px;height:20px;flex:0 0 auto;opacity:0;margin-left:auto}
-  .quiz-opt.correct .mark{opacity:1;color:#157a3f}
-  .quiz-opt.wrong .mark{opacity:1;color:#b3261e}
-  .quiz-opt.correct .quiz-letter{background:#157a3f;color:#fff;border-color:#157a3f}
-  .quiz-opt.wrong .quiz-letter{background:#b3261e;color:#fff;border-color:#b3261e}
+  .quiz-opt.correct .mark{opacity:1;color:var(--success)}
+  .quiz-opt.wrong .mark{opacity:1;color:var(--wrong)}
+  .quiz-opt.correct .quiz-letter{background:var(--success);color:var(--success-ink);border-color:var(--success)}
+  .quiz-opt.wrong .quiz-letter{background:var(--wrong);color:var(--wrong-ink);border-color:var(--wrong)}
   .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-  .quiz-opt.correct{background:color-mix(in srgb,#157a3f 20%,var(--paper));border-color:#157a3f;color:var(--ink)}
-  .quiz-opt.correct .mark{opacity:1;color:#157a3f}
+  .quiz-opt.correct{background:color-mix(in srgb,var(--success) 20%,var(--paper));border-color:var(--success);color:var(--ink)}
+  .quiz-opt.correct .mark{opacity:1;color:var(--success)}
   .quiz-opt.wrong{background:color-mix(in srgb,var(--danger) 18%,var(--paper));border-color:var(--danger)}
   .quiz-actions{display:flex;justify-content:flex-end;margin-top:18px}
   .quiz-result{text-align:center;padding:32px 0}
@@ -534,8 +546,8 @@
   .recap-bar .lbl{display:flex;justify-content:space-between;gap:10px;font-weight:800;font-size:14px;margin-bottom:6px}
   .recap-bar .lbl span:last-child{color:var(--muted)}
   .recap-bar .track{height:14px;border-radius:999px;background:color-mix(in srgb,var(--muted) 22%,transparent);overflow:hidden}
-  .recap-bar .track i{display:block;height:100%;width:0;border-radius:999px;background:var(--accent)}
-  .recap-scene.in .recap-bar .track i{width:var(--w);transition:width 1s cubic-bezier(.25,1,.5,1) .15s}
+  .recap-bar .track i{display:block;height:100%;width:100%;transform:scaleX(0);transform-origin:left;border-radius:999px;background:var(--accent)}
+  .recap-scene.in .recap-bar .track i{transform:scaleX(var(--w));transition:transform 1s cubic-bezier(.25,1,.5,1) .15s}
   .recap-chips{display:flex;flex-wrap:wrap;gap:9px;margin-top:22px}
   .recap-chip{padding:9px 14px;border-radius:14px;border:1px solid var(--glass-brd);background:var(--glass-bg);font-weight:700;font-size:14px;opacity:0;transform:translateY(10px);transition:opacity .5s ease, transform .5s ease}
   .recap-scene.in .recap-chip{opacity:1;transform:none}
@@ -576,12 +588,17 @@
     .v-feature .hero img{height:240px}
     .v-feature h2{font-size:1.9rem}
     .actbtn span.lbl{display:none}
-    :root{--topbar-pad-block:8px; --topbar-block-size:calc(var(--topbar-pad-block) * 2 + 40px)}
+    :root{--topbar-pad-block:8px; --topbar-block-size:calc(var(--topbar-pad-block) * 2 + 44px)}
     .topbar{gap:7px; padding:calc(var(--topbar-pad-block) + var(--safe-top)) max(10px,var(--safe-right)) var(--topbar-pad-block) max(10px,var(--safe-left))}
     .brand .logo{font-size:1.5rem}
-    .iconbtn{width:40px;height:40px}
     .seg button{padding:8px 10px}
     .actbtn.icon{width:auto; flex:1 1 0}
+  }
+  /* Performance: stacked backdrop-filters are expensive on mobile GPUs (esp. Safari).
+     Drop blur on the high-count, repeated elements; keep opaque-enough plates. */
+  @media (max-width:760px){
+    .reason,.langtag,.actbtn,.chip,.mini,.stat{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+    .actbtn,.chip,.mini,.stat{background:var(--glass-bg-strong)}
   }
   @media (prefers-reduced-motion:reduce){
     *,*::before,*::after{animation:none!important;transition:none!important}
@@ -613,9 +630,21 @@
   .onb-dot.active{background:var(--accent2)}
   .lang-hint{font-size:12px;color:var(--muted);margin:6px 0 0;line-height:1.45}
   .goal-bar{height:8px;border-radius:999px;background:color-mix(in srgb,var(--muted) 25%,transparent);overflow:hidden;margin-top:8px}
-  .goal-bar i{display:block;height:100%;background:var(--accent2);width:0;transition:width .25s ease}
+  .goal-bar i{display:block;height:100%;width:100%;transform:scaleX(0);transform-origin:left;background:var(--accent2);transition:transform .25s ease}
   .wiki-content.textonly img,.wiki-content.textonly video,.wiki-content.textonly .thumb,.wiki-content.textonly .infobox{display:none!important}
   .card.textonly .hero{display:none}
+  .reason-info{width:12px;height:12px;opacity:.65;margin-left:1px}
+  .reader-toc li.active > button{color:var(--accent);font-weight:900}
+  .related-loading{display:flex;flex-direction:column;gap:8px}
+  .related-skel{height:46px;border-radius:14px}
+  /* interest pill: toggle + dedicated topic-feed action */
+  .interest{display:inline-flex;align-items:stretch;border-radius:999px;overflow:hidden;border:1px solid var(--glass-brd);background:var(--glass-bg)}
+  .interest.sel{background:var(--accent2);border-color:transparent}
+  .interest .chip-toggle{border:0;background:transparent;border-radius:0;min-height:44px}
+  .interest.sel .chip-toggle{color:var(--on-accent2)}
+  .interest .chip-feed{border:0;background:transparent;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;width:44px;min-width:44px;min-height:44px;color:var(--accent2);border-left:1px solid var(--glass-brd)}
+  .interest.sel .chip-feed{color:var(--on-accent2);border-left-color:color-mix(in srgb,var(--on-accent2) 30%,transparent)}
+  .interest .chip-feed .ic{width:17px;height:17px}
 
   .focusable:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
 </style>
@@ -673,17 +702,20 @@
 </header>
 
 <div class="searchbar" id="searchBar" hidden>
-  <input class="field focusable" id="searchInput" data-i18n-ph="searchPh" placeholder="Auf Wikipedia suchen…" autocomplete="off">
+  <input class="field focusable" id="searchInput" data-i18n-ph="searchPh" data-i18n-aria="searchPh" placeholder="Auf Wikipedia suchen…" aria-label="Auf Wikipedia suchen" autocomplete="off">
   <button class="iconbtn focusable" id="searchGo" data-i18n-title="search" data-i18n-aria="search" title="Suchen" aria-label="Suchen"><svg class="ic"><use href="#i-search"/></svg></button>
   <button class="iconbtn focusable" id="searchClose" data-i18n-title="close" data-i18n-aria="close" title="Schließen" aria-label="Schließen"><svg class="ic"><use href="#i-x"/></svg></button>
 </div>
 <div class="search-results" id="searchResults" hidden></div>
 
 <div class="shell">
-  <main class="feed" id="feed" aria-live="polite"></main>
+  <main class="feed" id="feed">
+    <h1 class="sr-only" data-i18n="appTitleLong">Wikidoomia – dein lernender Wikipedia-Feed</h1>
+  </main>
   <aside class="rail" id="rail" aria-label="Kontext"></aside>
 </div>
 <div class="sentinel" id="sentinel"></div>
+<div id="feedStatus" class="sr-only" role="status" aria-live="polite"></div>
 
 <!-- Collections / profile drawer -->
 <div class="scrim" id="scrim"></div>
@@ -729,13 +761,13 @@
     <div class="panel">
       <h3 class="bebas" data-i18n="settings">Einstellungen</h3>
       <div class="settings-row">
-        <span data-i18n="dataSaver">Datensparmodus</span>
-        <button class="toggle" id="toggleDataSaver" type="button" aria-pressed="false"><i></i></button>
+        <span id="dataSaverLabel" data-i18n="dataSaver">Datensparmodus</span>
+        <button class="toggle focusable" id="toggleDataSaver" type="button" role="switch" aria-pressed="false" aria-labelledby="dataSaverLabel"><i></i></button>
       </div>
       <p class="lang-hint" data-i18n="langHint">Artikelsprache steuert Wikipedia-Inhalte. Die Oberfläche kann separat gewählt werden.</p>
-      <h4 class="bebas" style="font-size:1rem;margin:14px 0 6px" data-i18n="dailyGoal">Tagesziel</h4>
-      <div class="row"><input type="number" min="1" max="50" class="field focusable" id="dailyGoalInput" style="width:88px"><span class="muted" data-i18n="articlesPerDay">Artikel pro Tag</span></div>
-      <div class="goal-bar" id="goalBar"><i id="goalFill"></i></div>
+      <h4 class="bebas" id="dailyGoalHeading" style="font-size:1rem;margin:14px 0 6px" data-i18n="dailyGoal">Tagesziel</h4>
+      <div class="row"><input type="number" min="1" max="50" class="field focusable" id="dailyGoalInput" data-i18n-aria="dailyGoal" aria-label="Tagesziel" style="width:88px"><span class="muted" data-i18n="articlesPerDay">Artikel pro Tag</span></div>
+      <div class="goal-bar" id="goalBar" role="progressbar" aria-labelledby="dailyGoalHeading" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="goalFill"></i></div>
       <p class="muted" id="goalLabel" style="margin-top:6px"></p>
       <p class="muted" id="quizBestLabel" style="margin-top:10px"></p>
       <button class="btn focusable" id="drawerQuiz" style="margin-top:12px;width:100%" type="button"><svg class="ic"><use href="#i-quiz"/></svg><span data-i18n="startQuiz">Quiz starten</span></button>
@@ -834,7 +866,7 @@
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 <button class="fab-top glass iconbtn focusable" id="btnTop" type="button" hidden data-i18n-aria="backToTop" aria-label="Nach oben"><svg class="ic"><use href="#i-up"/></svg></button>
 
 <script>
@@ -859,7 +891,7 @@ const PRESET_TOPICS = {
 const I18N = {
   de:{
     htmlLang:"de", wikiName:"Deutsche Wikipedia",
-    brandSub:"dein Wissens‑Feed", langGroup:"Sprache", articleLang:"Artikelsprache", uiLanguage:"Sprache der Oberfläche",
+    brandSub:"dein Wissens‑Feed", appTitleLong:"Wikidoomia – dein lernender Wikipedia-Feed", langGroup:"Sprache", articleLang:"Artikelsprache", uiLanguage:"Sprache der Oberfläche",
     startQuiz:"Quiz starten", search:"Suchen", collProfile:"Sammlungen & Profil",
     theme:"Hell/Dunkel", themeAria:"Theme wechseln", searchPh:"Auf Wikipedia suchen…", close:"Schließen",
     myFeed:"Mein Wikidoomia", topicProfile:"Dein Themenprofil", recapBtn:"Mein Lese-Rückblick",
@@ -922,7 +954,7 @@ const I18N = {
   },
   en:{
     htmlLang:"en", wikiName:"English Wikipedia",
-    brandSub:"your knowledge feed", langGroup:"Language", articleLang:"Article language", uiLanguage:"Interface language",
+    brandSub:"your knowledge feed", appTitleLong:"Wikidoomia – your learning Wikipedia feed", langGroup:"Language", articleLang:"Article language", uiLanguage:"Interface language",
     startQuiz:"Start quiz", search:"Search", collProfile:"Collections & profile",
     theme:"Light/Dark", themeAria:"Toggle theme", searchPh:"Search Wikipedia…", close:"Close",
     myFeed:"My Wikidoomia", topicProfile:"Your topic profile", recapBtn:"My reading recap",
@@ -985,7 +1017,7 @@ const I18N = {
   },
   fr:{
     htmlLang:"fr", wikiName:"Wikipédia en français",
-    brandSub:"ton fil de savoir", langGroup:"Langue", articleLang:"Langue des articles", uiLanguage:"Langue de l'interface",
+    brandSub:"ton fil de savoir", appTitleLong:"Wikidoomia – ton fil Wikipédia qui apprend", langGroup:"Langue", articleLang:"Langue des articles", uiLanguage:"Langue de l'interface",
     startQuiz:"Lancer le quiz", search:"Rechercher", collProfile:"Collections et profil",
     theme:"Clair/Sombre", themeAria:"Changer de thème", searchPh:"Rechercher sur Wikipédia…", close:"Fermer",
     myFeed:"Mon Wikidoomia", topicProfile:"Ton profil thématique", recapBtn:"Mon bilan de lecture",
@@ -1561,6 +1593,19 @@ function pickStrategy(){
 const feedEl=$("#feed");
 
 function svgIc(id,cls){ return `<svg class="ic ${cls||''}"><use href="#${id}"/></svg>`; }
+function svgUse(id,cls){
+  const ns="http://www.w3.org/2000/svg";
+  const svg=document.createElementNS(ns,"svg"); svg.setAttribute("class","ic "+(cls||""));
+  const use=document.createElementNS(ns,"use"); use.setAttribute("href","#"+id);
+  svg.appendChild(use); return svg;
+}
+function announce(msg){ const s=$("#feedStatus"); if(s) s.textContent=msg||""; }
+function makeActivatable(el, fn){
+  el.setAttribute("role","button");
+  el.setAttribute("tabindex","0");
+  el.addEventListener("click",fn);
+  el.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); fn(e); } });
+}
 
 function articleCard(meta, reason, seed){
   const card=document.createElement("article");
@@ -1584,14 +1629,17 @@ function articleCard(meta, reason, seed){
     const hero=document.createElement("div");
     hero.className="hero";
     hero.innerHTML=`${reasonHtml}${langHtml}<img loading="lazy" alt="" src="${esc(meta.thumb)}">`;
-    hero.addEventListener("click",()=>openReader(meta));
+    const heroImg=hero.querySelector("img");
+    if(heroImg){ makeActivatable(heroImg,()=>openReader(meta)); heroImg.setAttribute("aria-label", t("openArticle")); }
     card.appendChild(hero);
   }
 
   const body=document.createElement("div");
   body.className="body";
-  const h2=document.createElement("h2"); h2.className="bebas"; h2.textContent=meta.title;
-  h2.addEventListener("click",()=>openReader(meta));
+  const h2=document.createElement("h2"); h2.className="bebas";
+  const titleBtn=document.createElement("button"); titleBtn.type="button"; titleBtn.className="title-btn focusable"; titleBtn.textContent=meta.title;
+  titleBtn.addEventListener("click",()=>openReader(meta));
+  h2.appendChild(titleBtn);
   body.appendChild(h2);
   const ex=document.createElement("p"); ex.className="extract";
   const lim = variant==="feature"?170 : (variant==="compact"?280 : 340);
@@ -1661,7 +1709,13 @@ function articleCard(meta, reason, seed){
   if(state.read.has(meta.title)){ card.classList.add("read"); addReadTag(card); }
 
   const reasonEl=card.querySelector(".reason");
-  if(reasonEl && reason) reasonEl.addEventListener("click",ev=>{ ev.stopPropagation(); explainReason(reason); });
+  if(reasonEl && reason){
+    reasonEl.appendChild(svgUse("i-info","reason-info"));
+    reasonEl.classList.add("focusable");
+    reasonEl.setAttribute("aria-label", t("whyCard"));
+    const explain=ev=>{ ev.stopPropagation(); explainReason(reason); };
+    makeActivatable(reasonEl, explain);
+  }
   if(state.dataSaver) card.classList.add("textonly");
   observeDwell(card,meta.title);
   return card;
@@ -1744,6 +1798,7 @@ async function loadMore(){
     box.innerHTML=`${esc(t("couldNotLoad"))} <button class="btn" style="margin-top:10px">${esc(t("retry"))}</button>`;
     box.querySelector("button").addEventListener("click",()=>{ box.remove(); loadMore(); });
     feedEl.appendChild(box);
+    announce(t("couldNotLoad"));
   }
   if(gen===state.feedGen) trimFeed();
   maybeShowPause();
@@ -1780,7 +1835,7 @@ function resetFeed(){
   state.trendingCache=[]; state.wantTrendingFirst=true;   // fresh hook each reset (language switch refetches)
   state.featuredCache=null; state.wantFeaturedFirst=true; // "today on Wikipedia" cluster on fresh feed
   state._railFetching=false;
-  feedEl.innerHTML="";
+  feedEl.querySelectorAll(":scope > :not(h1)").forEach(n=>n.remove());  // keep the sr-only page heading
   loadMore().then(()=>loadMore()).then(renderRail);
 }
 
@@ -1907,10 +1962,13 @@ function openReaderNeighbor(delta){
 function slugHeading(text){
   return String(text||"").trim().toLowerCase().replace(/[^\w\s-]/g,"").replace(/\s+/g,"-").replace(/-+/g,"-");
 }
+let tocMap=[];
 function buildReaderToc(container){
   const toc=$("#readerToc"); if(!toc) return;
+  tocMap=[];
   const heads=[...container.querySelectorAll("h2,h3")].filter(h=>h.textContent.trim());
-  if(!heads.length){ toc.hidden=true; toc.innerHTML=""; return; }
+  if(!heads.length){ toc.hidden=true; toc.replaceChildren(); return; }
+  const head=document.createElement("h3"); head.className="bebas"; head.textContent=t("toc");
   const ul=document.createElement("ul");
   heads.forEach((h,i)=>{
     if(!h.id) h.id=`sec-${slugHeading(h.textContent)||"part"}-${i}`;
@@ -1918,26 +1976,39 @@ function buildReaderToc(container){
     const b=document.createElement("button"); b.type="button"; b.className="focusable"; b.textContent=h.textContent.trim();
     b.addEventListener("click",()=>{ h.scrollIntoView({behavior:"smooth",block:"start"}); toc.hidden=true; });
     li.appendChild(b); ul.appendChild(li);
+    tocMap.push({h, li});
   });
-  toc.innerHTML=`<h3 class="bebas">${esc(t("toc"))}</h3>`;
-  toc.appendChild(ul);
+  toc.replaceChildren(head, ul);
 }
+function updateTocActive(){
+  if(!tocMap.length) return;
+  const scroller=$("#readerScroll"); if(!scroller) return;
+  const top=scroller.getBoundingClientRect().top;
+  let activeIdx=0;
+  for(let i=0;i<tocMap.length;i++){
+    if(tocMap[i].h.getBoundingClientRect().top - top <= 80) activeIdx=i; else break;
+  }
+  tocMap.forEach((e,i)=>e.li.classList.toggle("active", i===activeIdx));
+}
+function relatedHeading(){ const h=document.createElement("h3"); h.className="bebas"; h.textContent=t("relatedTitle"); return h; }
 async function renderRelatedArticles(meta){
   const host=$("#readerRelated"); if(!host) return;
-  host.hidden=true; host.innerHTML="";
+  const loading=document.createElement("div"); loading.className="related-loading";
+  for(let i=0;i<3;i++){ const sk=document.createElement("div"); sk.className="skeleton related-skel"; loading.appendChild(sk); }
+  host.replaceChildren(relatedHeading(), loading); host.hidden=false;
   try{
     const related=await fetchMoreLike(meta.title,4);
     if(meta!==currentReaderMeta) return;
     const items=related.filter(a=>a.title!==meta.title).slice(0,4);
-    if(!items.length) return;
-    host.hidden=false;
-    host.innerHTML=`<h3 class="bebas">${esc(t("relatedTitle"))}</h3>`;
+    if(!items.length){ host.hidden=true; host.replaceChildren(); return; }
+    const nodes=[relatedHeading()];
     items.forEach(a=>{
       const b=document.createElement("button"); b.type="button"; b.className="related-item focusable"; b.textContent=a.title;
       b.addEventListener("click",()=>openReader(a));
-      host.appendChild(b);
+      nodes.push(b);
     });
-  }catch(e){}
+    host.replaceChildren(...nodes);
+  }catch(e){ host.hidden=true; host.replaceChildren(); }
 }
 function applyDataSaver(){
   document.documentElement.classList.toggle("textonly",!!state.dataSaver);
@@ -1951,7 +2022,8 @@ function renderGoalUI(){
   const cur=state.stats.openedToday||0;
   const pct=Math.min(100,Math.round(cur/goal*100));
   const fill=$("#goalFill"), label=$("#goalLabel"), input=$("#dailyGoalInput");
-  if(fill) fill.style.width=pct+"%";
+  if(fill) fill.style.transform="scaleX("+(pct/100)+")";
+  const bar=$("#goalBar"); if(bar) bar.setAttribute("aria-valuenow",pct);
   if(label) label.textContent=t("goalProgress",cur,goal);
   if(input && document.activeElement!==input) input.value=goal;
   const qb=$("#quizBestLabel");
@@ -1985,10 +2057,10 @@ async function openReader(meta, opts){
   const c=$("#readerContent");
   c.innerHTML=`<p class="muted">${esc(t("loadingArticle"))}</p>`;
   c.classList.toggle("textonly",!!state.dataSaver);
-  $("#readerRelated").hidden=true; $("#readerRelated").innerHTML="";
-  $("#readerToc").hidden=true; $("#readerToc").innerHTML="";
+  $("#readerRelated").hidden=true; $("#readerRelated").replaceChildren();
+  $("#readerToc").hidden=true; $("#readerToc").replaceChildren(); tocMap=[];
   $("#readerTime").textContent="";
-  $("#readerProgress").style.width="0%";
+  $("#readerProgress").style.transform="scaleX(0)";
   applyReaderScale();
   const saved=getSavedScroll(meta);
   const resume=$("#readerResume");
@@ -2030,8 +2102,9 @@ $("#readerSmaller").addEventListener("click",()=>setReaderScale(-10));
 $("#readerBigger").addEventListener("click",()=>setReaderScale(+10));
 $("#readerScroll").addEventListener("scroll",function(){
   const max=this.scrollHeight-this.clientHeight;
-  $("#readerProgress").style.width=(max>0 ? this.scrollTop/max*100 : 0)+"%";
+  $("#readerProgress").style.transform="scaleX("+(max>0 ? this.scrollTop/max : 0)+")";
   if(currentReaderMeta){ clearTimeout(this._saveT); this._saveT=setTimeout(()=>saveReadScroll(currentReaderMeta,this.scrollTop),180); }
+  updateTocActive();
 },{passive:true});
 function closeReader(opts){
   opts=opts||{};
@@ -2262,7 +2335,7 @@ function buildRecap(){
 
   if(cats.length){
     const max=cats[0][1];
-    const bars=cats.map(([name,v])=>`<div class="recap-bar"><div class="lbl"><span>${esc(name)}</span></div><div class="track"><i style="--w:${Math.max(10,Math.round(v/max*100))}%"></i></div></div>`).join("");
+    const bars=cats.map(([name,v])=>`<div class="recap-bar"><div class="lbl"><span>${esc(name)}</span></div><div class="track"><i style="--w:${(Math.max(10,Math.round(v/max*100))/100).toFixed(2)}"></i></div></div>`).join("");
     sc.push(`<section class="recap-scene">
       <div class="kicker">${esc(t("rkThemes"))}</div>
       <h2 class="headline">${esc(t("rHeadThemes"))}</h2>
@@ -2495,21 +2568,31 @@ function renderRail(){
 }
 
 /* ---------- interests ---------- */
+function startTopicFeed(topic){
+  runTopicRoute(topic,false);
+  if(location.protocol==="http:"||location.protocol==="https:") history.replaceState(null,"",location.pathname+location.search+topicRoute(state.lang,topic));
+}
 function renderInterestChips(){
-  const host=$("#interestChips"); host.innerHTML="";
+  const host=$("#interestChips"); host.replaceChildren();
   const presets=PRESET_TOPICS[state.lang];
   const all=Array.from(new Set([...state.interests,...presets]));
   all.forEach(topic=>{
-    const c=document.createElement("button"); c.className="chip focusable"+(state.interests.includes(topic)?" sel":"");
-    c.textContent=topic;
-    c.addEventListener("click",()=>{
+    const sel=state.interests.includes(topic);
+    const group=document.createElement("span"); group.className="interest"+(sel?" sel":"");
+    const toggle=document.createElement("button"); toggle.type="button";
+    toggle.className="chip chip-toggle focusable"; toggle.textContent=topic; toggle.title=topic;
+    toggle.setAttribute("aria-pressed", sel?"true":"false");
+    toggle.addEventListener("click",()=>{
       const i=state.interests.indexOf(topic);
       if(i>=0) state.interests.splice(i,1); else state.interests.push(topic);
       LS.set("wf_interests",state.interests); renderInterestChips();
     });
-    c.addEventListener("dblclick",()=>{ runTopicRoute(topic,false); if(location.protocol==="http:"||location.protocol==="https:") history.replaceState(null,"",location.pathname+location.search+topicRoute(state.lang,topic)); });
-    c.title=state.interests.includes(topic)? `${topic} — ${t("topicFeed",topic)} (Doppelklick)` : topic;
-    host.appendChild(c);
+    const feed=document.createElement("button"); feed.type="button"; feed.className="chip-feed focusable";
+    feed.setAttribute("aria-label", t("topicFeed",topic)); feed.title=t("topicFeed",topic);
+    feed.appendChild(svgUse("i-compass"));
+    feed.addEventListener("click",()=>startTopicFeed(topic));
+    group.append(toggle, feed);
+    host.appendChild(group);
   });
 }
 
