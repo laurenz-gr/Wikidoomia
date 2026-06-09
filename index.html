@@ -23,7 +23,7 @@
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg:#f4f4f2;
@@ -456,6 +456,8 @@
     backdrop-filter:blur(26px) saturate(170%); -webkit-backdrop-filter:blur(26px) saturate(170%);
   }
   .reader.open{transform:none}
+  .reader.vt-open{transition:none}   /* during a view-transition morph the API animates instead */
+  ::view-transition-old(wf-hero),::view-transition-new(wf-hero){animation-duration:.34s;border-radius:26px;overflow:hidden}
   .reader-bar{
     display:flex;align-items:center;gap:10px;
     padding:calc(12px + var(--safe-top)) max(14px,var(--safe-right)) 12px max(14px,var(--safe-left));
@@ -474,7 +476,10 @@
   .text-size .iconbtn{width:auto;min-width:44px;padding:6px 12px;font-weight:800;font-size:15px}
   .reader-inner h1.title{font-size:2.6rem;line-height:.95;margin-bottom:6px}
 
-  .wiki-content{font-size:16px;line-height:1.65}
+  /* article body in a serif for an editorial, magazine-like reading feel;
+     UI chrome (headings, captions, infoboxes) stays in the app fonts */
+  .wiki-content{font-family:'Source Serif 4',Georgia,'Times New Roman',serif;font-size:17px;line-height:1.7}
+  .wiki-content table,.wiki-content figcaption,.wiki-content .thumbcaption{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
   .wiki-content::after{content:"";display:block;clear:both}
   .wiki-content p{margin:0 0 14px}
   .wiki-content h2,.wiki-content h3,.wiki-content h4{font-family:'Bebas Neue','Impact',sans-serif;text-transform:uppercase;margin:22px 0 8px;border-bottom:2px solid color-mix(in srgb,var(--muted) 30%,transparent);padding-bottom:4px}
@@ -667,7 +672,17 @@
 
   /* ---------- discover deck (swipe) ---------- */
   .shell[hidden],.deck[hidden]{display:none}
-  .deck{max-width:560px;margin:0 auto;padding:8px 14px calc(18px + var(--safe-bottom));display:flex;flex-direction:column;align-items:center;gap:16px}
+  .deck{position:relative;max-width:560px;margin:0 auto;padding:8px 14px calc(18px + var(--safe-bottom));display:flex;flex-direction:column;align-items:center;gap:16px}
+  .deck-onb{position:absolute;inset:0;z-index:6;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:28px;border-radius:26px}
+  .deck-onb h3{font-size:1.8rem;letter-spacing:.02em}
+  .deck-onb ul{list-style:none;display:flex;flex-direction:column;gap:12px;margin:4px 0;text-align:left}
+  .deck-onb li{display:flex;align-items:center;gap:12px;font-weight:600;font-size:14.5px}
+  .deck-onb .onb-ic{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;flex:none;border:1px solid var(--glass-brd)}
+  .deck-onb .onb-ic .ic{width:18px;height:18px}
+  .deck-onb .onb-ic.like{color:var(--success)}
+  .deck-onb .onb-ic.nope{color:var(--danger)}
+  .deck-onb .onb-ic.save{color:var(--accent2)}
+  .deck-onb .kbd-hint{font-size:12.5px}
   .deck-stack{position:relative;width:100%;height:min(64vh,580px)}
   .deck-card{position:absolute;inset:0;border-radius:26px;overflow:hidden;background:var(--glass-bg);border:1px solid var(--glass-brd);box-shadow:0 18px 50px rgba(0,0,0,.28);will-change:transform;touch-action:pan-y;cursor:pointer}
   .deck-card.behind{transform:scale(.93) translateY(14px);filter:saturate(.85) brightness(.96);pointer-events:none}
@@ -1075,6 +1090,14 @@ const I18N = {
     deckReload:"Neue Vorschläge",
     annInterested:t=>`Interessiert: ${t}`, annNope:t=>`Ausgeblendet: ${t}`, annSaved:t=>`Gemerkt: ${t}`,
     allTopics:"Alle", topicChipsAria:"Themenfilter",
+    deckOnbTitle:"So funktioniert der Stapel",
+    deckOnbLike:"Nach rechts wischen: interessiert mich",
+    deckOnbNope:"Nach links wischen: nichts für mich",
+    deckOnbSave:"Nach oben wischen: mit Stern merken",
+    deckOnbOpen:"Tippen: Artikel öffnen",
+    deckOnbKeys:"Am Computer: Pfeiltasten ← → ↑ und Enter.",
+    deckOnbGo:"Los geht's",
+    shareColl:"Sammlung teilen", collShared:n=>`„${n}“ als Liste kopiert`,
     consoleMsg:"Neugierig, wie der Feed lernt? Tippe  state.profile  ein – das ist dein lokales Themenprofil. Nichts verlässt deinen Browser. Viel Entdeckerfreude."
   },
   en:{
@@ -1146,6 +1169,14 @@ const I18N = {
     deckReload:"New suggestions",
     annInterested:t=>`Interested: ${t}`, annNope:t=>`Dismissed: ${t}`, annSaved:t=>`Saved: ${t}`,
     allTopics:"All", topicChipsAria:"Topic filter",
+    deckOnbTitle:"How the stack works",
+    deckOnbLike:"Swipe right: I'm interested",
+    deckOnbNope:"Swipe left: not for me",
+    deckOnbSave:"Swipe up: save with a star",
+    deckOnbOpen:"Tap: open the article",
+    deckOnbKeys:"On a computer: arrow keys ← → ↑ and Enter.",
+    deckOnbGo:"Let's go",
+    shareColl:"Share collection", collShared:n=>`“${n}” copied as a list`,
     consoleMsg:"Curious how the feed learns? Type  state.profile  — that's your local topic profile. Nothing leaves your browser. Happy exploring."
   },
   fr:{
@@ -1217,6 +1248,14 @@ const I18N = {
     deckReload:"Nouvelles suggestions",
     annInterested:t=>`Intéressé : ${t}`, annNope:t=>`Masqué : ${t}`, annSaved:t=>`Gardé : ${t}`,
     allTopics:"Tout", topicChipsAria:"Filtre par thème",
+    deckOnbTitle:"Comment fonctionne la pile",
+    deckOnbLike:"Glisser à droite : ça m'intéresse",
+    deckOnbNope:"Glisser à gauche : pas pour moi",
+    deckOnbSave:"Glisser vers le haut : garder avec une étoile",
+    deckOnbOpen:"Toucher : ouvrir l'article",
+    deckOnbKeys:"Sur ordinateur : flèches ← → ↑ et Entrée.",
+    deckOnbGo:"C'est parti",
+    shareColl:"Partager la collection", collShared:n=>`« ${n} » copiée sous forme de liste`,
     consoleMsg:"Curieux de voir comment le fil apprend ? Tape  state.profile  — c'est ton profil thématique local. Rien ne quitte ton navigateur. Bonne exploration."
   }
 };
@@ -1654,8 +1693,13 @@ async function fetchCategories(title){
 }
 
 /* ---------- personalization ---------- */
+/* seeds are language-scoped ("de::Titel") so a language switch never
+   feeds foreign-language titles into morelike queries */
+function seedKey(title){ return `${state.lang}::${title}`; }
+function seedTitle(key){ const i=key.indexOf("::"); return i<0?key:key.slice(i+2); }
 function bumpSeed(title,amount){
-  state.profile.seeds[title]=(state.profile.seeds[title]||0)+amount;
+  const key=seedKey(title);
+  state.profile.seeds[key]=(state.profile.seeds[key]||0)+amount;
   // keep map bounded
   const keys=Object.keys(state.profile.seeds);
   if(keys.length>60){
@@ -1663,6 +1707,21 @@ function bumpSeed(title,amount){
     state.profile.seeds=Object.fromEntries(cut);
   }
   saveProfile();
+}
+/* gentle forgetting: once per calendar day, all profile scores decay a bit,
+   so last month's binge no longer dominates today's feed */
+function decayProfile(){
+  const today=dayStr(), last=LS.get("wf_decayday",null);
+  if(last===today) return;
+  if(last){
+    const days=Math.min(30,Math.max(1,Math.round((new Date(today)-new Date(last))/864e5)));
+    const f=Math.pow(0.98,days);
+    for(const m of [state.profile.seeds,state.profile.cats]){
+      for(const k of Object.keys(m)){ m[k]*=f; if(Math.abs(m[k])<0.5) delete m[k]; }
+    }
+    saveProfile();
+  }
+  LS.set("wf_decayday",today);
 }
 async function enrichCats(title,amount){
   const cats=await fetchCategories(title);
@@ -1754,18 +1813,23 @@ async function dampenCats(title,amount){
   saveProfile(); renderProfile();
 }
 function signalDislike(meta,seed){
-  state.disliked[meta.title]=1; LS.set("wf_disliked",state.disliked);
-  delete state.profile.seeds[meta.title];                 // never seed from a disliked article
-  if(seed && state.profile.seeds[seed]!=null) bumpSeed(seed,-WEIGHTS.open); // this recommendation source under-performed
+  state.disliked[meta.title]=1;
+  // keep the block list bounded (oldest entries roll off first)
+  const dk=Object.keys(state.disliked);
+  if(dk.length>500) dk.slice(0,dk.length-500).forEach(k=>delete state.disliked[k]);
+  LS.set("wf_disliked",state.disliked);
+  delete state.profile.seeds[seedKey(meta.title)];        // never seed from a disliked article
+  if(seed && state.profile.seeds[seedKey(seed)]!=null) bumpSeed(seed,-WEIGHTS.open); // this recommendation source under-performed
   nudgeExploit(-0.12);                                    // a miss → widen the net again
   dampenCats(meta.title,WEIGHTS.open);                    // pull its topics down in the profile
   saveProfile();
 }
 // Deck "interested" = a medium positive (same strength as opening), without opening the reader.
+// Smaller exploit nudge than an open: rapid-fire swipes shouldn't saturate exploitation in a minute.
 function signalInterested(meta){
   bumpSeed(meta.title,WEIGHTS.open);
   enrichCats(meta.title,WEIGHTS.open);
-  nudgeExploit(+0.04);
+  nudgeExploit(+0.02);
 }
 async function shareArticle(meta){
   const link=appLinkFor(meta);
@@ -1792,10 +1856,22 @@ function hasProfile(){ return Object.values(state.profile.seeds).some(v=>v>=WEIG
 
 function pickStrategy(){
   const r=Math.random();
-  const strongSeeds=Object.fromEntries(Object.entries(state.profile.seeds).filter(([,v])=>v>=WEIGHTS.open));
+  // only seeds from the current article language work as morelike queries
+  const pfx=state.lang+"::", strongSeeds={};
+  for(const [k,v] of Object.entries(state.profile.seeds)){
+    if(v>=WEIGHTS.open && k.startsWith(pfx)) strongSeeds[seedTitle(k)]=Math.sqrt(v); // sqrt: damp super-seeds so one starred article can't monopolise the feed
+  }
   const profileOn=Object.keys(strongSeeds).length>0;
   // exploit grows after hits, shrinks after misses (adaptive ε-greedy)
   if(profileOn && r<state.exploit){ return {type:"morelike", seed:weightedPick(strongSeeds)}; }
+  // occasionally follow the learned topic profile (categories), not just article seeds
+  const catPool={};
+  for(const [k,v] of Object.entries(state.profile.cats)){
+    if(v>=WEIGHTS.open && k.length>3 && !/\d/.test(k) && !/^(Mann|Frau|Männer|Frauen|Men|Women|Homme|Femme)$/i.test(k)) catPool[k]=Math.sqrt(v);
+  }
+  if(Object.keys(catPool).length && Math.random()<0.35){
+    return {type:"search", term:weightedPick(catPool)};
+  }
   if(state.interests.length && Math.random()<0.5){
     return {type:"search", term:state.interests[Math.floor(Math.random()*state.interests.length)]};
   }
@@ -1895,7 +1971,7 @@ function articleCard(meta, reason, seed){
   downBtn.innerHTML=svgIc("i-down");
   downBtn.addEventListener("click",()=>{
     const sib=card.nextSibling;
-    const prevSeed=state.profile.seeds[meta.title];
+    const prevSeed=state.profile.seeds[seedKey(meta.title)];
     const prevExploit=state.exploit;
     signalDislike(meta,seed);
     card.style.transition="opacity .25s, transform .25s";
@@ -1903,7 +1979,7 @@ function articleCard(meta, reason, seed){
     setTimeout(()=>{ card.remove(); if(feedEl.querySelectorAll(".card").length<3) loadMore(); },240);
     toastAction(t("lessLikeThis"), t("undo"), ()=>{
       delete state.disliked[meta.title]; LS.set("wf_disliked",state.disliked);
-      if(prevSeed!=null) state.profile.seeds[meta.title]=prevSeed; else delete state.profile.seeds[meta.title];
+      if(prevSeed!=null) state.profile.seeds[seedKey(meta.title)]=prevSeed; else delete state.profile.seeds[seedKey(meta.title)];
       state.exploit=prevExploit; LS.set("wf_exploit",state.exploit); saveProfile();
       const fresh=articleCard(meta,reason,seed);
       feedEl.insertBefore(fresh,(sib && sib.parentNode===feedEl)?sib:null);
@@ -2790,8 +2866,14 @@ function renderCollections(){
     const del=document.createElement("button"); del.className="mini focusable"; del.innerHTML=svgIc("i-trash");
     del.title=t("deleteCollTitle"); del.setAttribute("aria-label",t("deleteCollTitle"));
     del.addEventListener("click",async ()=>{ if(await modalConfirm({title:t("deleteCollTitle"),message:t("deleteCollMsg",name),confirm:t("del"),danger:true})){ delete state.collections[name]; saveCollections(); }});
-    head.append(ren,del); sec.appendChild(head);
     const arr=state.collections[name];
+    if(arr.length){
+      const sh=document.createElement("button"); sh.className="mini focusable"; sh.innerHTML=svgIc("i-share");
+      sh.title=t("shareColl"); sh.setAttribute("aria-label",t("shareColl"));
+      sh.addEventListener("click",()=>shareCollection(name));
+      head.append(sh);
+    }
+    head.append(ren,del); sec.appendChild(head);
     if(arr.length===0){ const e=document.createElement("p"); e.className="muted"; e.textContent=t("empty"); sec.appendChild(e); }
     arr.forEach(m=>{
       const it=document.createElement("div"); it.className="coll-item";
@@ -2804,6 +2886,16 @@ function renderCollections(){
     host.appendChild(sec);
   });
   updateCollBadge();
+}
+async function shareCollection(name){
+  const arr=state.collections[name]||[];
+  const text=`${name} – Wikidoomia\n\n`+arr.map(m=>`• ${m.title}\n  ${appLinkFor(m)}`).join("\n");
+  if(navigator.share){
+    try{ await navigator.share({title:name,text}); return; }
+    catch(e){ if(e&&e.name==="AbortError") return; }
+  }
+  try{ await navigator.clipboard.writeText(text); toast(t("collShared",name)); }
+  catch(e){ toast(text.slice(0,120)); }
 }
 function profileSummaryHTML(){
   const s=state.stats;
@@ -2828,7 +2920,7 @@ function profileSummaryHTML(){
       <div class="topic-row">
         <span class="name" title="${esc(name)}">${esc(name)}</span>
         <span class="bar"><i style="width:${Math.max(8,Math.round(v/max*100))}%"></i></span>
-      </div>`).join("") + `<p class="muted" style="margin-top:8px">${esc(t("profileSummary",starCount,Object.keys(state.profile.seeds).length))}</p>`;
+      </div>`).join("") + `<p class="muted" style="margin-top:8px">${esc(t("profileSummary",starCount,Object.keys(state.profile.seeds).filter(k=>k.startsWith(state.lang+"::")).length))}</p>`;
   }
   return statsHtml + body;
 }
@@ -3034,7 +3126,7 @@ function attachDeckDrag(card, meta){
 }
 function decide(meta, action){
   if(!meta) return;
-  const prevSeed=state.profile.seeds[meta.title];
+  const prevSeed=state.profile.seeds[seedKey(meta.title)];
   const wasStarred=!!state.stars[meta.title];
   const prevExploit=state.exploit;
   if(action==="like"){ state.seen.add(meta.title); signalInterested(meta); announce(t("annInterested",meta.title)); }
@@ -3044,7 +3136,8 @@ function decide(meta, action){
     if(!state.stars[meta.title]){ state.stars[meta.title]={title:meta.title,url:meta.url,lang:meta.lang}; signalStar(meta,true); LS.set("wf_stars",state.stars); }
     announce(t("annSaved",meta.title));
   }
-  else if(action==="open"){ state.seen.add(meta.title); openReader(meta); }
+  else if(action==="open"){ state.seen.add(meta.title); openFromDeck(meta); }
+  if(action!=="open") buzz(action==="nope"?8:14);
   state.deckHistory.push({meta,action,prevSeed,wasStarred,exploit:prevExploit});
   updateDeckUndo();
   const top=$("#deckStack .deck-card.top");
@@ -3059,7 +3152,7 @@ function undoDeck(){
   const {meta,action,prevSeed,wasStarred,exploit}=rec;
   if(action==="nope"){ delete state.disliked[meta.title]; LS.set("wf_disliked",state.disliked); }
   if(action==="save" && !wasStarred && state.stars[meta.title]){ delete state.stars[meta.title]; LS.set("wf_stars",state.stars); }
-  if(prevSeed==null) delete state.profile.seeds[meta.title]; else state.profile.seeds[meta.title]=prevSeed;
+  if(prevSeed==null) delete state.profile.seeds[seedKey(meta.title)]; else state.profile.seeds[seedKey(meta.title)]=prevSeed;
   if(typeof exploit==="number"){ state.exploit=exploit; LS.set("wf_exploit",state.exploit); }
   saveProfile(); state.seen.delete(meta.title);
   state.deckQueue.unshift(meta);
@@ -3093,6 +3186,7 @@ function setView(view){
     updateDeckUndo();
     if(!state.deckQueue.length){ const p=refillDeck(); renderDeck(); p.then(()=>{ if(state.view==="deck") renderDeck(); }); }
     else renderDeck();
+    maybeShowDeckOnboarding();
   }else{
     if(!feedEl.querySelector(".card") && !state.queueBusy) loadMore();
   }
@@ -3105,6 +3199,61 @@ $("#deckSaveBtn").addEventListener("click",()=>decide(state.deckQueue[0],"save")
 $("#deckOpenBtn").addEventListener("click",()=>decide(state.deckQueue[0],"open"));
 $("#deckUndo").addEventListener("click",undoDeck);
 $("#deckStack").addEventListener("click",e=>{ if(e.target.closest("#deckReloadBtn")){ const p=refillDeck(); renderDeck(); p.then(()=>{ if(state.view==="deck") renderDeck(); }); } });
+
+/* subtle haptic tick on swipe decisions (Android; iOS silently ignores it) */
+function buzz(ms){ if(navigator.vibrate){ try{ navigator.vibrate(ms); }catch(e){} } }
+
+/* card → reader morph via the View Transitions API (progressive enhancement) */
+function openFromDeck(meta){
+  const top=$("#deckStack .deck-card.top");
+  const reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // unfocused/occluded documents throttle rendering, which can delay the
+  // transition callback (and thus the reader) indefinitely — open directly then
+  if(!document.startViewTransition || reduce || !top || !document.hasFocus()){ openReader(meta); return; }
+  top.style.viewTransitionName="wf-hero";
+  const vt=document.startViewTransition(()=>{
+    top.style.viewTransitionName="";
+    reader.style.viewTransitionName="wf-hero";
+    reader.classList.add("vt-open");   // skip the slide-up; the morph is the animation
+    openReader(meta);
+  });
+  vt.finished.finally(()=>{ reader.style.viewTransitionName=""; reader.classList.remove("vt-open"); });
+}
+
+/* one-time gesture explainer the first time the stack is shown */
+function maybeShowDeckOnboarding(){
+  if(LS.get("wf_deckonb",false) || $(".deck-onb")) return;
+  const ov=document.createElement("div");
+  ov.className="deck-onb glass";
+  ov.setAttribute("role","dialog"); ov.setAttribute("aria-modal","true");
+  ov.setAttribute("aria-label",t("deckOnbTitle"));
+  const h=document.createElement("h3"); h.className="bebas"; h.textContent=t("deckOnbTitle");
+  const ul=document.createElement("ul");
+  [["i-heart","like","deckOnbLike"],["i-x","nope","deckOnbNope"],["i-star","save","deckOnbSave"],["i-book","open","deckOnbOpen"]].forEach(([ic,cls,key])=>{
+    const li=document.createElement("li");
+    const w=document.createElement("span"); w.className="onb-ic "+cls; w.appendChild(svgUse(ic));
+    li.append(w,document.createTextNode(t(key))); ul.appendChild(li);
+  });
+  const kbd=document.createElement("p"); kbd.className="muted kbd-hint"; kbd.textContent=t("deckOnbKeys");
+  const go=document.createElement("button"); go.className="btn primary focusable"; go.textContent=t("deckOnbGo");
+  go.addEventListener("click",()=>{ LS.set("wf_deckonb",true); ov.remove(); });
+  ov.append(h,ul,kbd,go);
+  $("#deck").appendChild(ov);
+  go.focus();
+}
+
+/* desktop: drive the stack with the keyboard */
+document.addEventListener("keydown",e=>{
+  if(state.view!=="deck" || anyOverlayOpen()) return;
+  if($(".deck-onb")){ if(e.key==="Enter"||e.key==="Escape"){ e.preventDefault(); LS.set("wf_deckonb",true); const o=$(".deck-onb"); if(o) o.remove(); } return; }
+  const tag=(document.activeElement&&document.activeElement.tagName)||"";
+  if(tag==="INPUT"||tag==="TEXTAREA"||tag==="SELECT") return;
+  const meta=state.deckQueue[0]; if(!meta) return;
+  if(e.key==="ArrowLeft"){ e.preventDefault(); decide(meta,"nope"); }
+  else if(e.key==="ArrowRight"){ e.preventDefault(); decide(meta,"like"); }
+  else if(e.key==="ArrowUp"){ e.preventDefault(); decide(meta,"save"); }
+  else if(e.key==="Enter" && !(e.target.closest && e.target.closest("button,a"))){ e.preventDefault(); decide(meta,"open"); }
+});
 
 /* ---------- theme & lang ---------- */
 function applyTheme(){
@@ -3329,6 +3478,13 @@ function init(){
   if((!state.readOrder||!state.readOrder.length) && state.readProg && Object.keys(state.readProg).length){
     state.readOrder=Object.keys(state.readProg).slice(0,80); LS.set("wf_readorder",state.readOrder);
   }
+  // migrate: language-scope legacy seed keys ("Titel" → "de::Titel", best guess: current lang)
+  if(Object.keys(state.profile.seeds).some(k=>!k.includes("::"))){
+    const m={};
+    for(const [k,v] of Object.entries(state.profile.seeds)) m[k.includes("::")?k:`${state.lang}::${k}`]=v;
+    state.profile.seeds=m; saveProfile();
+  }
+  decayProfile();
   document.documentElement.lang=state.uiLang;
   document.querySelectorAll("#langSeg button").forEach(x=>x.classList.toggle("active",x.dataset.lang===state.lang));
   document.querySelectorAll("#uiLangSeg button").forEach(x=>x.classList.toggle("active",x.dataset.uilang===state.uiLang));

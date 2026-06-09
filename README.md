@@ -28,7 +28,14 @@ Every interaction feeds a small on-device profile:
 | Dwell time | weakest (capped) | a light nudge, so a long article can't dominate the profile |
 | "Less like this" | negative | hides the article, dampens its topics, weakens that recommendation source |
 
-The feed mixes related content (exploit) with random discovery (explore); the balance shifts toward exploration after misses and toward your interests after hits. None of this leaves the browser — open the dev console and type `state.profile` to inspect it.
+The feed mixes related content (exploit) with random discovery (explore); the balance shifts toward exploration after misses and toward your interests after hits. A few refinements keep it honest over time:
+
+- **Time decay** — all profile scores fade a little every day, so last month's binge no longer dominates today's feed.
+- **Damped picking** — recommendation seeds are weighted by the square root of their score, so one starred article can't monopolise the feed.
+- **Topic-profile searches** — the learned category profile occasionally drives a search of its own, not just article-to-article similarity.
+- **Language-scoped seeds** — seeds are tied to the article language, so switching DE/EN/FR never sends mismatched queries.
+
+None of this leaves the browser — open the dev console and type `state.profile` to inspect it.
 
 ## Tech
 
