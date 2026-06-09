@@ -637,6 +637,65 @@
   .related-item{display:block;width:100%;text-align:left;margin:8px 0;padding:12px 14px;border-radius:14px;border:1px solid var(--glass-brd);background:var(--glass-bg);color:var(--ink);font:inherit;font-weight:800;cursor:pointer}
   .fab-top{position:fixed;right:max(16px,var(--safe-right));bottom:calc(22px + var(--safe-bottom));z-index:36;width:46px;height:46px;border-radius:50%;opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .2s,transform .2s}
   .fab-top.show{opacity:1;pointer-events:auto;transform:none}
+
+  /* ---------- view toggle (Feed / Discover) ---------- */
+  .view-seg button{display:inline-flex;align-items:center;gap:6px;font-weight:800;font-size:13px;white-space:nowrap}
+  .view-seg .ic{width:16px;height:16px}
+  @media (max-width:560px){ .view-seg button span{display:none} .view-seg button{padding:9px 11px} }
+
+  /* ---------- topic chip filter bar ---------- */
+  .topicbar{
+    position:sticky; top:calc(var(--topbar-block-size) + var(--safe-top)); z-index:33;
+    display:flex; gap:8px; overflow-x:auto; scrollbar-width:none;
+    max-width:1080px; margin:0 auto; padding:8px max(12px,var(--safe-left)) 8px max(12px,var(--safe-right));
+    -webkit-overflow-scrolling:touch}
+  .topicbar::-webkit-scrollbar{display:none}
+  .topicbar .chip{flex:0 0 auto; cursor:pointer}
+  .topicbar .chip.active{background:var(--accent2); color:var(--on-accent2); border-color:transparent}
+  body.view-deck .sentinel{display:none}
+  body.view-deck .fab-top{display:none !important}
+
+  /* ---------- discover deck (swipe) ---------- */
+  .shell[hidden],.deck[hidden]{display:none}
+  .deck{max-width:560px;margin:0 auto;padding:8px 14px calc(18px + var(--safe-bottom));display:flex;flex-direction:column;align-items:center;gap:16px}
+  .deck-stack{position:relative;width:100%;height:min(64vh,580px)}
+  .deck-card{position:absolute;inset:0;border-radius:26px;overflow:hidden;background:var(--glass-bg);border:1px solid var(--glass-brd);box-shadow:0 18px 50px rgba(0,0,0,.28);will-change:transform;touch-action:pan-y;cursor:pointer}
+  .deck-card.behind{transform:scale(.93) translateY(14px);filter:saturate(.85) brightness(.96);pointer-events:none}
+  .deck-card.top{transition:transform .32s cubic-bezier(.2,.8,.2,1)}
+  .deck-card.dragging{transition:none}
+  .deck-card.fly-left{transform:translateX(-140%) rotate(-18deg)!important;opacity:0;transition:transform .4s ease,opacity .4s ease}
+  .deck-card.fly-right{transform:translateX(140%) rotate(18deg)!important;opacity:0;transition:transform .4s ease,opacity .4s ease}
+  .deck-card.fly-up{transform:translateY(-140%) scale(.9)!important;opacity:0;transition:transform .4s ease,opacity .4s ease}
+  .deck-card .photo{position:absolute;inset:0;background-size:cover;background-position:center;background-color:#222}
+  .deck-card.noimg .photo{background:linear-gradient(150deg,var(--accent2),var(--accent))}
+  .deck-card .meta{position:absolute;left:0;right:0;bottom:0;padding:22px 22px 24px;color:#fff;background:linear-gradient(to top,rgba(0,0,0,.86),rgba(0,0,0,.5) 46%,rgba(0,0,0,0));text-shadow:0 1px 3px rgba(0,0,0,.5)}
+  .deck-card .kicker{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.2);backdrop-filter:blur(6px);margin-bottom:10px}
+  .deck-card .kicker .ic{width:12px;height:12px}
+  .deck-card .ttl{font-family:'Bebas Neue','Impact',sans-serif;font-size:2.3rem;line-height:.98;margin:0 0 8px}
+  .deck-card .ex{margin:0;font-size:14.5px;line-height:1.45;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;color:rgba(255,255,255,.92)}
+  .deck-card.noimg .meta{background:linear-gradient(to top,rgba(0,0,0,.45),rgba(0,0,0,.12) 55%,transparent)}
+  .stamp{position:absolute;top:26px;font-family:'Bebas Neue','Impact',sans-serif;font-size:2.1rem;letter-spacing:.04em;padding:4px 16px;border:4px solid;border-radius:14px;opacity:0;pointer-events:none;text-transform:uppercase}
+  .stamp.like{right:22px;color:var(--success);border-color:var(--success);transform:rotate(14deg)}
+  .stamp.nope{left:22px;color:var(--danger);border-color:var(--danger);transform:rotate(-14deg)}
+  .stamp.save{left:50%;top:16px;transform:translateX(-50%);color:#fff;border-color:#fff}
+  .deck-actions{display:flex;align-items:center;justify-content:center;gap:14px}
+  .deck-btn{width:58px;height:58px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--glass-brd);background:var(--glass-bg);cursor:pointer;transition:transform .15s,background .15s}
+  .deck-btn:hover{transform:translateY(-2px)}
+  .deck-btn:active{transform:scale(.92)}
+  .deck-btn .ic{width:26px;height:26px}
+  .deck-btn.nope{color:var(--danger)}
+  .deck-btn.like{color:var(--success)}
+  .deck-btn.save{color:var(--accent2)}
+  .deck-btn.open{color:var(--ink)}
+  .deck-btn.undo{width:46px;height:46px;color:var(--muted)}
+  .deck-btn.undo .ic{width:20px;height:20px}
+  .deck-hint{font-size:12.5px;text-align:center;max-width:42ch;margin:0}
+  .deck-empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:24px;border-radius:26px;border:1px dashed var(--glass-brd)}
+  .deck-empty .ic{width:34px;height:34px;color:var(--muted)}
+  @media (prefers-reduced-motion:reduce){
+    .deck-card.top,.deck-card.fly-left,.deck-card.fly-right,.deck-card.fly-up{transition:none}
+  }
+
   .reason{cursor:pointer}
   .settings-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:10px 0}
   .toggle{position:relative;width:46px;height:26px;border-radius:999px;border:1px solid var(--glass-brd);background:var(--glass-bg);cursor:pointer;flex:0 0 auto}
@@ -697,12 +756,18 @@
   <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></symbol>
   <symbol id="i-up" viewBox="0 0 24 24"><path d="m18 15-6-6-6 6"/></symbol>
   <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z"/></symbol>
+  <symbol id="i-rotate" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9 9 0 0 0-6.36 2.64L3 8"/><path d="M3 3v5h5"/></symbol>
 </defs></svg>
 
 <header class="topbar glass">
   <div class="brand">
     <span class="logo bebas">Wiki<span class="ac">doomia</span></span>
     <span class="sub" data-i18n="brandSub">dein Wissens‑Feed</span>
+  </div>
+  <div class="seg view-seg" id="viewSeg" role="tablist" data-i18n-aria="viewSwitchAria" aria-label="Ansicht wechseln">
+    <button class="active focusable" id="viewFeedBtn" type="button" data-view="feed" role="tab" aria-selected="true"><svg class="ic"><use href="#i-list"/></svg><span data-i18n="viewFeed">Feed</span></button>
+    <button class="focusable" id="viewDeckBtn" type="button" data-view="deck" role="tab" aria-selected="false"><svg class="ic"><use href="#i-compass"/></svg><span data-i18n="viewDeck">Entdecken</span></button>
   </div>
   <button class="iconbtn focusable" id="btnQuiz" data-i18n-title="startQuiz" data-i18n-aria="startQuiz" title="Quiz starten" aria-label="Quiz starten" hidden>
     <svg class="ic"><use href="#i-quiz"/></svg>
@@ -727,13 +792,29 @@
 </div>
 <div class="search-results" id="searchResults" hidden></div>
 
-<div class="shell">
+<div class="topicbar" id="topicBar" data-i18n-aria="topicChipsAria" aria-label="Themenfilter"></div>
+
+<div class="shell" id="shell">
   <main class="feed" id="feed">
     <h1 class="sr-only" data-i18n="appTitleLong">Wikidoomia – dein lernender Wikipedia-Feed</h1>
   </main>
   <aside class="rail" id="rail" aria-label="Kontext"></aside>
 </div>
 <div class="sentinel" id="sentinel"></div>
+
+<!-- Discover / swipe deck -->
+<section class="deck" id="deck" hidden data-i18n-aria="viewDeck" aria-label="Entdecken">
+  <div class="deck-stack" id="deckStack"></div>
+  <div class="deck-actions" id="deckActions">
+    <button class="deck-btn undo focusable" id="deckUndo" type="button" hidden data-i18n-aria="deckUndo" aria-label="Zurück"><svg class="ic"><use href="#i-rotate"/></svg></button>
+    <button class="deck-btn nope focusable" id="deckNope" type="button" data-i18n-aria="deckNope" aria-label="Nichts für mich"><svg class="ic"><use href="#i-x"/></svg></button>
+    <button class="deck-btn save focusable" id="deckSaveBtn" type="button" data-i18n-aria="deckSave" aria-label="Merken"><svg class="ic"><use href="#i-star"/></svg></button>
+    <button class="deck-btn open focusable" id="deckOpenBtn" type="button" data-i18n-aria="deckOpen" aria-label="Öffnen"><svg class="ic"><use href="#i-book"/></svg></button>
+    <button class="deck-btn like focusable" id="deckLikeBtn" type="button" data-i18n-aria="deckLike" aria-label="Interessiert"><svg class="ic"><use href="#i-heart"/></svg></button>
+  </div>
+  <p class="deck-hint muted" id="deckHint" data-i18n="deckHint"></p>
+</section>
+
 <div id="feedStatus" class="sr-only" role="status" aria-live="polite"></div>
 
 <!-- Collections / profile drawer -->
@@ -972,6 +1053,13 @@ const I18N = {
     onbLead2:"Sterne, geöffnete Artikel und Lesezeit formen dein Profil — alles nur lokal auf deinem Gerät.",
     onbTip1:"Stern = stärkstes Signal", onbTip2:"Artikel öffnen = mittleres Signal", onbTip3:"Lesezeit = leichtes Signal",
     back:"Zurück", renameColl:"Sammlung umbenennen", topicFeed:t=>`Themen-Feed: ${t}`,
+    viewFeed:"Feed", viewDeck:"Entdecken", viewSwitchAria:"Ansicht wechseln",
+    deckLike:"Interessiert", deckNope:"Nichts für mich", deckSave:"Merken", deckOpen:"Öffnen", deckUndo:"Zurück",
+    deckHint:"Wische rechts für „interessiert“, links für „nichts für mich“, nach oben zum Merken – oder tippe zum Öffnen.",
+    deckEmpty:"Keine weiteren Vorschläge gerade. Schau später wieder rein.", deckLoading:"Vorschläge werden geladen…",
+    deckReload:"Neue Vorschläge",
+    annInterested:t=>`Interessiert: ${t}`, annNope:t=>`Ausgeblendet: ${t}`, annSaved:t=>`Gemerkt: ${t}`,
+    allTopics:"Alle", topicChipsAria:"Themenfilter",
     consoleMsg:"Neugierig, wie der Feed lernt? Tippe  state.profile  ein – das ist dein lokales Themenprofil. Nichts verlässt deinen Browser. Viel Entdeckerfreude."
   },
   en:{
@@ -1036,6 +1124,13 @@ const I18N = {
     onbLead2:"Stars, opened articles, and reading time shape your profile — all stored locally on your device.",
     onbTip1:"Star = strongest signal", onbTip2:"Open article = medium signal", onbTip3:"Reading time = light signal",
     back:"Back", renameColl:"Rename collection", topicFeed:t=>`Topic feed: ${t}`,
+    viewFeed:"Feed", viewDeck:"Discover", viewSwitchAria:"Switch view",
+    deckLike:"Interested", deckNope:"Not for me", deckSave:"Save", deckOpen:"Open", deckUndo:"Undo",
+    deckHint:"Swipe right for “interested”, left for “not for me”, up to save — or tap to open.",
+    deckEmpty:"No more suggestions right now. Check back later.", deckLoading:"Loading suggestions…",
+    deckReload:"New suggestions",
+    annInterested:t=>`Interested: ${t}`, annNope:t=>`Dismissed: ${t}`, annSaved:t=>`Saved: ${t}`,
+    allTopics:"All", topicChipsAria:"Topic filter",
     consoleMsg:"Curious how the feed learns? Type  state.profile  — that's your local topic profile. Nothing leaves your browser. Happy exploring."
   },
   fr:{
@@ -1100,6 +1195,13 @@ const I18N = {
     onbLead2:"Étoiles, articles ouverts et temps de lecture façonnent ton profil — tout reste local sur ton appareil.",
     onbTip1:"Étoile = signal le plus fort", onbTip2:"Ouvrir un article = signal moyen", onbTip3:"Temps de lecture = signal léger",
     back:"Retour", renameColl:"Renommer la collection", topicFeed:t=>`Fil thématique : ${t}`,
+    viewFeed:"Fil", viewDeck:"Découvrir", viewSwitchAria:"Changer de vue",
+    deckLike:"Intéressé", deckNope:"Pas pour moi", deckSave:"Garder", deckOpen:"Ouvrir", deckUndo:"Annuler",
+    deckHint:"Glisse à droite pour « intéressé », à gauche pour « pas pour moi », vers le haut pour garder — ou touche pour ouvrir.",
+    deckEmpty:"Aucune autre suggestion pour le moment. Reviens plus tard.", deckLoading:"Chargement des suggestions…",
+    deckReload:"Nouvelles suggestions",
+    annInterested:t=>`Intéressé : ${t}`, annNope:t=>`Masqué : ${t}`, annSaved:t=>`Gardé : ${t}`,
+    allTopics:"Tout", topicChipsAria:"Filtre par thème",
     consoleMsg:"Curieux de voir comment le fil apprend ? Tape  state.profile  — c'est ton profil thématique local. Rien ne quitte ton navigateur. Bonne exploration."
   }
 };
@@ -1159,7 +1261,13 @@ const state = {
   dailyGoal: LS.get("wf_dailygoal",5),
   quizBest: LS.get("wf_quizbest",0),
   readerQueue: [],
-  readerQueueIdx: -1
+  readerQueueIdx: -1,
+  view: LS.get("wf_view","feed"),       // "feed" | "deck" (Tinder-style discovery)
+  deckQueue: [],                        // upcoming deck candidates (metas)
+  deckHistory: [],                      // {meta,action,prevSeed,wasStarred} for undo
+  deckBusy:false,
+  deckGen:0,
+  activeTopic: null                     // currently selected topic chip (filters both views)
 };
 
 function saveProfile(){ LS.set("wf_profile",state.profile); }
@@ -1638,6 +1746,12 @@ function signalDislike(meta,seed){
   dampenCats(meta.title,WEIGHTS.open);                    // pull its topics down in the profile
   saveProfile();
 }
+// Deck "interested" = a medium positive (same strength as opening), without opening the reader.
+function signalInterested(meta){
+  bumpSeed(meta.title,WEIGHTS.open);
+  enrichCats(meta.title,WEIGHTS.open);
+  nudgeExploit(+0.04);
+}
 async function shareArticle(meta){
   const link=appLinkFor(meta);
   const snippet=(meta.extract&&meta.extract.length>40)?meta.extract.slice(0,160).trim()+"…":meta.title;
@@ -1984,7 +2098,7 @@ function setLangIfNeeded(lang){
   if(!ROUTE_LANGS.includes(lang) || lang===state.lang) return;
   state.lang=lang; LS.set("wf_lang",state.lang);
   document.querySelectorAll("#langSeg button").forEach(x=>x.classList.toggle("active",x.dataset.lang===state.lang));
-  renderInterestChips();
+  renderInterestChips(); renderTopicBar(); resetDeck();
 }
 function runSearchRoute(term, fromHash){
   term=(term||"").trim(); if(!term) return;
@@ -2744,6 +2858,219 @@ function renderInterestChips(){
   });
 }
 
+/* ---------- topic chip filter bar ---------- */
+function renderTopicBar(){
+  const bar=$("#topicBar"); if(!bar) return;
+  bar.replaceChildren();
+  const presets=PRESET_TOPICS[state.lang]||[];
+  const topics=Array.from(new Set([...(state.interests||[]),...presets]));
+  const all=document.createElement("button");
+  all.type="button"; all.className="chip focusable"+(state.activeTopic?"":" active");
+  all.textContent=t("allTopics");
+  all.setAttribute("aria-pressed", state.activeTopic?"false":"true");
+  all.addEventListener("click",()=>setActiveTopic(null));
+  bar.appendChild(all);
+  topics.forEach(tp=>{
+    const c=document.createElement("button"); c.type="button";
+    c.className="chip focusable"+(state.activeTopic===tp?" active":"");
+    c.textContent=tp; c.title=tp;
+    c.setAttribute("aria-pressed", state.activeTopic===tp?"true":"false");
+    c.addEventListener("click",()=>setActiveTopic(state.activeTopic===tp?null:tp));
+    bar.appendChild(c);
+  });
+}
+function setActiveTopic(topic){
+  state.activeTopic=topic||null;
+  renderTopicBar();
+  if(state.view==="deck"){
+    state.deckGen++; state.deckQueue=[]; state.deckHistory=[]; updateDeckUndo();
+    const p=refillDeck(); renderDeck(); p.then(()=>{ if(state.view==="deck") renderDeck(); });
+  }else{
+    if(state.activeTopic) startTopicFeed(state.activeTopic);
+    else { state.pendingStrategies=[]; resetFeed(); }
+  }
+}
+
+/* ---------- discover deck (Tinder-style swipe) ---------- */
+function inDeck(title){ return state.deckQueue.some(a=>a.title===title); }
+async function fetchDeckBatch(){
+  let strat = state.activeTopic ? {type:"search",term:state.activeTopic} : pickStrategy();
+  let batch=[];
+  try{
+    if(strat.type==="morelike") batch=await fetchMoreLike(strat.seed);
+    else if(strat.type==="search") batch=await fetchSearch(strat.term);
+    else batch=await fetchRandom();
+    if(strat.type==="morelike" && !batch.length) batch=await fetchRandom();
+  }catch(e){ batch=[]; }
+  const reason = strat.type==="morelike" ? "foryou"
+               : (strat.type==="search" && state.activeTopic) ? "topic" : "none";
+  const seed = strat.type==="morelike" ? strat.seed : null;
+  return batch.map(a=>Object.assign({},a,{_reason:reason,_seed:seed}));
+}
+async function refillDeck(){
+  if(state.deckBusy) return;
+  state.deckBusy=true;
+  const gen=state.deckGen;
+  let guard=0;
+  try{
+    while(state.deckQueue.length<5 && guard<8){
+      guard++;
+      const batch=await fetchDeckBatch();
+      if(gen!==state.deckGen) return;
+      const fresh=batch.filter(a=>a.title && !state.seen.has(a.title) && !state.disliked[a.title] && !inDeck(a.title));
+      const withImg=fresh.filter(a=>a.thumb), without=fresh.filter(a=>!a.thumb);
+      // image-first; allow a couple of image-less as fallback so the deck never starves
+      const ordered=[...withImg, ...without.slice(0,Math.max(0,2-withImg.length))];
+      ordered.forEach(a=>{ if(!inDeck(a.title)) state.deckQueue.push(a); });
+    }
+  }finally{
+    if(gen===state.deckGen) state.deckBusy=false;
+  }
+}
+function maybeRefillDeck(){
+  if(state.deckQueue.length<4 && !state.deckBusy){
+    refillDeck().then(()=>{ if(state.view==="deck") renderDeck(); });
+  }
+}
+function deckKicker(meta){
+  if(meta._reason==="foryou") return {ic:"i-sparkles", txt:t("forYou")};
+  if(meta._reason==="topic" && state.activeTopic) return {ic:"i-compass", txt:state.activeTopic};
+  return null;
+}
+function buildDeckCard(meta, isTop){
+  const card=document.createElement("article");
+  card.className="deck-card "+(isTop?"top":"behind")+(meta.thumb?"":" noimg");
+  if(isTop) card.dataset.title=meta.title;
+  const photo=document.createElement("div"); photo.className="photo";
+  if(meta.thumb) photo.style.backgroundImage=`url("${meta.thumb.replace(/"/g,'%22')}")`;
+  card.appendChild(photo);
+  if(isTop){
+    const sl=document.createElement("div"); sl.className="stamp like"; sl.textContent=t("deckLike");
+    const sn=document.createElement("div"); sn.className="stamp nope"; sn.textContent=t("deckNope");
+    const ss=document.createElement("div"); ss.className="stamp save"; ss.textContent=t("deckSave");
+    card.append(sl,sn,ss);
+  }
+  const m=document.createElement("div"); m.className="meta";
+  const k=deckKicker(meta);
+  m.innerHTML=`${k?`<span class="kicker">${svgIc(k.ic)}${esc(k.txt)}</span>`:""}<h2 class="ttl bebas">${esc(meta.title)}</h2><p class="ex">${esc(meta.extract||"")}</p>`;
+  card.appendChild(m);
+  if(isTop) attachDeckDrag(card, meta);
+  return card;
+}
+function buildDeckStatus(){
+  const box=document.createElement("div"); box.className="deck-empty glass";
+  if(state.deckBusy){
+    box.innerHTML=`${svgIc("i-refresh")}<p class="muted">${esc(t("deckLoading"))}</p>`;
+  }else{
+    box.innerHTML=`${svgIc("i-compass")}<p class="muted">${esc(t("deckEmpty"))}</p><button class="btn focusable" id="deckReloadBtn">${esc(t("deckReload"))}</button>`;
+  }
+  return box;
+}
+function renderDeck(){
+  const stack=$("#deckStack"); if(!stack) return;
+  if(!state.deckQueue.length){ stack.replaceChildren(buildDeckStatus()); return; }
+  const wantTop=state.deckQueue[0].title;
+  const curTop=stack.querySelector(".deck-card.top");
+  const flying=curTop && /fly-/.test(curTop.className);
+  if(curTop && !flying && curTop.dataset.title===wantTop) return;  // already showing the right card
+  stack.replaceChildren();
+  if(state.deckQueue[1]) stack.appendChild(buildDeckCard(state.deckQueue[1],false));
+  stack.appendChild(buildDeckCard(state.deckQueue[0],true));
+}
+function attachDeckDrag(card, meta){
+  let sx=0,sy=0,dx=0,dy=0,drag=false;
+  const sl=card.querySelector(".stamp.like"), sn=card.querySelector(".stamp.nope"), ss=card.querySelector(".stamp.save");
+  const TH=110;
+  const setStamps=(l,n,s)=>{ if(sl)sl.style.opacity=l; if(sn)sn.style.opacity=n; if(ss)ss.style.opacity=s; };
+  card.addEventListener("pointerdown",e=>{
+    if(e.button!=null && e.button!==0) return;
+    drag=true; sx=e.clientX; sy=e.clientY; dx=dy=0;
+    card.classList.add("dragging");
+    try{ card.setPointerCapture(e.pointerId); }catch(_){}
+  });
+  card.addEventListener("pointermove",e=>{
+    if(!drag) return;
+    dx=e.clientX-sx; dy=e.clientY-sy;
+    card.style.transform=`translate(${dx}px,${dy}px) rotate(${dx/18}deg)`;
+    const up = dy<-60 && Math.abs(dy)>Math.abs(dx);
+    setStamps(up?0:Math.max(0,Math.min(1,dx/TH)), up?0:Math.max(0,Math.min(1,-dx/TH)), up?Math.max(0,Math.min(1,-dy/TH)):0);
+  });
+  const finish=()=>{
+    if(!drag) return; drag=false; card.classList.remove("dragging");
+    if(dy<-90 && Math.abs(dy)>Math.abs(dx)){ decide(meta,"save"); return; }
+    if(dx>TH){ decide(meta,"like"); return; }
+    if(dx<-TH){ decide(meta,"nope"); return; }
+    card.style.transform=""; setStamps(0,0,0);
+    if(Math.abs(dx)<6 && Math.abs(dy)<6) decide(meta,"open");
+  };
+  card.addEventListener("pointerup",finish);
+  card.addEventListener("pointercancel",()=>{ drag=false; card.classList.remove("dragging"); card.style.transform=""; setStamps(0,0,0); });
+}
+function decide(meta, action){
+  if(!meta) return;
+  const prevSeed=state.profile.seeds[meta.title];
+  const wasStarred=!!state.stars[meta.title];
+  const prevExploit=state.exploit;
+  if(action==="like"){ state.seen.add(meta.title); signalInterested(meta); announce(t("annInterested",meta.title)); }
+  else if(action==="nope"){ signalDislike(meta, meta._seed); announce(t("annNope",meta.title)); }
+  else if(action==="save"){
+    state.seen.add(meta.title);
+    if(!state.stars[meta.title]){ state.stars[meta.title]={title:meta.title,url:meta.url,lang:meta.lang}; signalStar(meta,true); LS.set("wf_stars",state.stars); }
+    announce(t("annSaved",meta.title));
+  }
+  else if(action==="open"){ state.seen.add(meta.title); openReader(meta); }
+  state.deckHistory.push({meta,action,prevSeed,wasStarred,exploit:prevExploit});
+  updateDeckUndo();
+  const top=$("#deckStack .deck-card.top");
+  const flyCls = action==="nope"?"fly-left" : action==="save"?"fly-up" : action==="like"?"fly-right" : null;
+  state.deckQueue.shift();
+  if(flyCls && top){ top.classList.add(flyCls); setTimeout(()=>{ renderDeck(); maybeRefillDeck(); },360); }
+  else { renderDeck(); maybeRefillDeck(); }
+}
+function updateDeckUndo(){ const u=$("#deckUndo"); if(u) u.hidden=state.deckHistory.length===0; }
+function undoDeck(){
+  const rec=state.deckHistory.pop(); if(!rec) return;
+  const {meta,action,prevSeed,wasStarred,exploit}=rec;
+  if(action==="nope"){ delete state.disliked[meta.title]; LS.set("wf_disliked",state.disliked); }
+  if(action==="save" && !wasStarred && state.stars[meta.title]){ delete state.stars[meta.title]; LS.set("wf_stars",state.stars); }
+  if(prevSeed==null) delete state.profile.seeds[meta.title]; else state.profile.seeds[meta.title]=prevSeed;
+  if(typeof exploit==="number"){ state.exploit=exploit; LS.set("wf_exploit",state.exploit); }
+  saveProfile(); state.seen.delete(meta.title);
+  state.deckQueue.unshift(meta);
+  updateDeckUndo(); renderDeck();
+}
+function resetDeck(){
+  state.deckGen++; state.deckQueue=[]; state.deckHistory=[]; updateDeckUndo();
+  if(state.view==="deck"){ const p=refillDeck(); renderDeck(); p.then(()=>{ if(state.view==="deck") renderDeck(); }); }
+}
+function setView(view){
+  state.view = view==="deck" ? "deck" : "feed";
+  LS.set("wf_view",state.view);
+  const deck=state.view==="deck";
+  $("#shell").hidden=deck;
+  $("#deck").hidden=!deck;
+  document.body.classList.toggle("view-deck",deck);
+  $("#viewFeedBtn").classList.toggle("active",!deck);
+  $("#viewDeckBtn").classList.toggle("active",deck);
+  $("#viewFeedBtn").setAttribute("aria-selected",String(!deck));
+  $("#viewDeckBtn").setAttribute("aria-selected",String(deck));
+  if(deck){
+    updateDeckUndo();
+    if(!state.deckQueue.length){ const p=refillDeck(); renderDeck(); p.then(()=>{ if(state.view==="deck") renderDeck(); }); }
+    else renderDeck();
+  }else{
+    if(!feedEl.querySelector(".card") && !state.queueBusy) loadMore();
+  }
+}
+$("#viewFeedBtn").addEventListener("click",()=>setView("feed"));
+$("#viewDeckBtn").addEventListener("click",()=>setView("deck"));
+$("#deckNope").addEventListener("click",()=>decide(state.deckQueue[0],"nope"));
+$("#deckLikeBtn").addEventListener("click",()=>decide(state.deckQueue[0],"like"));
+$("#deckSaveBtn").addEventListener("click",()=>decide(state.deckQueue[0],"save"));
+$("#deckOpenBtn").addEventListener("click",()=>decide(state.deckQueue[0],"open"));
+$("#deckUndo").addEventListener("click",undoDeck);
+$("#deckStack").addEventListener("click",e=>{ if(e.target.closest("#deckReloadBtn")){ const p=refillDeck(); renderDeck(); p.then(()=>{ if(state.view==="deck") renderDeck(); }); } });
+
 /* ---------- theme & lang ---------- */
 function applyTheme(){
   document.documentElement.classList.toggle("dark",state.theme==="dark");
@@ -2757,6 +3084,7 @@ document.querySelectorAll("#langSeg button").forEach(b=>{
     state.lang=b.dataset.lang; LS.set("wf_lang",state.lang);
     document.querySelectorAll("#langSeg button").forEach(x=>x.classList.toggle("active",x===b));
     renderInterestChips();              // preset topics follow the content wiki
+    renderTopicBar(); resetDeck();
     resetFeed();
     toast(WIKI_NAMES[state.lang]);
   });
@@ -2973,6 +3301,7 @@ function init(){
   state.surpriseAt=randInt(4,8);
   updateCollBadge();
   renderRail();
+  renderTopicBar();
   applyDataSaver();
   renderGoalUI();
   if($("#readerPrev")) $("#readerPrev").addEventListener("click",()=>openReaderNeighbor(-1));
@@ -2992,6 +3321,7 @@ function init(){
   }else{
     resetFeed();
   }
+  if(state.view==="deck") setView("deck");   // restore last used view (deck loads its own queue)
   syncFromHash();   // open a shared deep link (#/<lang>/article/<title>) on first load
 }
 init();
