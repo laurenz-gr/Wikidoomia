@@ -344,6 +344,8 @@
   .card.read .hero img{opacity:.6}
   .read-tag{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);margin-bottom:6px}
   .read-tag .ic{width:13px;height:13px;color:var(--success)}
+  .read-tag.partial{color:var(--accent2)}
+  .read-tag.partial .ic{color:var(--accent2)}
 
   .skeleton{height:300px;border-radius:16px;position:relative;overflow:hidden}
   .skeleton::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,var(--glass-hi),transparent);transform:translateX(-100%);animation:sweep 1.3s infinite}
@@ -926,7 +928,7 @@ const I18N = {
     quizKicker:"Welcher Artikel wird beschrieben?", next:"Weiter", result:"Ergebnis",
     quizPerfect:"Perfekt!", quizGood:"Stark gelesen!", quizMeh:"Dranbleiben lohnt sich.",
     aRight:"Richtig", aWrong:"Falsch", correctAnswerIs:tt=>`Falsch. Richtig: ${tt}`, openArticle:"Artikel öffnen",
-    undo:"Rückgängig", refreshed:"Aktualisiert", read:"Gelesen", minRead:n=>`~${n} Min`, textSmaller:"Schrift kleiner", textBigger:"Schrift größer",
+    undo:"Rückgängig", refreshed:"Aktualisiert", read:"Gelesen", readPct:n=>`${n}% gelesen`, minRead:n=>`~${n} Min`, textSmaller:"Schrift kleiner", textBigger:"Schrift größer",
     rkUmfang:"Dein Lese-Rückblick", rArticlesOpened:"Artikel geöffnet",
     rSub1:d=>`Dazu <strong>${d}</strong> konzentrierte Lesezeit — gezählt nur, während du wirklich dabei warst.`,
     rkRhythm:"Dranbleiben", rDay:"Tag", rDays:"Tage", rInARow:"in Folge",
@@ -989,7 +991,7 @@ const I18N = {
     quizKicker:"Which article is described?", next:"Next", result:"Result",
     quizPerfect:"Perfect!", quizGood:"Well read!", quizMeh:"Worth sticking with it.",
     aRight:"Correct", aWrong:"Wrong", correctAnswerIs:tt=>`Wrong. Correct: ${tt}`, openArticle:"Open article",
-    undo:"Undo", refreshed:"Refreshed", read:"Read", minRead:n=>`~${n} min`, textSmaller:"Smaller text", textBigger:"Larger text",
+    undo:"Undo", refreshed:"Refreshed", read:"Read", readPct:n=>`${n}% read`, minRead:n=>`~${n} min`, textSmaller:"Smaller text", textBigger:"Larger text",
     rkUmfang:"Your reading recap", rArticlesOpened:"articles opened",
     rSub1:d=>`Plus <strong>${d}</strong> of focused reading — counted only while you were really there.`,
     rkRhythm:"Staying consistent", rDay:"day", rDays:"days", rInARow:"in a row",
@@ -1052,7 +1054,7 @@ const I18N = {
     quizKicker:"Quel article est décrit ?", next:"Suivant", result:"Résultat",
     quizPerfect:"Parfait !", quizGood:"Bien lu !", quizMeh:"Ça vaut la peine de persévérer.",
     aRight:"Correct", aWrong:"Faux", correctAnswerIs:tt=>`Faux. Bonne réponse : ${tt}`, openArticle:"Ouvrir l'article",
-    undo:"Annuler", refreshed:"Actualisé", read:"Lu", minRead:n=>`~${n} min`, textSmaller:"Texte plus petit", textBigger:"Texte plus grand",
+    undo:"Annuler", refreshed:"Actualisé", read:"Lu", readPct:n=>`${n}% lu`, minRead:n=>`~${n} min`, textSmaller:"Texte plus petit", textBigger:"Texte plus grand",
     rkUmfang:"Ton bilan de lecture", rArticlesOpened:"articles ouverts",
     rSub1:d=>`Et <strong>${d}</strong> de lecture attentive — comptée uniquement quand tu étais vraiment là.`,
     rkRhythm:"La régularité", rDay:"jour", rDays:"jours", rInARow:"d'affilée",
@@ -1130,6 +1132,7 @@ const state = {
   endReached:false,
   dataSaver: LS.get("wf_datasaver",false),
   readPos: LS.get("wf_readpos",{}),
+  readProg: LS.get("wf_readprog",{}),
   dailyGoal: LS.get("wf_dailygoal",5),
   quizBest: LS.get("wf_quizbest",0),
   readerQueue: [],
@@ -1415,10 +1418,13 @@ async function nextTrending(){
 }
 /* REST feed/featured — Wikipedia start-page content. CORS (no JSONP); works on http(s)
    and from file:// in Chromium/Firefox. Fails gracefully (returns null) if blocked. */
+function featuredDayKey(date=new Date()){
+  return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`;
+}
 async function fetchFeatured(){
   const lang=state.lang;
-  if(state.featuredCache && state.featuredCache.lang===lang) return state.featuredCache;
-  const n=new Date(), y=n.getFullYear(), m=String(n.getMonth()+1).padStart(2,"0"), dd=String(n.getDate()).padStart(2,"0");
+  const day=featuredDayKey(), [y,m,dd]=day.split("-");
+  if(state.featuredCache && state.featuredCache.lang===lang && state.featuredCache.day===day) return state.featuredCache;
   let data;
   try{
     const r=await fetch(`https://${lang}.wikipedia.org/api/rest_v1/feed/featured/${y}/${m}/${dd}`,{headers:{Accept:"application/json"}});
@@ -1438,7 +1444,7 @@ async function fetchFeatured(){
   const news=(data.news||[]).slice(0,3).map(it=>({ text:txt(it.story), title:(it.links&&it.links[0]&&pageTitle(it.links[0]))||linkFromHtml(it.story) }));
   const onthisday=(data.onthisday||[]).slice(0,3).map(it=>({ text:`${it.year} — ${it.text}`, title:(it.pages&&it.pages[0]&&pageTitle(it.pages[0]))||null }));
   const dyk=(data.dyk||[]).slice(0,3).map(it=>({ text:txt(it.html||it.text), title:linkFromHtml(it.html) }));
-  state.featuredCache={lang, tfa, news, onthisday, dyk};
+  state.featuredCache={lang, day, tfa, news, onthisday, dyk};
   return state.featuredCache;
 }
 function openByTitle(title,lang){
@@ -1518,24 +1524,36 @@ function signalOpen(meta){
   nudgeExploit(+0.04);   // engaged → lean a bit more into the working vein
   registerOpen();        // streak + reading stats
   noteRead(meta);        // build quiz material, offer quiz after ~10 reads
-  markRead(meta.title);  // "already read" marker
 }
-function addReadTag(card){
+function readPctFor(meta){
+  const f=(state.readProg||{})[posKey(meta)];
+  return f==null ? 0 : Math.round(Math.max(0,Math.min(1,f))*100);
+}
+function updateReadTag(card, meta){
   const body=card.querySelector(".body");
-  if(body && !body.querySelector(".read-tag")){
-    const tag=document.createElement("span"); tag.className="read-tag";
+  if(!body) return;
+  const pct=readPctFor(meta);
+  let tag=body.querySelector(".read-tag");
+  if(pct<1){ if(tag) tag.remove(); card.classList.remove("read"); return; }
+  if(!tag){ tag=document.createElement("span"); tag.className="read-tag"; body.insertBefore(tag, body.firstChild); }
+  if(pct>=90){
+    card.classList.add("read"); tag.classList.remove("partial");
     tag.innerHTML=`${svgIc("i-check")} ${esc(t("read"))}`;
-    body.insertBefore(tag, body.firstChild);
+  }else{
+    card.classList.remove("read"); tag.classList.add("partial");
+    tag.innerHTML=`${svgIc("i-book")} ${esc(t("readPct",pct))}`;
   }
 }
-function markRead(title){
-  if(!state.read.has(title)){
-    state.read.add(title);
-    if(state.read.size>800){ const arr=[...state.read]; state.read=new Set(arr.slice(arr.length-800)); }
-    LS.set("wf_read",[...state.read]);
-  }
-  let card; try{ card=feedEl.querySelector(`.card[data-title="${CSS.escape(title)}"]`); }catch(e){}
-  if(card && !card.classList.contains("read")){ card.classList.add("read"); addReadTag(card); }
+function saveReadProg(meta, frac){
+  if(!meta||!meta.title) return;
+  frac=Math.max(0,Math.min(1,frac||0));
+  state.readProg=state.readProg||{};
+  const key=posKey(meta);
+  if(frac>(state.readProg[key]||0)){ state.readProg[key]=frac; LS.set("wf_readprog",state.readProg); }
+}
+function refreshReadTag(meta){
+  let card; try{ card=feedEl.querySelector(`.card[data-title="${CSS.escape(meta.title)}"]`); }catch(e){}
+  if(card) updateReadTag(card, meta);
 }
 function signalStar(meta,on){
   bumpSeed(meta.title, on?WEIGHTS.star:-WEIGHTS.star);
@@ -1707,7 +1725,7 @@ function articleCard(meta, reason, seed){
   actions.append(starBtn,collBtn,downBtn,shareBtn);
   card.appendChild(actions);
 
-  if(state.read.has(meta.title)){ card.classList.add("read"); addReadTag(card); }
+  updateReadTag(card, meta);
 
   const reasonEl=card.querySelector(".reason");
   if(reasonEl && reason){
@@ -1839,6 +1857,12 @@ function resetFeed(){
   feedEl.querySelectorAll(":scope > :not(h1)").forEach(n=>n.remove());  // keep the sr-only page heading
   loadMore().then(()=>loadMore()).then(renderRail);
 }
+function checkFeaturedDayRollover(){
+  if(!state.featuredCache || state.featuredCache.day===featuredDayKey()) return;
+  state.featuredCache=null;
+  resetFeed();
+  toast(t("refreshed"));
+}
 
 /* ---------- dwell tracking ---------- */
 const dwellTimers=new Map();
@@ -1856,7 +1880,10 @@ const dwellObserver=new IntersectionObserver((entries)=>{
 function observeDwell(card,title){ dwellObserver.observe(card); }
 window.addEventListener("visibilitychange",()=>{
   if(document.hidden){ dwellTimers.forEach((start,title)=>signalDwell(title,(Date.now()-start)/1000)); dwellTimers.clear(); }
+  else checkFeaturedDayRollover();
 });
+window.addEventListener("focus",checkFeaturedDayRollover);
+setInterval(checkFeaturedDayRollover,60_000);
 
 /* ---------- shareable deep links (hash routing) ----------
    Hybrid model: articles, searches and topics get shareable in-app URLs. */
@@ -2087,6 +2114,7 @@ async function openReader(meta, opts){
     const words=(c.textContent||"").trim().split(/\s+/).length;
     $("#readerTime").textContent = t("minRead", Math.max(1, Math.round(words/200)));
     if(saved>120) $("#readerScroll").scrollTop=saved;
+    setTimeout(()=>{ if(meta===currentReaderMeta && readerLaidOut()) saveReadProg(meta, readerSeenFraction()); },700);
     renderRelatedArticles(meta);
   }catch(e){
     c.innerHTML=`<p class="muted">${esc(t("loadErr"))} <a href="${meta.url}" target="_blank" rel="noopener">${esc(t("openWiki"))}</a>.</p>`;
@@ -2102,16 +2130,29 @@ function setReaderScale(delta){
 }
 $("#readerSmaller").addEventListener("click",()=>setReaderScale(-10));
 $("#readerBigger").addEventListener("click",()=>setReaderScale(+10));
+function readerLaidOut(){
+  const el=$("#readerScroll"); const c=$("#readerContent");
+  if(!el||!c) return false;
+  // guard against the brief pre-layout state right after opening, where the
+  // panel's clientHeight is tiny and scrollHeight==clientHeight (would falsely read 100%)
+  return el.clientHeight >= Math.min(420,(window.innerHeight||600)*0.5) && (c.textContent||"").trim().length>0;
+}
+function readerSeenFraction(){
+  const el=$("#readerScroll"); if(!el||!readerLaidOut()) return 0;
+  const sh=el.scrollHeight, ch=el.clientHeight;
+  if(sh<=ch+4) return 1;                       // whole article genuinely fits → fully seen
+  return Math.max(0,Math.min(1,(el.scrollTop+ch)/sh));
+}
 $("#readerScroll").addEventListener("scroll",function(){
   const max=this.scrollHeight-this.clientHeight;
   $("#readerProgress").style.transform="scaleX("+(max>0 ? this.scrollTop/max : 0)+")";
-  if(currentReaderMeta){ clearTimeout(this._saveT); this._saveT=setTimeout(()=>saveReadScroll(currentReaderMeta,this.scrollTop),180); }
+  if(currentReaderMeta){ clearTimeout(this._saveT); this._saveT=setTimeout(()=>{ saveReadScroll(currentReaderMeta,this.scrollTop); saveReadProg(currentReaderMeta,readerSeenFraction()); },180); }
   updateTocActive();
 },{passive:true});
 function closeReader(opts){
   opts=opts||{};
   if(!reader.classList.contains("open")) return;
-  if(currentReaderMeta) saveReadScroll(currentReaderMeta, $("#readerScroll").scrollTop||0);
+  if(currentReaderMeta){ saveReadScroll(currentReaderMeta, $("#readerScroll").scrollTop||0); saveReadProg(currentReaderMeta, readerSeenFraction()); refreshReadTag(currentReaderMeta); }
   reader.classList.remove("open"); reader.setAttribute("aria-hidden","true");
   document.body.style.overflow=""; currentReaderMeta=null; releaseFocus();
   // Drop the article route without adding a new history entry (avoids a back-button loop).
