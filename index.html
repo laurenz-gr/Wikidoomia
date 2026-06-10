@@ -136,7 +136,7 @@
     transition:transform .3s cubic-bezier(.2,.8,.2,1);
   }
   .topbar.hidden{transform:translateY(-120%)}
-  .brand{display:flex; align-items:baseline; gap:8px; margin-right:auto; min-width:0; overflow:hidden}
+  .brand{display:flex; align-items:baseline; gap:8px; margin-right:auto; flex:0 0 auto; overflow:visible}
   .brand .logo{
     font-size:1.9rem; line-height:.9;
     color:var(--ink);
@@ -433,6 +433,9 @@
     border:1px solid var(--glass-brd); background:var(--glass-bg-strong);
     backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
   }
+  @media (max-width:680px){
+    .field{font-size:16px} /* avoid iOS focus zoom / horizontal viewport drift */
+  }
   .btn{
     display:inline-flex;align-items:center;justify-content:center;gap:8px;
     padding:11px 16px;border-radius:14px;cursor:pointer;font:inherit;font-weight:800;
@@ -655,8 +658,14 @@
   /* ---------- view toggle (Feed / Discover) ---------- */
   .view-seg button{display:inline-flex;align-items:center;gap:6px;font-weight:800;font-size:13px;white-space:nowrap}
   .view-seg .ic{width:16px;height:16px}
-  /* small screens: icon-only for the inactive tab, the active one keeps its label */
-  @media (max-width:560px){ .view-seg button span{display:none} .view-seg button.active span{display:inline} .view-seg button{padding:9px 11px} }
+  /* phones: icon-only segment (active tab stays distinct via its accent fill) so the
+     full "Wikidoomia" wordmark always fits without being clipped */
+  @media (max-width:560px){ .view-seg button span{display:none} .view-seg button{padding:9px 11px} }
+  /* ultra-narrow phones (<=360px): trim header gap and brand size to avoid h-overflow */
+  @media (max-width:360px){
+    .topbar{gap:5px; padding-left:max(8px,var(--safe-left)); padding-right:max(8px,var(--safe-right))}
+    .brand .logo{font-size:1.3rem}
+  }
 
   /* ---------- topic chip filter bar ---------- */
   .topicbar{
@@ -669,6 +678,9 @@
   .topicbar::-webkit-scrollbar{display:none}
   .topicbar .chip{flex:0 0 auto; cursor:pointer}
   .topicbar .chip.active{background:var(--accent2); color:var(--on-accent2); border-color:transparent}
+  @media (max-width:680px){
+    .topicbar{position:relative;top:auto;z-index:1} /* on phones it scrolls away instead of covering cards */
+  }
   body.view-deck .sentinel{display:none}
   body.view-deck .fab-top{display:none !important}
 
@@ -3429,9 +3441,14 @@ addSwipeClose($("#recap"), ()=>$("#recapScroll"), closeRecap);
 // global horizontal swipe on the feed surface: left → open profile drawer, right → close it
 (function(){
   let sx=0,sy=0,ok=false;
-  document.addEventListener("touchstart",e=>{ if(e.touches.length!==1){ok=false;return;} const t=e.touches[0]; sx=t.clientX; sy=t.clientY; ok=true; },{passive:true});
+  document.addEventListener("touchstart",e=>{
+    if(e.touches.length!==1){ok=false;return;}
+    if(state.view==="deck" || e.target.closest("#deck,.deck-card,.deck-actions,button,a,input,select,textarea")){ok=false;return;}
+    const t=e.touches[0]; sx=t.clientX; sy=t.clientY; ok=true;
+  },{passive:true});
   document.addEventListener("touchend",e=>{
     if(!ok)return; ok=false;
+    if(state.view==="deck") return;
     if(reader.classList.contains("open")||$("#quiz").classList.contains("open")||$("#recap").classList.contains("open")) return;
     if(collMenuEl || document.querySelector(".onb.open")) return;
     const t=e.changedTouches[0]; const dx=t.clientX-sx, dy=t.clientY-sy;
