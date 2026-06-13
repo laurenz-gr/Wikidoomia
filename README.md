@@ -6,11 +6,13 @@ The whole app is a single `index.html` — no build step. Personalization, stars
 
 ## Features
 
+- **Discover today** — a fresh entry hub at the top of a new feed: featured article, on-this-day, did-you-know, trending picks, and optional **near you** (one-time location opt-in, never stored)
 - **Endless feed** of Wikipedia articles with three card rhythms (standard, compact, feature)
 - **Behaviour-based personalization** — star (strongest signal) > opening an article > dwell time, plus a "less like this" negative signal and an adaptive explore/exploit rate
 - **Serendipity** — an occasional "random find" mixed in at irregular intervals
 - **Search** with live suggestions and recent searches
-- **Collections** and **sharing** (Web Share API, clipboard fallback)
+- **Collections** and **sharing** — link share or a generated **image card** (canvas, Web Share / download fallback)
+- **Reader tools** — adjustable font size, table of contents, and a session **reading path** (“rabbit hole”) when you hop between linked articles
 - **Quiz** that appears after ~10 articles read, generated from what you've actually read
 - **Reading recap** — a short scrollytelling story built from your own stats
 - **Three languages (DE / EN / FR)** with interface language and article language set independently
@@ -90,6 +92,8 @@ Being a static site, it can be hosted on any static host (e.g. GitHub Pages); th
 ## Privacy
 
 By default, no personal data is sent to any server. All preferences live in your browser. Article content is fetched directly from Wikipedia.
+
+**Near you** uses your device location only after you tap the button; coordinates stay in memory for the session and are not written to `localStorage`.
 
 If you **opt in** to device sync, an E2E-encrypted blob (your `localStorage` profile) is stored on the sync worker. The server cannot decrypt it; only someone with your sync code can. You can disconnect sync or use export/import instead at any time.
 

@@ -297,6 +297,34 @@
     .digest .digest-head{column-span:all}
     .digest-sec{break-inside:avoid}
   }
+  .discovery-hub{padding:18px 18px 16px}
+  .discover-tfa{margin-bottom:14px;padding:12px 14px;border-radius:14px;border:1px solid color-mix(in srgb,var(--accent) 35%,transparent);background:color-mix(in srgb,var(--accent) 8%,var(--glass-bg))}
+  .discover-tfa .lbl{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;color:var(--accent-text);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+  .discover-tfa .lbl .ic{width:14px;height:14px}
+  .discover-tfa .ttl{background:none;border:0;padding:0;text-align:left;font:inherit;font-family:'Bebas Neue','Impact',sans-serif;font-size:1.55rem;line-height:1;color:var(--ink);cursor:pointer;width:100%}
+  .discover-tfa .ttl:hover{color:var(--accent2)}
+  .discover-tfa .ex{margin:6px 0 0;font-size:14px;line-height:1.45;color:var(--muted)}
+  .discover-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+  .discover-chip{padding:8px 12px;border-radius:999px;border:1px solid var(--glass-brd);background:var(--glass-bg);color:var(--ink);font:inherit;font-size:13px;font-weight:800;cursor:pointer;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .discover-chip:hover{background:var(--accent2);color:var(--on-accent2);border-color:transparent}
+  .discover-hint{font-size:12px;margin:0 0 8px;line-height:1.45}
+  .discover-nearby .btn{margin-top:4px;width:100%}
+  .discover-nearby-status{font-size:12px;font-weight:800;color:var(--muted);margin-top:8px}
+  .share-menu .row{gap:10px}
+  .share-menu .btn{flex:1}
+  .reader-trail{font-size:12px;font-weight:700;color:var(--muted);margin:0 0 10px;line-height:1.5;display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px}
+  .reader-trail .trail-lbl{color:var(--accent2);font-weight:900;white-space:nowrap}
+  .reader-trail .trail-link{background:none;border:0;padding:0;color:var(--ink);font:inherit;font-weight:800;cursor:pointer;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:2px;max-width:28ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .reader-trail .trail-sep{opacity:.45}
+  .reader-trail .trail-now{color:var(--accent2);font-weight:900}
+  .reader-scale-lbl{display:inline-block;min-width:2.8em;text-align:center;font-size:12px;font-weight:900;color:var(--muted)}
+  .reader-toc-empty{padding:8px 0;font-size:14px;color:var(--muted)}
+  @media (max-width:520px){
+    .reader-tools{flex-wrap:wrap;gap:8px}
+    .reader-tools .text-size{margin-left:auto}
+    .reader-nav .btn span{display:none}
+    .reader-nav .btn{padding:9px 12px;flex:0 1 auto}
+  }
   .langtag{
     position:absolute; top:12px; right:12px; z-index:2;
     padding:4px 9px; border-radius:8px; font-size:11px; font-weight:900;
@@ -816,6 +844,8 @@
   <symbol id="i-rotate" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9 9 0 0 0-6.36 2.64L3 8"/><path d="M3 3v5h5"/></symbol>
   <symbol id="i-gear" viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></symbol>
   <symbol id="i-monitor" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s7-4.35 7-11a7 7 0 1 0-14 0c0 6.65 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+  <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></symbol>
 </defs></svg>
 
 <header class="topbar glass">
@@ -993,6 +1023,7 @@
   </div>
   <div class="reader-scroll" id="readerScroll">
     <div class="reader-inner">
+      <nav class="reader-trail" id="readerTrail" hidden aria-label="Lesepfad"></nav>
       <div class="reader-nav" id="readerNav">
         <button class="btn focusable" id="readerPrev" type="button" hidden><svg class="ic"><use href="#i-chevron-left"/></svg><span data-i18n="prevArticle">Vorheriger</span></button>
         <button class="btn focusable" id="readerTocBtn" type="button"><svg class="ic"><use href="#i-list"/></svg><span data-i18n="toc">Inhalt</span></button>
@@ -1002,6 +1033,7 @@
         <span class="read-time" id="readerTime"></span>
         <span class="text-size">
           <button class="iconbtn focusable" id="readerSmaller" data-i18n-title="textSmaller" data-i18n-aria="textSmaller" title="Schrift kleiner" aria-label="Schrift kleiner">A−</button>
+          <span class="reader-scale-lbl" id="readerScaleLabel" aria-live="polite">100%</span>
           <button class="iconbtn focusable" id="readerBigger" data-i18n-title="textBigger" data-i18n-aria="textBigger" title="Schrift größer" aria-label="Schrift größer">A+</button>
         </span>
       </div>
@@ -1129,6 +1161,15 @@ const I18N = {
     serendipity:"Zufallsfund", serendipityTitle:"Zufallsfund zum Stöbern", lessLikeThis:"Weniger davon",
     trending:"Viel gelesen", trendingTitle:"Aktuell viel gelesen auf Wikipedia",
     featuredToday:"Heute auf Wikipedia", tfaLabel:"Artikel des Tages", secNews:"In den Nachrichten", secOnThisDay:"Was geschah heute", secDyk:"Schon gewusst?",
+    discoverToday:"Heute entdecken", discoverNearby:"In deiner Nähe", discoverNearbyBtn:"Standort einmalig nutzen",
+    discoverNearbyHint:"Zeigt Wikipedia-Artikel in der Umgebung. Der Standort wird nicht gespeichert.",
+    discoverNearbyFail:"Standort nicht verfügbar", discoverNearbyEmpty:"Keine Artikel in der Nähe gefunden", discoverNearbyLoading:"Suche in der Nähe…",
+    whyNearby:"Artikel in deiner geografischen Nähe",
+    tocEmpty:"Kein Inhaltsverzeichnis für diesen Artikel",
+    readerScalePct:n=>`${n}%`,
+    shareLink:"Link teilen", shareCard:"Bildkarte teilen", shareChoose:"Wie teilen?",
+    shareCardSaved:"Bildkarte gespeichert", shareCardFail:"Bildkarte konnte nicht erstellt werden",
+    rabbitTrail:"Dein Pfad", rabbitTrailNow:"jetzt", rabbitTrailShare:"Lesepfad teilen",
     continueTitle:"Weiterlesen",
     loadingArticle:"Lade Artikel…", loadFail:"Konnte den Artikel nicht laden.", loadErr:"Fehler beim Laden.",
     starRemoved:"Stern entfernt", starred:"★ Mit Stern markiert", linkCopied:"Link kopiert",
@@ -1222,6 +1263,15 @@ const I18N = {
     serendipity:"Random find", serendipityTitle:"A random find to explore", lessLikeThis:"Less like this",
     trending:"Trending", trendingTitle:"Currently most-read on Wikipedia",
     featuredToday:"Today on Wikipedia", tfaLabel:"Featured article", secNews:"In the news", secOnThisDay:"On this day", secDyk:"Did you know?",
+    discoverToday:"Discover today", discoverNearby:"Near you", discoverNearbyBtn:"Use location once",
+    discoverNearbyHint:"Shows Wikipedia articles nearby. Your location is not stored.",
+    discoverNearbyFail:"Location unavailable", discoverNearbyEmpty:"No nearby articles found", discoverNearbyLoading:"Searching nearby…",
+    whyNearby:"Articles in your geographic area",
+    tocEmpty:"No table of contents for this article",
+    readerScalePct:n=>`${n}%`,
+    shareLink:"Share link", shareCard:"Share image card", shareChoose:"How to share?",
+    shareCardSaved:"Image card saved", shareCardFail:"Couldn't create image card",
+    rabbitTrail:"Your path", rabbitTrailNow:"now", rabbitTrailShare:"Share reading path",
     continueTitle:"Continue reading",
     loadingArticle:"Loading article…", loadFail:"Couldn't load the article.", loadErr:"Loading error.",
     starRemoved:"Star removed", starred:"★ Starred", linkCopied:"Link copied",
@@ -1315,6 +1365,15 @@ const I18N = {
     serendipity:"Trouvaille", serendipityTitle:"Une trouvaille à explorer", lessLikeThis:"Moins de ça",
     trending:"Populaire", trendingTitle:"Très lu en ce moment sur Wikipédia",
     featuredToday:"Aujourd'hui sur Wikipédia", tfaLabel:"Article du jour", secNews:"Actualités", secOnThisDay:"Éphéméride", secDyk:"Le saviez-vous ?",
+    discoverToday:"Découvrir aujourd'hui", discoverNearby:"Près de toi", discoverNearbyBtn:"Utiliser la position une fois",
+    discoverNearbyHint:"Affiche des articles Wikipédia à proximité. La position n'est pas enregistrée.",
+    discoverNearbyFail:"Position indisponible", discoverNearbyEmpty:"Aucun article à proximité", discoverNearbyLoading:"Recherche à proximité…",
+    whyNearby:"Articles dans ta zone géographique",
+    tocEmpty:"Pas de sommaire pour cet article",
+    readerScalePct:n=>`${n}%`,
+    shareLink:"Partager le lien", shareCard:"Partager une carte image", shareChoose:"Comment partager ?",
+    shareCardSaved:"Carte image enregistrée", shareCardFail:"Impossible de créer la carte image",
+    rabbitTrail:"Ton parcours", rabbitTrailNow:"maintenant", rabbitTrailShare:"Partager le parcours",
     continueTitle:"Reprendre la lecture",
     loadingArticle:"Chargement de l'article…", loadFail:"Impossible de charger l'article.", loadErr:"Erreur de chargement.",
     starRemoved:"Étoile retirée", starred:"★ Marqué d'une étoile", linkCopied:"Lien copié",
@@ -1443,7 +1502,10 @@ const state = {
   activeTopic: null,                    // currently selected topic chip (filters both views)
   syncCode: LS.get("wf_sync",null),     // accountless E2E sync passphrase (never sent to server)
   lastSyncAt: LS.get("wf_lastsync",null),
-  syncBusy:false
+  syncBusy:false,
+  nearbyCache:[],                       // session-only nearby articles (not persisted)
+  nearbyCoords:null,                    // session-only {lat,lon} after opt-in
+  rabbitTrail:[]                        // session reading path (max 12 hops)
 };
 
 function saveProfile(){ LS.set("wf_profile",state.profile); }
@@ -1762,8 +1824,141 @@ async function fetchFeatured(){
   state.featuredCache={lang, day, tfa, news, onthisday, dyk};
   return state.featuredCache;
 }
-function openByTitle(title,lang){
-  openReader({title, extract:"", url:`https://${lang}.wikipedia.org/wiki/${encodeURIComponent(title)}`, lang});
+function openByTitle(title,lang,source){
+  openReader({title, extract:"", url:`https://${lang}.wikipedia.org/wiki/${encodeURIComponent(title)}`, lang}, {source:source||"discover"});
+}
+async function fetchNearby(lat,lon,n=8){
+  try{
+    const j=await apiGet({action:"query",list:"geosearch",gscoord:`${lat}|${lon}`,gsradius:10000,gslimit:n,gsnamespace:0});
+    const items=(j?.query?.geosearch||[]).filter(p=>p&&p.title);
+    const titles=items.map(p=>p.title);
+    if(!titles.length) return [];
+    const d=await apiGet({...COMMON,titles:titles.join("|")});
+    const arr=normalizePages(d);
+    const order=new Map(titles.map((tt,i)=>[tt,i]));
+    arr.sort((a,b)=>(order.get(a.title)??999)-(order.get(b.title)??999));
+    return arr;
+  }catch(e){ return []; }
+}
+function requestNearbyCoords(){
+  return new Promise((resolve,reject)=>{
+    if(!navigator.geolocation){ reject(new Error("no geo")); return; }
+    navigator.geolocation.getCurrentPosition(
+      pos=>resolve({lat:pos.coords.latitude,lon:pos.coords.longitude}),
+      err=>reject(err),
+      {enableHighAccuracy:false,timeout:12000,maximumAge:300000}
+    );
+  });
+}
+function appendDigestSection(card,label,items,lang){
+  if(!items||!items.length) return;
+  const sec=document.createElement("div"); sec.className="digest-sec";
+  const h=document.createElement("h3"); h.className="bebas"; h.textContent=label;
+  sec.appendChild(h);
+  const ul=document.createElement("ul");
+  items.forEach(it=>{
+    if(!it.text) return;
+    const li=document.createElement("li");
+    if(it.title){
+      const a=document.createElement("button"); a.className="digest-link focusable"; a.textContent=it.text;
+      a.addEventListener("click",()=>openByTitle(it.title,lang,"discover"));
+      li.appendChild(a);
+    }else li.textContent=it.text;
+    ul.appendChild(li);
+  });
+  sec.appendChild(ul); card.appendChild(sec);
+}
+async function loadNearbyIntoHub(listEl,btn,statusEl){
+  if(!listEl) return;
+  if(btn) btn.disabled=true;
+  if(statusEl) statusEl.textContent=t("discoverNearbyLoading");
+  try{
+    let coords=state.nearbyCoords;
+    if(!coords){ coords=await requestNearbyCoords(); state.nearbyCoords=coords; }
+    state.nearbyCache=await fetchNearby(coords.lat,coords.lon,8);
+    listEl.replaceChildren();
+    if(!state.nearbyCache.length){
+      if(statusEl) statusEl.textContent=t("discoverNearbyEmpty");
+      return;
+    }
+    if(statusEl) statusEl.textContent="";
+    state.nearbyCache.forEach(a=>{
+      const b=document.createElement("button"); b.className="discover-chip focusable"; b.textContent=a.title;
+      b.addEventListener("click",()=>openReader(a,{source:"discover"}));
+      listEl.appendChild(b);
+    });
+  }catch(e){
+    if(statusEl) statusEl.textContent=t("discoverNearbyFail");
+  }finally{
+    if(btn) btn.disabled=false;
+  }
+}
+async function buildDiscoveryHub(f){
+  const card=document.createElement("article"); card.className="card glass digest discovery-hub";
+  card.dataset.discoveryHub="1";
+  const head=document.createElement("div"); head.className="digest-head";
+  head.appendChild(svgUse("i-sparkles"));
+  const headTxt=document.createElement("span"); headTxt.textContent=t("discoverToday");
+  head.appendChild(headTxt); card.appendChild(head);
+
+  if(f?.tfa?.title){
+    const tfaBox=document.createElement("div"); tfaBox.className="discover-tfa";
+    const lbl=document.createElement("div"); lbl.className="lbl";
+    lbl.appendChild(svgUse("i-sparkles")); lbl.append(" "+t("tfaLabel"));
+    const ttl=document.createElement("button"); ttl.type="button"; ttl.className="ttl focusable"; ttl.textContent=f.tfa.title;
+    ttl.addEventListener("click",()=>openReader(f.tfa,{source:"discover"}));
+    tfaBox.append(lbl,ttl);
+    if(f.tfa.extract){
+      const ex=document.createElement("p"); ex.className="ex"; ex.textContent=truncateAtWord(f.tfa.extract,180);
+      tfaBox.appendChild(ex);
+    }
+    card.appendChild(tfaBox);
+    if(f.tfa.title) state.seen.add(f.tfa.title);
+  }
+
+  if(f){
+    appendDigestSection(card,t("secNews"),f.news,f.lang);
+    appendDigestSection(card,t("secOnThisDay"),f.onthisday,f.lang);
+    appendDigestSection(card,t("secDyk"),f.dyk,f.lang);
+  }
+
+  let trending=state.trendingCache.filter(a=>a&&a.title).slice(0,5);
+  if(!trending.length){
+    const fetched=await fetchTrending(8);
+    if(fetched.length){ state.trendingCache=fetched; trending=fetched.slice(0,5); }
+  }
+  if(trending.length){
+    const trSec=document.createElement("div"); trSec.className="digest-sec";
+    const h=document.createElement("h3"); h.className="bebas"; h.textContent=t("trending");
+    trSec.appendChild(h);
+    const chips=document.createElement("div"); chips.className="discover-chips";
+    trending.forEach(a=>{
+      const b=document.createElement("button"); b.className="discover-chip focusable"; b.textContent=a.title;
+      b.addEventListener("click",()=>openReader(a,{source:"discover"}));
+      chips.appendChild(b);
+    });
+    trSec.appendChild(chips); card.appendChild(trSec);
+  }
+
+  const nearSec=document.createElement("div"); nearSec.className="digest-sec discover-nearby";
+  const nearH=document.createElement("h3"); nearH.className="bebas"; nearH.textContent=t("discoverNearby");
+  const nearHint=document.createElement("p"); nearHint.className="muted discover-hint"; nearHint.textContent=t("discoverNearbyHint");
+  const nearBtn=document.createElement("button"); nearBtn.type="button"; nearBtn.className="btn focusable"; nearBtn.textContent=t("discoverNearbyBtn");
+  const nearList=document.createElement("div"); nearList.className="discover-chips";
+  const nearStatus=document.createElement("p"); nearStatus.className="discover-nearby-status";
+  nearBtn.addEventListener("click",()=>loadNearbyIntoHub(nearList,nearBtn,nearStatus));
+  nearSec.append(nearH,nearHint,nearBtn,nearList,nearStatus);
+  card.appendChild(nearSec);
+
+  if(state.nearbyCache.length){
+    state.nearbyCache.forEach(a=>{
+      const b=document.createElement("button"); b.className="discover-chip focusable"; b.textContent=a.title;
+      b.addEventListener("click",()=>openReader(a,{source:"discover"}));
+      nearList.appendChild(b);
+    });
+  }
+
+  return card;
 }
 function buildDigestCard(f){
   const card=document.createElement("article"); card.className="card glass digest";
@@ -1918,7 +2113,7 @@ function renderContinueList(){
   items.forEach(it=>{
     const li=document.createElement("li"); li.className="continue-row";
     const a=document.createElement("button"); a.className="digest-link focusable"; a.textContent=it.title;
-    a.addEventListener("click",()=>{ closeDrawer(); openByTitle(it.title,it.lang); });
+    a.addEventListener("click",()=>{ closeDrawer(); openByTitle(it.title,it.lang,"feed"); });
     const pctEl=document.createElement("span"); pctEl.className="continue-pct"; pctEl.textContent=t("readPct",it.pct);
     li.append(a,pctEl); ul.appendChild(li);
   });
@@ -1957,21 +2152,164 @@ function signalInterested(meta){
   enrichCats(meta.title,WEIGHTS.open);
   nudgeExploit(+0.02);
 }
-async function shareArticle(meta){
+const TRAIL_MAX=12;
+const TRAIL_CONTINUE=new Set(["link","related","neighbor","trail"]);
+function pushRabbitTrail(meta,source){
+  if(!meta?.title) return;
+  const key=posKey(meta);
+  const trail=state.rabbitTrail||[];
+  const last=trail[trail.length-1];
+  if(last&&last.key===key) return;
+  if(source==="feed"||source==="search"||source==="deck"||source==="discover"||source==="hash"){
+    state.rabbitTrail=[{title:meta.title,lang:meta.lang||state.lang,key}];
+  }else if(TRAIL_CONTINUE.has(source)){
+    state.rabbitTrail=[...trail,{title:meta.title,lang:meta.lang||state.lang,key}].slice(-TRAIL_MAX);
+  }else{
+    state.rabbitTrail=[{title:meta.title,lang:meta.lang||state.lang,key}];
+  }
+  renderRabbitTrail(meta);
+}
+function renderRabbitTrail(currentMeta){
+  const host=$("#readerTrail"); if(!host) return;
+  const trail=state.rabbitTrail||[];
+  if(trail.length<2){ host.hidden=true; host.replaceChildren(); return; }
+  host.hidden=false; host.replaceChildren();
+  const lbl=document.createElement("span"); lbl.className="trail-lbl"; lbl.textContent=t("rabbitTrail")+":";
+  host.appendChild(lbl);
+  trail.slice(0,-1).forEach((item,i)=>{
+    if(i>0){ const sep=document.createElement("span"); sep.className="trail-sep"; sep.textContent="→"; host.appendChild(sep); }
+    const b=document.createElement("button"); b.type="button"; b.className="trail-link focusable"; b.textContent=item.title; b.title=item.title;
+    b.addEventListener("click",()=>openReader({title:item.title,extract:"",thumb:null,url:`https://${item.lang}.wikipedia.org/wiki/${slugTitle(item.title)}`,lang:item.lang},{source:"trail"}));
+    host.appendChild(b);
+  });
+  const sepNow=document.createElement("span"); sepNow.className="trail-sep"; sepNow.textContent="→";
+  const now=document.createElement("span"); now.className="trail-now"; now.textContent=(currentMeta&&currentMeta.title)||t("rabbitTrailNow");
+  host.append(sepNow,now);
+}
+function rabbitTrailShareText(){
+  const trail=state.rabbitTrail||[];
+  if(trail.length<2) return "";
+  return trail.map((item,i)=>i===trail.length-1?`${item.title} (${t("rabbitTrailNow")})`:item.title).join(" → ");
+}
+function loadShareImage(url){
+  return new Promise((resolve,reject)=>{
+    const img=new Image();
+    img.crossOrigin="anonymous";
+    img.onload=()=>resolve(img);
+    img.onerror=()=>reject(new Error("img"));
+    img.src=url;
+  });
+}
+function wrapCanvasLines(ctx,text,maxW,maxLines){
+  const words=String(text||"").split(/\s+/).filter(Boolean);
+  const lines=[]; let line="";
+  for(const w of words){
+    const test=line?line+" "+w:w;
+    if(ctx.measureText(test).width>maxW && line){ lines.push(line); line=w; }
+    else line=test;
+    if(lines.length>=maxLines) break;
+  }
+  if(line && lines.length<maxLines) lines.push(line);
+  if(words.length && lines.length===maxLines){
+    let last=lines[maxLines-1];
+    while(ctx.measureText(last+"…").width>maxW && last.length>3) last=last.slice(0,-1);
+    lines[maxLines-1]=last+"…";
+  }
+  return lines;
+}
+async function buildShareCardBlob(meta){
+  const W=1080,H=1350;
+  const canvas=document.createElement("canvas");
+  canvas.width=W; canvas.height=H;
+  const ctx=canvas.getContext("2d");
+  const dark=effectiveDark();
+  const bg1=dark?"#12141c":"#f4f4f2", bg2=dark?"#1e2438":"#ffffff";
+  const ink=dark?"#f2f2ef":"#12141c", muted=dark?"#a8adba":"#5c6370";
+  const grad=ctx.createLinearGradient(0,0,W,H); grad.addColorStop(0,bg1); grad.addColorStop(1,bg2);
+  ctx.fillStyle=grad; ctx.fillRect(0,0,W,H);
+
+  let y=72;
+  if(meta.thumb){
+    try{
+      const img=await loadShareImage(meta.thumb);
+      const ih=420, iw=W-96, ix=48;
+      const scale=Math.max(iw/img.width, ih/img.height);
+      const sw=img.width*scale, sh=img.height*scale;
+      ctx.save(); ctx.beginPath(); ctx.rect(ix,y,iw,ih); ctx.clip();
+      ctx.drawImage(img, ix+(iw-sw)/2, y+(ih-sh)/2, sw, sh);
+      ctx.restore();
+      y+=ih+36;
+    }catch(e){}
+  }
+
+  ctx.fillStyle=muted; ctx.font="700 28px Inter,system-ui,sans-serif"; ctx.fillText("Wikidoomia", 48, y); y+=44;
+  ctx.fillStyle=ink; ctx.font="900 64px 'Bebas Neue',Impact,sans-serif";
+  const titleLines=wrapCanvasLines(ctx,meta.title,W-96,3);
+  titleLines.forEach(line=>{ ctx.fillText(line,48,y); y+=72; });
+  y+=8;
+  const snippet=truncateAtWord(meta.extract||"",220);
+  if(snippet){
+    ctx.fillStyle=muted; ctx.font="500 32px Inter,system-ui,sans-serif";
+    wrapCanvasLines(ctx,snippet,W-96,5).forEach(line=>{ ctx.fillText(line,48,y); y+=44; });
+  }
+  ctx.fillStyle=muted; ctx.font="600 24px Inter,system-ui,sans-serif";
+  ctx.fillText("Wikipedia · CC BY-SA", 48, H-56);
+  return new Promise((resolve,reject)=>{
+    canvas.toBlob(b=>b?resolve(b):reject(new Error("blob")),"image/png");
+  });
+}
+async function shareArticleLink(meta){
   const link=appLinkFor(meta);
   const snippet=(meta.extract&&meta.extract.length>40)?meta.extract.slice(0,160).trim()+"…":meta.title;
-  const data={title:meta.title,text:`${meta.title}
-
-${snippet}
-
-${link}`,url:link};
+  let text=`${meta.title}\n\n${snippet}\n\n${link}`;
+  const trail=rabbitTrailShareText();
+  if(trail) text=`${meta.title}\n\n${t("rabbitTrail")}: ${trail}\n\n${link}`;
+  const data={title:meta.title,text,url:link};
   if(navigator.share){
     try{ await navigator.share(data); return; }
     catch(e){ if(e&&e.name==="AbortError") return; }
   }
-  try{ await navigator.clipboard.writeText(link); toast(t("linkCopied")); }
+  try{ await navigator.clipboard.writeText(text); toast(t("linkCopied")); }
   catch(e){ toast(link); }
 }
+async function shareArticleCard(meta){
+  try{
+    const blob=await buildShareCardBlob(meta);
+    const file=new File([blob],"wikidoomia-share.png",{type:"image/png"});
+    const link=appLinkFor(meta);
+    if(navigator.share && navigator.canShare && navigator.canShare({files:[file]})){
+      try{
+        await navigator.share({title:meta.title,text:`${meta.title}\n${link}`,files:[file]});
+        return;
+      }catch(e){ if(e&&e.name==="AbortError") return; }
+    }
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement("a");
+    a.href=url; a.download="wikidoomia-share.png"; a.click();
+    setTimeout(()=>URL.revokeObjectURL(url),2000);
+    toast(t("shareCardSaved"));
+  }catch(e){ toast(t("shareCardFail")); }
+}
+function showShareMenu(meta){
+  const w=document.createElement("div"); w.className="onb open share-menu";
+  w.innerHTML=`<div class="sheet glass" style="max-width:420px">
+    <div class="row" style="justify-content:space-between;margin-bottom:12px">
+      <h2 class="bebas" style="font-size:1.4rem">${esc(t("shareChoose"))}</h2>
+      <button class="iconbtn focusable" data-x aria-label="${esc(t("close"))}">${svgIc("i-x")}</button>
+    </div>
+    <p class="muted" style="margin-bottom:14px">„${esc(meta.title)}“</p>
+    <div class="row">
+      <button class="btn focusable" data-link>${svgIc("i-share")} ${esc(t("shareLink"))}</button>
+      <button class="btn primary focusable" data-card>${svgIc("i-image")} ${esc(t("shareCard"))}</button>
+    </div></div>`;
+  document.body.appendChild(w); trapFocus(w);
+  const done=()=>{ w.remove(); releaseFocus(); };
+  w.querySelector("[data-x]").onclick=done;
+  w.addEventListener("click",e=>{ if(e.target===w) done(); });
+  w.querySelector("[data-link]").onclick=()=>{ done(); shareArticleLink(meta); };
+  w.querySelector("[data-card]").onclick=()=>{ done(); shareArticleCard(meta); };
+}
+async function shareArticle(meta){ showShareMenu(meta); }
 const dwellAccum={};
 function signalDwell(title,seconds){
   const prev=dwellAccum[title]||0;
@@ -2053,7 +2391,7 @@ function articleCard(meta, reason, seed){
     hero.className="hero";
     hero.innerHTML=`${reasonHtml}${langHtml}<img loading="lazy" alt="" src="${esc(meta.thumb)}">`;
     const heroImg=hero.querySelector("img");
-    if(heroImg){ makeActivatable(heroImg,()=>openReader(meta)); heroImg.setAttribute("aria-label", t("openArticle")); }
+    if(heroImg){ makeActivatable(heroImg,()=>openReader(meta,{source:"feed"})); heroImg.setAttribute("aria-label", t("openArticle")); }
     card.appendChild(hero);
   }
 
@@ -2061,7 +2399,7 @@ function articleCard(meta, reason, seed){
   body.className="body";
   const h2=document.createElement("h2"); h2.className="bebas";
   const titleBtn=document.createElement("button"); titleBtn.type="button"; titleBtn.className="title-btn focusable"; titleBtn.textContent=meta.title;
-  titleBtn.addEventListener("click",()=>openReader(meta));
+  titleBtn.addEventListener("click",()=>openReader(meta,{source:"feed"}));
   h2.appendChild(titleBtn);
   body.appendChild(h2);
   const ex=document.createElement("p"); ex.className="extract";
@@ -2069,7 +2407,7 @@ function articleCard(meta, reason, seed){
   ex.textContent = truncateAtWord(meta.extract,lim);
   const rm=document.createElement("button"); rm.className="readmore focusable";
   rm.innerHTML=`${svgIc("i-book")} ${esc(t("readFull"))}`;
-  rm.addEventListener("click",()=>openReader(meta));
+  rm.addEventListener("click",()=>openReader(meta,{source:"feed"}));
   body.append(ex,rm);
   card.appendChild(body);
 
@@ -2157,22 +2495,18 @@ async function loadMore(){
   // per fill round, so a single read can't flood the feed with same-topic articles.
   const MAX_PER_CLUSTER=2, clusterUse={};
   try{
-    // one-shot "Today on Wikipedia" cluster on a fresh feed (article of the day + digest)
+    // one-shot "Discover today" hub on a fresh feed
     if(state.wantFeaturedFirst && state.pendingStrategies.length===0 && feedEl.querySelectorAll(".card").length===0){
       state.wantFeaturedFirst=false;
       const f=await fetchFeatured();
       if(gen!==state.feedGen){ skels.forEach(s=>s.remove()); state.queueBusy=false; return; }
-      if(f){
-        if(f.tfa && f.tfa.extract && !state.seen.has(f.tfa.title) && !state.disliked[f.tfa.title]){
-          state.seen.add(f.tfa.title);
-          feedEl.insertBefore(articleCard(f.tfa,"tfa",null), skels[0]||null);
-          added++; state.sessionCards++;
-        }
-        if((f.news&&f.news.length)||(f.onthisday&&f.onthisday.length)||(f.dyk&&f.dyk.length)){
-          feedEl.insertBefore(buildDigestCard(f), skels[0]||null);
-        }
-        state.wantTrendingFirst=false;   // avoid stacking another big hook right after
+      if(!state.trendingCache.length) state.trendingCache=await fetchTrending(20);
+      if(gen!==state.feedGen) return;
+      if(f || state.trendingCache.length){
+        feedEl.insertBefore(await buildDiscoveryHub(f), skels[0]||null);
+        if(f?.tfa?.title) state.sessionCards++;
       }
+      state.wantTrendingFirst=false;
     }
     while(added<4 && attempts<6){
       attempts++;
@@ -2264,7 +2598,9 @@ function resetFeed(){
   state.cardsSinceSurprise=0; state.surpriseAt=randInt(4,8);
   state.cardsSinceTrending=0; state.trendingAt=randInt(14,22);
   state.trendingCache=[]; state.wantTrendingFirst=true;   // fresh hook each reset (language switch refetches)
-  state.featuredCache=null; state.wantFeaturedFirst=true; // "today on Wikipedia" cluster on fresh feed
+  state.featuredCache=null; state.wantFeaturedFirst=true; // "discover today" hub on fresh feed
+  state.nearbyCache=[]; state.nearbyCoords=null;
+  state.rabbitTrail=[];
   state._railFetching=false;
   feedEl.querySelectorAll(":scope > :not(h1)").forEach(n=>n.remove());  // keep the sr-only page heading
   loadMore().then(()=>loadMore()).then(renderRail);
@@ -2363,7 +2699,7 @@ function syncFromHash(){
   if(route.type==="article"){
     if(currentReaderMeta && currentReaderMeta.title===route.title) return;
     openReader({title:route.title, extract:"", thumb:null,
-      url:`https://${state.lang}.wikipedia.org/wiki/${slugTitle(route.title)}`, lang:state.lang}, {fromHash:true});
+      url:`https://${state.lang}.wikipedia.org/wiki/${slugTitle(route.title)}`, lang:state.lang}, {fromHash:true, source:"hash"});
   }else if(route.type==="search"){
     runSearchRoute(route.term, true);
   }else if(route.type==="topic"){
@@ -2406,7 +2742,7 @@ function openReaderNeighbor(delta){
   buildReaderQueue(currentReaderMeta.title);
   const idx=state.readerQueueIdx+delta;
   if(idx<0||idx>=state.readerQueue.length) return;
-  openReader(readerMetaFromTitle(state.readerQueue[idx]));
+  openReader(readerMetaFromTitle(state.readerQueue[idx]), {source:"neighbor"});
 }
 function slugHeading(text){
   return String(text||"").trim().toLowerCase().replace(/[^\w\s-]/g,"").replace(/\s+/g,"-").replace(/-+/g,"-");
@@ -2415,12 +2751,21 @@ let tocMap=[];
 function tocAvailable(){ return tocMap.length>0; }
 function setTocControlsVisible(){
   const has=tocAvailable();
-  const btn=$("#readerTocBtn"); if(btn) btn.hidden=!has;
-  const fab=$("#readerTocFab"); if(fab){ fab.hidden=!has; if(!has) fab.classList.remove("show"); }
+  const btn=$("#readerTocBtn"); if(btn) btn.hidden=false;
+  const fab=$("#readerTocFab"); if(fab){ fab.hidden=false; if(!has) fab.classList.remove("show"); }
   if(!has) closeReaderToc();
 }
 function openReaderToc(){
-  if(!tocAvailable()) return;
+  if(!tocAvailable()){
+    const toc=$("#readerToc"), bg=$("#readerTocBg"); if(!toc) return;
+    toc.hidden=false; if(bg) bg.hidden=false;
+    if(!toc.childElementCount){
+      const empty=document.createElement("p"); empty.className="reader-toc-empty"; empty.textContent=t("tocEmpty");
+      toc.appendChild(empty);
+    }
+    requestAnimationFrame(()=>{ toc.classList.add("open"); if(bg) bg.classList.add("open"); });
+    return;
+  }
   const toc=$("#readerToc"), bg=$("#readerTocBg"); if(!toc) return;
   toc.hidden=false; if(bg) bg.hidden=false;
   requestAnimationFrame(()=>{ toc.classList.add("open"); if(bg) bg.classList.add("open"); });
@@ -2443,7 +2788,13 @@ function buildReaderToc(container){
   const toc=$("#readerToc"); if(!toc) return;
   tocMap=[];
   const heads=[...container.querySelectorAll("h2,h3")].filter(h=>h.textContent.trim());
-  if(!heads.length){ toc.hidden=true; toc.replaceChildren(); setTocControlsVisible(); return; }
+  if(!heads.length){
+    toc.hidden=true; toc.replaceChildren();
+    const empty=document.createElement("p"); empty.className="reader-toc-empty"; empty.textContent=t("tocEmpty");
+    toc.appendChild(empty);
+    setTocControlsVisible();
+    return;
+  }
   const head=document.createElement("h3"); head.className="bebas"; head.textContent=t("toc");
   const ul=document.createElement("ul");
   heads.forEach((h,i)=>{
@@ -2481,7 +2832,7 @@ async function renderRelatedArticles(meta){
     const nodes=[relatedHeading()];
     items.forEach(a=>{
       const b=document.createElement("button"); b.type="button"; b.className="related-item focusable"; b.textContent=a.title;
-      b.addEventListener("click",()=>openReader(a));
+      b.addEventListener("click",()=>openReader(a,{source:"related"}));
       nodes.push(b);
     });
     host.replaceChildren(...nodes);
@@ -2520,6 +2871,8 @@ let currentReaderMeta=null;
 const reader=$("#reader");
 async function openReader(meta, opts){
   opts=opts||{};
+  const source=opts.source||"feed";
+  if(!opts.skipTrail) pushRabbitTrail(meta,source);
   currentReaderMeta=meta;
   buildReaderQueue(meta.title);
   updateReaderNav();
@@ -2574,7 +2927,10 @@ async function openReader(meta, opts){
   }
 }
 function applyReaderScale(){
-  $("#readerContent").style.fontSize=(state.readerScale/100*16).toFixed(1)+"px";
+  const scale=state.readerScale||100;
+  $("#readerContent").style.fontSize=(scale/100*16).toFixed(1)+"px";
+  const lbl=$("#readerScaleLabel");
+  if(lbl) lbl.textContent=t("readerScalePct",scale);
 }
 function setReaderScale(delta){
   state.readerScale=Math.max(80,Math.min(150,(state.readerScale||100)+delta));
@@ -2639,7 +2995,7 @@ function rewriteWikiLinks(container){
       a.addEventListener("click",ev=>{
         ev.preventDefault();
         openReader({title, extract:"", thumb:null,
-          url:`https://${state.lang}.wikipedia.org/wiki/${encodeURIComponent(title)}`, lang:state.lang});
+          url:`https://${state.lang}.wikipedia.org/wiki/${encodeURIComponent(title)}`, lang:state.lang}, {source:"link"});
       });
     }else if(href.startsWith("/")){
       a.setAttribute("href",`https://${state.lang}.wikipedia.org${href}`); a.target="_blank"; a.rel="noopener";
@@ -2769,7 +3125,7 @@ function answerQuiz(i){
   const wrap=$("#quizNextWrap");
   const art=document.createElement("button"); art.className="btn focusable";
   art.innerHTML=`${svgIc("i-book")} ${esc(t("openArticle"))}`;
-  art.addEventListener("click",()=>openReader(q.meta));
+  art.addEventListener("click",()=>openReader(q.meta,{source:"feed"}));
   const next=document.createElement("button"); next.className="btn primary focusable";
   next.textContent = quizState.idx<quizState.qs.length-1 ? t("next") : t("result");
   next.addEventListener("click",()=>{
@@ -3013,7 +3369,7 @@ function renderCollections(){
     arr.forEach(m=>{
       const it=document.createElement("div"); it.className="coll-item";
       const t=document.createElement("span"); t.className="ttl"; t.textContent=m.title;
-      t.addEventListener("click",()=>{ closeDrawer(); openReader(m); });
+      t.addEventListener("click",()=>{ closeDrawer(); openReader(m,{source:"feed"}); });
       const rm=document.createElement("button"); rm.className="mini focusable"; rm.innerHTML=svgIc("i-x");
       rm.addEventListener("click",()=>{ const i=arr.findIndex(x=>x.title===m.title); if(i<0)return; const removed=arr[i]; arr.splice(i,1); saveCollections(); toastAction(t("removedFrom",name),t("undo"),()=>{ arr.splice(Math.min(i,arr.length),0,removed); saveCollections(); }); });
       it.append(t,rm); sec.appendChild(it);
@@ -3074,7 +3430,7 @@ function renderRail(){
   html+=`<section class="rail-card glass"><h3 class="bebas">${esc(t("topicProfile"))}</h3>${profileSummaryHTML()}</section>`;
   rail.innerHTML=html;
   const ul=rail.querySelector(".rail-list");
-  if(ul) tr.forEach(a=>{ const li=document.createElement("li"); const btn=document.createElement("button"); btn.className="rail-link focusable"; btn.textContent=a.title; btn.addEventListener("click",()=>openReader(a)); li.appendChild(btn); ul.appendChild(li); });
+  if(ul) tr.forEach(a=>{ const li=document.createElement("li"); const btn=document.createElement("button"); btn.className="rail-link focusable"; btn.textContent=a.title; btn.addEventListener("click",()=>openReader(a,{source:"discover"})); li.appendChild(btn); ul.appendChild(li); });
   // populate trending for the panel on demand (desktop only)
   if(visible && !tr.length && !state._railFetching){
     state._railFetching=true;
@@ -3347,13 +3703,13 @@ function openFromDeck(meta){
   const reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   // unfocused/occluded documents throttle rendering, which can delay the
   // transition callback (and thus the reader) indefinitely — open directly then
-  if(!document.startViewTransition || reduce || !top || !document.hasFocus()){ openReader(meta); return; }
+  if(!document.startViewTransition || reduce || !top || !document.hasFocus()){ openReader(meta,{source:"deck"}); return; }
   top.style.viewTransitionName="wf-hero";
   const vt=document.startViewTransition(()=>{
     top.style.viewTransitionName="";
     reader.style.viewTransitionName="wf-hero";
     reader.classList.add("vt-open");   // skip the slide-up; the morph is the animation
-    openReader(meta);
+    openReader(meta,{source:"deck"});
   });
   vt.finished.finally(()=>{ reader.style.viewTransitionName=""; reader.classList.remove("vt-open"); });
 }
@@ -3483,7 +3839,7 @@ async function renderSuggest(term){
     const thumb = meta.thumb ? `<img src="${esc(meta.thumb)}" alt="">` : `<div class="ph"></div>`;
     const sub = meta.extract ? esc(meta.extract.slice(0,90)) : "";
     row.innerHTML=`${thumb}<div class="st"><b>${esc(meta.title)}</b><span>${sub}</span></div>`;
-    const go=()=>{ addRecent(term); closeSearch(); openReader(meta); };
+    const go=()=>{ addRecent(term); closeSearch(); openReader(meta,{source:"search"}); };
     row.addEventListener("click",go);
     row.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); go(); } });
     box.appendChild(row);
