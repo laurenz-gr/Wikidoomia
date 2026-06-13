@@ -8,3 +8,6 @@ Thumbs.db
 # Node (only if you add tooling later)
 node_modules/
 npm-debug.log*
+
+# Cursor private hook/transcript state
+.cursor/hooks/state/
