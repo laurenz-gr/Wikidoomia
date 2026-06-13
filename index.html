@@ -2179,7 +2179,12 @@ function renderRabbitTrail(currentMeta){
   trail.slice(0,-1).forEach((item,i)=>{
     if(i>0){ const sep=document.createElement("span"); sep.className="trail-sep"; sep.textContent="→"; host.appendChild(sep); }
     const b=document.createElement("button"); b.type="button"; b.className="trail-link focusable"; b.textContent=item.title; b.title=item.title;
-    b.addEventListener("click",()=>openReader({title:item.title,extract:"",thumb:null,url:`https://${item.lang}.wikipedia.org/wiki/${slugTitle(item.title)}`,lang:item.lang},{source:"trail"}));
+    b.addEventListener("click",()=>{
+      state.rabbitTrail=trail.slice(0,i+1);
+      const meta={title:item.title,extract:"",thumb:null,url:`https://${item.lang}.wikipedia.org/wiki/${slugTitle(item.title)}`,lang:item.lang};
+      openReader(meta,{source:"trail",skipTrail:true});
+      renderRabbitTrail(meta);
+    });
     host.appendChild(b);
   });
   const sepNow=document.createElement("span"); sepNow.className="trail-sep"; sepNow.textContent="→";
@@ -2217,43 +2222,88 @@ function wrapCanvasLines(ctx,text,maxW,maxLines){
   }
   return lines;
 }
+function roundRectPath(ctx,x,y,w,h,r){
+  r=Math.min(r,w/2,h/2);
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+}
+// Fill missing title/extract/thumb from the live reader DOM so the share card is
+// never empty, even when the article was opened via a wikilink or reading-path step.
+function shareCardMeta(meta){
+  const out=Object.assign({},meta);
+  const c=$("#readerContent");
+  if(c){
+    if(!out.extract || out.extract.trim().length<40){
+      const p=[...c.querySelectorAll("p")].map(el=>(el.textContent||"").trim()).find(tx=>tx.length>60);
+      if(p) out.extract=p;
+    }
+    if(!out.thumb){
+      const img=[...c.querySelectorAll("img")]
+        .find(im=>((im.naturalWidth||im.width||0)>=120 && (im.naturalHeight||im.height||0)>=120))
+        || c.querySelector("img");
+      if(img) out.thumb=img.currentSrc||img.getAttribute("src")||null;
+    }
+  }
+  return out;
+}
 async function buildShareCardBlob(meta){
-  const W=1080,H=1350;
+  const W=1080,H=1350,PAD=72;
+  try{ if(document.fonts&&document.fonts.ready) await document.fonts.ready; }catch(e){}
   const canvas=document.createElement("canvas");
   canvas.width=W; canvas.height=H;
   const ctx=canvas.getContext("2d");
+  ctx.textBaseline="alphabetic";
   const dark=effectiveDark();
   const bg1=dark?"#12141c":"#f4f4f2", bg2=dark?"#1e2438":"#ffffff";
   const ink=dark?"#f2f2ef":"#12141c", muted=dark?"#a8adba":"#5c6370";
+  const accent=dark?"#ff7a47":"#ff6b35";
   const grad=ctx.createLinearGradient(0,0,W,H); grad.addColorStop(0,bg1); grad.addColorStop(1,bg2);
   ctx.fillStyle=grad; ctx.fillRect(0,0,W,H);
 
-  let y=72;
-  if(meta.thumb){
-    try{
-      const img=await loadShareImage(meta.thumb);
-      const ih=420, iw=W-96, ix=48;
-      const scale=Math.max(iw/img.width, ih/img.height);
-      const sw=img.width*scale, sh=img.height*scale;
-      ctx.save(); ctx.beginPath(); ctx.rect(ix,y,iw,ih); ctx.clip();
-      ctx.drawImage(img, ix+(iw-sw)/2, y+(ih-sh)/2, sw, sh);
-      ctx.restore();
-      y+=ih+36;
-    }catch(e){}
+  let img=null;
+  if(meta.thumb){ try{ img=await loadShareImage(meta.thumb); }catch(e){} }
+
+  const maxW=W-PAD*2;
+  const brandH=40, brandGap=20;
+  const titleLH=86;
+  ctx.font="900 78px 'Bebas Neue',Impact,sans-serif";
+  const titleLines=wrapCanvasLines(ctx,meta.title,maxW,4);
+  const extLH=46;
+  ctx.font="500 33px Inter,system-ui,sans-serif";
+  const snippet=truncateAtWord(meta.extract||"",260);
+  const extLines=snippet?wrapCanvasLines(ctx,snippet,maxW,6):[];
+  const textH=brandH+brandGap + titleLines.length*titleLH + (extLines.length?24+extLines.length*extLH:0);
+
+  const footerY=H-64;
+  let y;
+  if(img){
+    const ih=Math.min(620,Math.round(H*0.46)), iw=maxW, ix=PAD, iy=PAD;
+    const scale=Math.max(iw/img.width, ih/img.height);
+    const sw=img.width*scale, sh=img.height*scale;
+    ctx.save(); roundRectPath(ctx,ix,iy,iw,ih,28); ctx.clip();
+    ctx.drawImage(img, ix+(iw-sw)/2, iy+(ih-sh)/2, sw, sh);
+    ctx.restore();
+    y=iy+ih+56;
+  }else{
+    const top=PAD+24, bottom=footerY-48;
+    y=Math.max(top, top+Math.round(((bottom-top)-textH)/2));
   }
 
-  ctx.fillStyle=muted; ctx.font="700 28px Inter,system-ui,sans-serif"; ctx.fillText("Wikidoomia", 48, y); y+=44;
-  ctx.fillStyle=ink; ctx.font="900 64px 'Bebas Neue',Impact,sans-serif";
-  const titleLines=wrapCanvasLines(ctx,meta.title,W-96,3);
-  titleLines.forEach(line=>{ ctx.fillText(line,48,y); y+=72; });
-  y+=8;
-  const snippet=truncateAtWord(meta.extract||"",220);
-  if(snippet){
-    ctx.fillStyle=muted; ctx.font="500 32px Inter,system-ui,sans-serif";
-    wrapCanvasLines(ctx,snippet,W-96,5).forEach(line=>{ ctx.fillText(line,48,y); y+=44; });
+  ctx.fillStyle=accent; ctx.font="800 30px Inter,system-ui,sans-serif";
+  ctx.fillText("WIKIDOOMIA", PAD, y); y+=brandH+brandGap;
+  ctx.fillStyle=ink; ctx.font="900 78px 'Bebas Neue',Impact,sans-serif";
+  titleLines.forEach(line=>{ ctx.fillText(line,PAD,y); y+=titleLH; });
+  if(extLines.length){
+    y+=24; ctx.fillStyle=muted; ctx.font="500 33px Inter,system-ui,sans-serif";
+    extLines.forEach(line=>{ ctx.fillText(line,PAD,y); y+=extLH; });
   }
-  ctx.fillStyle=muted; ctx.font="600 24px Inter,system-ui,sans-serif";
-  ctx.fillText("Wikipedia · CC BY-SA", 48, H-56);
+  ctx.fillStyle=muted; ctx.font="600 26px Inter,system-ui,sans-serif";
+  ctx.fillText("Wikipedia · CC BY-SA · wikidoomia", PAD, footerY);
   return new Promise((resolve,reject)=>{
     canvas.toBlob(b=>b?resolve(b):reject(new Error("blob")),"image/png");
   });
@@ -2274,7 +2324,7 @@ async function shareArticleLink(meta){
 }
 async function shareArticleCard(meta){
   try{
-    const blob=await buildShareCardBlob(meta);
+    const blob=await buildShareCardBlob(shareCardMeta(meta));
     const file=new File([blob],"wikidoomia-share.png",{type:"image/png"});
     const link=appLinkFor(meta);
     if(navigator.share && navigator.canShare && navigator.canShare({files:[file]})){
