@@ -1,9 +1,14 @@
 {
   "version": 1,
   "transcripts": {
-    "/Users/laurenzgruneberg/.cursor/projects/Users-laurenzgruneberg-wikidoomia/agent-transcripts/00dffc5b-f52e-4501-8c49-397528b6dd1a/00dffc5b-f52e-4501-8c49-397528b6dd1a.jsonl": { "mtime": 1781165052 },
     "/Users/laurenzgruneberg/.cursor/projects/Users-laurenzgruneberg-wikidoomia/agent-transcripts/12faf5c5-c426-4068-bda7-00019ebbabc9/12faf5c5-c426-4068-bda7-00019ebbabc9.jsonl": { "mtime": 1781098154 },
-    "/Users/laurenzgruneberg/.cursor/projects/Users-laurenzgruneberg-wikidoomia/agent-transcripts/50d930ab-3656-4fc7-bb67-f22c9ba378e6/50d930ab-3656-4fc7-bb67-f22c9ba378e6.jsonl": { "mtime": 1781200181 },
-    "/Users/laurenzgruneberg/.cursor/projects/Users-laurenzgruneberg-wikidoomia/agent-transcripts/50d930ab-3656-4fc7-bb67-f22c9ba378e6/subagents/030e0dc5-66ec-412d-8108-0b991d499d2d.jsonl": { "mtime": 1781200190 }
+    "/Users/laurenzgruneberg/.cursor/projects/Users-laurenzgruneberg-wikidoomia/agent-transcripts/00dffc5b-f52e-4501-8c49-397528b6dd1a/00dffc5b-f52e-4501-8c49-397528b6dd1a.jsonl": { "mtime": 1781165052 },
+    "/Users/laurenzgruneberg/.cursor/projects/Users-laurenzgruneberg-wikidoomia/agent-transcripts/50d930ab-3656-4fc7-bb67-f22c9ba378e6/subagents/030e0dc5-66ec-412d-8108-0b991d499d2d.jsonl": { "mtime": 1781200673 },
+    "/Users/laurenzgruneberg/.cursor/projects/Users-laurenzgruneberg-wikidoomia/agent-transcripts/50d930ab-3656-4fc7-bb67-f22c9ba378e6/50d930ab-3656-4fc7-bb67-f22c9ba378e6.jsonl": { "mtime": 1781200684 },
+    "/Users/laurenzgruneberg/.cursor/projects/Users-laurenzgruneberg-wikidoomia/agent-transcripts/c209bd02-e2a6-48f5-91a3-6477738d2c6a/c209bd02-e2a6-48f5-91a3-6477738d2c6a.jsonl": { "mtime": 1781367079 },
+    "/Users/laurenzgruneberg/.cursor/projects/Users-laurenzgruneberg-wikidoomia/agent-transcripts/cfbea23c-4877-4949-801c-5ef3cddc3674/subagents/c4647b06-9dfa-4e93-b181-6c4a40b6d99c.jsonl": { "mtime": 1781368557 },
+    "/Users/laurenzgruneberg/.cursor/projects/Users-laurenzgruneberg-wikidoomia/agent-transcripts/cfbea23c-4877-4949-801c-5ef3cddc3674/subagents/7d30b4e6-1c4f-4cdb-8846-2ea0bb01066f.jsonl": { "mtime": 1781369546 },
+    "/Users/laurenzgruneberg/.cursor/projects/Users-laurenzgruneberg-wikidoomia/agent-transcripts/cfbea23c-4877-4949-801c-5ef3cddc3674/cfbea23c-4877-4949-801c-5ef3cddc3674.jsonl": { "mtime": 1781370518 },
+    "/Users/laurenzgruneberg/.cursor/projects/Users-laurenzgruneberg-wikidoomia/agent-transcripts/cfbea23c-4877-4949-801c-5ef3cddc3674/subagents/8ad1e596-eb41-4d05-a84c-cb1cd7c7dd7b.jsonl": { "mtime": 1781370527 }
   }
 }
