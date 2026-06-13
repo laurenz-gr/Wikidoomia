@@ -1,0 +1,11 @@
+name = "wikidoomia-sync"
+main = "src/index.js"
+compatibility_date = "2024-06-01"
+
+# Create a KV namespace once, then paste the id here:
+#   npx wrangler kv namespace create PROFILES
+#   npx wrangler kv namespace create PROFILES --preview
+[[kv_namespaces]]
+binding = "PROFILES"
+id = "REPLACE_WITH_PRODUCTION_KV_ID"
+preview_id = "REPLACE_WITH_PREVIEW_KV_ID"

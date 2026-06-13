@@ -14,8 +14,18 @@
 <meta name="twitter:title" content="Wikidoomia – dein Wissens-Feed">
 <meta name="twitter:description" content="Ein endloser, lernender Wikipedia-Feed. Personalisierung, Sammlungen und Quiz – alles lokal in deinem Browser.">
 <meta name="twitter:image" content="icons/icon-512.png">
-<meta name="theme-color" content="#f4f4f2" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#15171d" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" id="themeColorMeta" content="#f4f4f2">
+<script>
+/* pre-paint theme: resolve stored preference ("system"|"light"|"dark", default
+   system) before first paint so dark-mode users never see a light flash */
+(function(){try{
+  var raw=localStorage.getItem("wf_theme");
+  var pref=raw?JSON.parse(raw):"system";
+  var dark=pref==="dark"||(pref!=="light"&&matchMedia("(prefers-color-scheme: dark)").matches);
+  if(dark) document.documentElement.classList.add("dark");
+  var m=document.getElementById("themeColorMeta"); if(m) m.content=dark?"#15171d":"#f4f4f2";
+}catch(e){}})();
+</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Wikidoomia">
@@ -794,6 +804,8 @@
   <symbol id="i-quiz" viewBox="0 0 24 24"><path d="M21.42 10.92a1 1 0 0 0-.02-1.84L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.84l8.57 3.9a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/></symbol>
   <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
   <symbol id="i-trend" viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></symbol>
+  <symbol id="i-upload" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 8l5-5 5 5M12 3v12"/></symbol>
 
   <symbol id="i-chevron-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
   <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
@@ -802,6 +814,8 @@
   <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></symbol>
   <symbol id="i-heart" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z"/></symbol>
   <symbol id="i-rotate" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9 9 0 0 0-6.36 2.64L3 8"/><path d="M3 3v5h5"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-monitor" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></symbol>
 </defs></svg>
 
 <header class="topbar glass">
@@ -821,7 +835,7 @@
     <svg class="ic"><use href="#i-search"/></svg>
   </button>
   <button class="iconbtn focusable" id="btnColl" data-i18n-title="collProfile" data-i18n-aria="collProfile" title="Sammlungen & Profil" aria-label="Sammlungen & Profil">
-    <svg class="ic"><use href="#i-collection"/></svg>
+    <svg class="ic"><use href="#i-gear"/></svg>
     <span class="badge-count" id="collBadge" hidden>0</span>
   </button>
   <button class="iconbtn focusable" id="btnTheme" data-i18n-title="theme" data-i18n-aria="themeAria" title="Hell/Dunkel" aria-label="Theme wechseln">
@@ -881,9 +895,22 @@
       </div>
       <div id="collList"><p class="muted" data-i18n="noColls">Noch keine Sammlungen.</p></div>
     </div>
+    <div class="panel" id="continuePanel" hidden>
+      <h3 class="bebas" data-i18n="continueTitle">Weiterlesen</h3>
+      <div id="continueList" class="digest-sec"></div>
+    </div>
     <div class="panel">
       <h3 class="bebas" data-i18n="interests">Interessen</h3>
       <div class="chips" id="interestChips"></div>
+    </div>
+    <div class="panel">
+      <h3 class="bebas" data-i18n="appearanceHeading">Erscheinungsbild</h3>
+      <div class="seg" id="themeSeg" role="group" data-i18n-aria="appearanceHeading" aria-label="Erscheinungsbild" style="margin-top:4px">
+        <button data-theme="system" class="focusable" data-i18n="themeSystem">System</button>
+        <button data-theme="light" class="focusable" data-i18n="themeLight">Hell</button>
+        <button data-theme="dark" class="focusable" data-i18n="themeDark">Dunkel</button>
+      </div>
+      <p class="lang-hint" data-i18n="appearanceHint">„System" folgt automatisch dem Hell-/Dunkelmodus deines Geräts.</p>
     </div>
     <div class="panel">
       <h3 class="bebas" data-i18n="articleLang">Artikelsprache</h3>
@@ -915,6 +942,36 @@
       <p class="muted" id="goalLabel" style="margin-top:6px"></p>
       <p class="muted" id="quizBestLabel" style="margin-top:10px"></p>
       <button class="btn focusable" id="drawerQuiz" style="margin-top:12px;width:100%" type="button"><svg class="ic"><use href="#i-quiz"/></svg><span data-i18n="startQuiz">Quiz starten</span></button>
+    </div>
+
+    <div class="panel" id="syncPanel" hidden>
+      <h3 class="bebas" data-i18n="deviceSync">Geräte-Sync</h3>
+      <div id="syncSetup">
+        <p class="muted" data-i18n="syncHint">Optional: Profil verschlüsselt zwischen Geräten synchronisieren. Der Server sieht nur Geheimtext.</p>
+        <button class="btn focusable" id="syncSetupBtn" type="button" style="margin-top:8px;width:100%"><svg class="ic"><use href="#i-refresh"/></svg><span data-i18n="syncSetupBtn">Sync einrichten</span></button>
+        <input class="field focusable" id="syncCodeInput" data-i18n-ph="syncCodePh" placeholder="WD-Code von anderem Gerät…" style="margin-top:12px;width:100%">
+        <button class="btn focusable" id="syncConnectBtn" type="button" style="margin-top:8px;width:100%"><span data-i18n="syncConnectBtn">Mit Code verbinden</span></button>
+      </div>
+      <div id="syncActive" hidden>
+        <p class="muted" id="syncStatus"></p>
+        <p class="muted" style="margin-top:8px;font-size:12px" data-i18n="syncCodeShown">Dein Sync-Code (bitte speichern):</p>
+        <code id="syncCodeDisplay" style="word-break:break-all;display:block;margin:6px 0 10px;padding:10px;border-radius:10px;border:1px solid var(--glass-brd);background:var(--glass-bg);font-size:12px;line-height:1.45"></code>
+        <div class="row" style="gap:8px">
+          <button class="btn focusable" id="syncCopyBtn" type="button" style="flex:1"><span data-i18n="syncCopy">Code kopieren</span></button>
+          <button class="btn focusable" id="syncNowBtn" type="button" style="flex:1"><svg class="ic"><use href="#i-refresh"/></svg><span data-i18n="syncNow">Jetzt syncen</span></button>
+        </div>
+        <button class="btn focusable" id="syncDisconnectBtn" type="button" style="margin-top:8px;width:100%"><span data-i18n="syncDisconnect">Sync trennen</span></button>
+        <p class="muted" style="margin-top:10px;font-size:12px" data-i18n="syncWarn">Code sicher aufbewahren — ohne ihn sind die Cloud-Daten verloren. Nur du kannst sie entschlüsseln.</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3 class="bebas" data-i18n="myFeed">Mein Wikidoomia</h3>
+      <div class="row" style="gap:8px;margin-top:4px">
+        <button class="btn focusable" id="exportProfile" style="flex:1"><svg class="ic"><use href="#i-download"/></svg><span data-i18n="exportProfile">Profil exportieren</span></button>
+        <button class="btn focusable" id="importProfile" style="flex:1"><svg class="ic"><use href="#i-upload"/></svg><span data-i18n="importProfile">Profil importieren</span></button>
+      </div>
+      <input type="file" id="importFile" accept="application/json,.json" hidden>
     </div>
 
     <div class="row" style="justify-content:space-between;margin-top:4px">
@@ -1026,6 +1083,13 @@ const LS = {
   get(k,f){ try{ const v=localStorage.getItem(k); return v==null?f:JSON.parse(v);}catch(e){return f;} },
   set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
 };
+// Optional E2E device sync — empty hides UI entirely (default, fully on-device).
+// To enable: paste your deployed sync endpoint here, e.g.
+//   "https://wikidoomia-sync.<subdomain>.workers.dev"
+// or a local dev server "http://localhost:8787" while running `npm run mock` in worker/.
+const SYNC_ENDPOINT = "";
+const SYNC_EXCLUDE = new Set(["wf_sync","wf_lastsync"]);
+let pushSyncTimer = null;
 
 const PRESET_TOPICS = {
   de:["Geschichte","Wissenschaft","Technik","Kunst","Musik","Natur","Geographie","Sport","Philosophie","Astronomie","Medizin","Politik","Film","Literatur","Mathematik","Architektur","Psychologie","Biologie"],
@@ -1040,9 +1104,23 @@ const I18N = {
     brandSub:"dein Wissens‑Feed", appTitleLong:"Wikidoomia – dein lernender Wikipedia-Feed", langGroup:"Sprache", articleLang:"Artikelsprache", uiLanguage:"Sprache der Oberfläche",
     startQuiz:"Quiz starten", search:"Suchen", collProfile:"Sammlungen & Profil",
     theme:"Hell/Dunkel", themeAria:"Theme wechseln", searchPh:"Auf Wikipedia suchen…", close:"Schließen",
+    appearanceHeading:"Erscheinungsbild", themeSystem:"System", themeLight:"Hell", themeDark:"Dunkel",
+    appearanceHint:"\u201eSystem\u201c folgt automatisch dem Hell-/Dunkelmodus deines Geräts.",
     myFeed:"Mein Wikidoomia", topicProfile:"Dein Themenprofil", recapBtn:"Mein Lese-Rückblick",
     collections:"Sammlungen", newColl:"Neue Sammlung", noColls:"Noch keine Sammlungen.",
     interests:"Interessen", resetProfile:"Profil zurücksetzen",
+    exportProfile:"Profil exportieren", importProfile:"Profil importieren",
+    exportDone:"Profil als Datei gesichert", importDone:"Profil wiederhergestellt",
+    importBad:"Datei nicht lesbar – ist das eine Wikidoomia-Sicherung?",
+    importTitle:"Profil importieren", importConfirm:"Diese Sicherung lädt dein Profil, Sterne, Sammlungen und Einstellungen. Vorhandene Daten auf diesem Gerät werden ersetzt. Fortfahren?", importBtn:"Importieren",
+    deviceSync:"Geräte-Sync", syncHint:"Optional: Profil verschlüsselt zwischen Geräten synchronisieren. Der Server sieht nur Geheimtext.",
+    syncSetupBtn:"Sync einrichten", syncConnectBtn:"Mit Code verbinden", syncCodePh:"WD-Code von anderem Gerät…",
+    syncActive:"Sync aktiv", syncLast:n=>`Zuletzt synchronisiert: ${n}`, syncNever:"Noch nicht synchronisiert",
+    syncCopy:"Code kopieren", syncNow:"Jetzt syncen", syncDisconnect:"Sync trennen",
+    syncWarn:"Code sicher aufbewahren — ohne ihn sind die Cloud-Daten verloren. Nur du kannst sie entschlüsseln.",
+    syncDone:"Profil synchronisiert", syncFail:"Sync fehlgeschlagen — später erneut versuchen",
+    syncCodeShown:"Dein Sync-Code (bitte speichern):", syncCopied:"Code kopiert",
+    syncDisconnectTitle:"Sync trennen", syncDisconnectConfirm:"Sync-Code auf diesem Gerät entfernen? Cloud-Daten bleiben erhalten.",
     backToFeed:"Zurück zum Feed", starMark:"Mit Stern markieren", toCollection:"Zu Sammlung",
     share:"Teilen", openWiki:"Auf Wikipedia öffnen", closeQuizAria:"Quiz schließen", quiz:"Quiz",
     welcome:"Willkommen bei Wikidoomia", onbLead:"Wähle ein paar Themen für den Start.",
@@ -1119,9 +1197,23 @@ const I18N = {
     brandSub:"your knowledge feed", appTitleLong:"Wikidoomia – your learning Wikipedia feed", langGroup:"Language", articleLang:"Article language", uiLanguage:"Interface language",
     startQuiz:"Start quiz", search:"Search", collProfile:"Collections & profile",
     theme:"Light/Dark", themeAria:"Toggle theme", searchPh:"Search Wikipedia…", close:"Close",
+    appearanceHeading:"Appearance", themeSystem:"System", themeLight:"Light", themeDark:"Dark",
+    appearanceHint:"\u201cSystem\u201d automatically follows your device's light/dark mode.",
     myFeed:"My Wikidoomia", topicProfile:"Your topic profile", recapBtn:"My reading recap",
     collections:"Collections", newColl:"New collection", noColls:"No collections yet.",
     interests:"Interests", resetProfile:"Reset profile",
+    exportProfile:"Export profile", importProfile:"Import profile",
+    exportDone:"Profile saved as a file", importDone:"Profile restored",
+    importBad:"Couldn't read that file – is it a Wikidoomia backup?",
+    importTitle:"Import profile", importConfirm:"This backup loads your profile, stars, collections and settings. Existing data on this device will be replaced. Continue?", importBtn:"Import",
+    deviceSync:"Device sync", syncHint:"Optional: sync your profile encrypted across devices. The server only sees ciphertext.",
+    syncSetupBtn:"Set up sync", syncConnectBtn:"Connect with code", syncCodePh:"WD code from another device…",
+    syncActive:"Sync active", syncLast:n=>`Last synced: ${n}`, syncNever:"Not synced yet",
+    syncCopy:"Copy code", syncNow:"Sync now", syncDisconnect:"Disconnect sync",
+    syncWarn:"Keep your code safe — without it, cloud data is unrecoverable. Only you can decrypt it.",
+    syncDone:"Profile synced", syncFail:"Sync failed — will retry later",
+    syncCodeShown:"Your sync code (save it):", syncCopied:"Code copied",
+    syncDisconnectTitle:"Disconnect sync", syncDisconnectConfirm:"Remove sync code on this device? Cloud data stays stored.",
     backToFeed:"Back to the feed", starMark:"Mark with a star", toCollection:"Add to collection",
     share:"Share", openWiki:"Open on Wikipedia", closeQuizAria:"Close quiz", quiz:"Quiz",
     welcome:"Welcome to Wikidoomia", onbLead:"Pick a few topics to start.",
@@ -1198,9 +1290,23 @@ const I18N = {
     brandSub:"ton fil de savoir", appTitleLong:"Wikidoomia – ton fil Wikipédia qui apprend", langGroup:"Langue", articleLang:"Langue des articles", uiLanguage:"Langue de l'interface",
     startQuiz:"Lancer le quiz", search:"Rechercher", collProfile:"Collections et profil",
     theme:"Clair/Sombre", themeAria:"Changer de thème", searchPh:"Rechercher sur Wikipédia…", close:"Fermer",
+    appearanceHeading:"Apparence", themeSystem:"Système", themeLight:"Clair", themeDark:"Sombre",
+    appearanceHint:"« Système » suit automatiquement le mode clair/sombre de ton appareil.",
     myFeed:"Mon Wikidoomia", topicProfile:"Ton profil thématique", recapBtn:"Mon bilan de lecture",
     collections:"Collections", newColl:"Nouvelle collection", noColls:"Pas encore de collections.",
     interests:"Centres d'intérêt", resetProfile:"Réinitialiser le profil",
+    exportProfile:"Exporter le profil", importProfile:"Importer le profil",
+    exportDone:"Profil enregistré dans un fichier", importDone:"Profil restauré",
+    importBad:"Fichier illisible – est-ce une sauvegarde Wikidoomia ?",
+    importTitle:"Importer le profil", importConfirm:"Cette sauvegarde charge ton profil, tes étoiles, tes collections et tes réglages. Les données présentes sur cet appareil seront remplacées. Continuer ?", importBtn:"Importer",
+    deviceSync:"Sync appareils", syncHint:"Optionnel : synchroniser ton profil chiffré entre appareils. Le serveur ne voit que du texte chiffré.",
+    syncSetupBtn:"Configurer la sync", syncConnectBtn:"Connecter avec un code", syncCodePh:"Code WD d'un autre appareil…",
+    syncActive:"Sync active", syncLast:n=>`Dernière sync : ${n}`, syncNever:"Pas encore synchronisé",
+    syncCopy:"Copier le code", syncNow:"Sync maintenant", syncDisconnect:"Déconnecter la sync",
+    syncWarn:"Conserve ton code — sans lui, les données cloud sont perdues. Seul toi peux les déchiffrer.",
+    syncDone:"Profil synchronisé", syncFail:"Échec de la sync — nouvel essai plus tard",
+    syncCodeShown:"Ton code de sync (à enregistrer) :", syncCopied:"Code copié",
+    syncDisconnectTitle:"Déconnecter la sync", syncDisconnectConfirm:"Retirer le code de sync sur cet appareil ? Les données cloud restent stockées.",
     backToFeed:"Retour au fil", starMark:"Marquer d'une étoile", toCollection:"Ajouter à une collection",
     share:"Partager", openWiki:"Ouvrir sur Wikipédia", closeQuizAria:"Fermer le quiz", quiz:"Quiz",
     welcome:"Bienvenue sur Wikidoomia", onbLead:"Choisis quelques thèmes pour commencer.",
@@ -1291,7 +1397,7 @@ const WEIGHTS = { dwell:0.18, dwellCap:1.2, open:2.0, star:5.0 };
 const state = {
   lang: LS.get("wf_lang","de"),          // article / content language (Wikipedia source)
   uiLang: LS.get("wf_uilang", LS.get("wf_lang","de")), // interface language
-  theme: LS.get("wf_theme","light"),
+  theme: LS.get("wf_theme","system"),   // "system" | "light" | "dark"
   interests: LS.get("wf_interests",[]),
   // profile.seeds: { "Article Title": score }  — used as morelike seeds
   // profile.cats:  { "Category": score }       — shown as topic profile
@@ -1304,7 +1410,7 @@ const state = {
   recent: LS.get("wf_recent",[]),        // recent search terms
   readPool: LS.get("wf_readpool",[]),    // recently opened articles (quiz material)
   openedSinceQuiz:0,                     // counts opens toward next quiz offer
-  exploit: LS.get("wf_exploit",0.5),     // adaptive exploit-vs-explore probability
+  exploit: LS.get("wf_exploit",0.4),     // adaptive exploit-vs-explore probability (starts explore-leaning so one read can't dominate)
   stats: LS.get("wf_stats",{day:"",lastActive:"",streak:0,openedToday:0,total:0}),
   seen: new Set(),
   feedGen:0,                             // generation token; bumped on resetFeed to cancel stale loads
@@ -1325,7 +1431,6 @@ const state = {
   readPos: LS.get("wf_readpos",{}),
   readProg: LS.get("wf_readprog",{}),
   readOrder: LS.get("wf_readorder",[]),  // posKeys, most-recently-read first (for "continue reading")
-  wantContinueFirst:false,               // show a "continue reading" cluster on a fresh feed
   dailyGoal: LS.get("wf_dailygoal",5),
   quizBest: LS.get("wf_quizbest",0),
   readerQueue: [],
@@ -1335,7 +1440,10 @@ const state = {
   deckHistory: [],                      // {meta,action,prevSeed,wasStarred} for undo
   deckBusy:false,
   deckGen:0,
-  activeTopic: null                     // currently selected topic chip (filters both views)
+  activeTopic: null,                    // currently selected topic chip (filters both views)
+  syncCode: LS.get("wf_sync",null),     // accountless E2E sync passphrase (never sent to server)
+  lastSyncAt: LS.get("wf_lastsync",null),
+  syncBusy:false
 };
 
 function saveProfile(){ LS.set("wf_profile",state.profile); }
@@ -1474,7 +1582,7 @@ function dayStr(offset=0){ return new Date(Date.now()+offset*864e5).toISOString(
 
 /* adaptive explore/exploit: exploit rises after positive engagement, falls after a miss */
 function nudgeExploit(d){
-  state.exploit=Math.max(0.30,Math.min(0.85,(state.exploit||0.5)+d));
+  state.exploit=Math.max(0.30,Math.min(0.78,(state.exploit||0.4)+d));
   LS.set("wf_exploit",state.exploit);
 }
 /* streak + reading stats */
@@ -1748,7 +1856,7 @@ async function enrichCats(title,amount){
 function signalOpen(meta){
   bumpSeed(meta.title,WEIGHTS.open);
   enrichCats(meta.title,WEIGHTS.open);
-  nudgeExploit(+0.04);   // engaged → lean a bit more into the working vein
+  nudgeExploit(+0.02);   // engaged → lean a bit more into the working vein (gentle: one open shouldn't flip the feed to exploit)
   registerOpen();        // streak + reading stats
   noteRead(meta);        // build quiz material, offer quiz after ~10 reads
 }
@@ -1797,20 +1905,24 @@ function continueReadingItems(limit=6){
   }
   return out;
 }
-function buildContinueCard(items){
-  const card=document.createElement("article"); card.className="card glass digest continue";
-  card.innerHTML=`<div class="digest-head">${svgIc("i-book")} ${esc(t("continueTitle"))}</div>`;
-  const sec=document.createElement("div"); sec.className="digest-sec";
+/* "Continue reading" now lives in the drawer (settings) as its own list,
+   not as a permanent card at the top of the feed. */
+function renderContinueList(){
+  const host=$("#continueList"), panel=$("#continuePanel");
+  if(!host||!panel) return;
+  const items=continueReadingItems();
+  if(!items.length){ panel.hidden=true; host.innerHTML=""; return; }
+  panel.hidden=false;
+  host.innerHTML="";
   const ul=document.createElement("ul");
   items.forEach(it=>{
     const li=document.createElement("li"); li.className="continue-row";
     const a=document.createElement("button"); a.className="digest-link focusable"; a.textContent=it.title;
-    a.addEventListener("click",()=>openByTitle(it.title,it.lang));
+    a.addEventListener("click",()=>{ closeDrawer(); openByTitle(it.title,it.lang); });
     const pctEl=document.createElement("span"); pctEl.className="continue-pct"; pctEl.textContent=t("readPct",it.pct);
     li.append(a,pctEl); ul.appendChild(li);
   });
-  sec.appendChild(ul); card.appendChild(sec);
-  return card;
+  host.appendChild(ul);
 }
 function refreshReadTag(meta){
   let card; try{ card=feedEl.querySelector(`.card[data-title="${CSS.escape(meta.title)}"]`); }catch(e){}
@@ -1868,20 +1980,28 @@ function signalDwell(title,seconds){
 }
 function hasProfile(){ return Object.values(state.profile.seeds).some(v=>v>=WEIGHTS.open); }
 
+// Profile only "switches on" once enough reading signal has accumulated, so a
+// single article (open = WEIGHTS.open, plus up to dwellCap from reading time)
+// can't take over the feed. WEIGHTS.open*2 ≈ "two reads' worth"; a star
+// (WEIGHTS.star = 5.0) clears it on its own, since that's an explicit signal.
+const PROFILE_ON_AT = WEIGHTS.open*2;   // 4.0
 function pickStrategy(){
   const r=Math.random();
   // only seeds from the current article language work as morelike queries
   const pfx=state.lang+"::", strongSeeds={};
+  let seedSignal=0;
   for(const [k,v] of Object.entries(state.profile.seeds)){
-    if(v>=WEIGHTS.open && k.startsWith(pfx)) strongSeeds[seedTitle(k)]=Math.sqrt(v); // sqrt: damp super-seeds so one starred article can't monopolise the feed
+    if(v>=WEIGHTS.open && k.startsWith(pfx)){ strongSeeds[seedTitle(k)]=Math.sqrt(v); seedSignal+=v; } // sqrt: damp super-seeds so one starred article can't monopolise the feed
   }
-  const profileOn=Object.keys(strongSeeds).length>0;
+  const profileOn=seedSignal>=PROFILE_ON_AT;
   // exploit grows after hits, shrinks after misses (adaptive ε-greedy)
   if(profileOn && r<state.exploit){ return {type:"morelike", seed:weightedPick(strongSeeds)}; }
-  // occasionally follow the learned topic profile (categories), not just article seeds
+  // occasionally follow the learned topic profile (categories), not just article seeds.
+  // Threshold > a single open (which adds WEIGHTS.open to every category at once)
+  // so one article's categories don't immediately drive topic searches.
   const catPool={};
   for(const [k,v] of Object.entries(state.profile.cats)){
-    if(v>=WEIGHTS.open && k.length>3 && !/\d/.test(k) && !/^(Mann|Frau|Männer|Frauen|Men|Women|Homme|Femme)$/i.test(k)) catPool[k]=Math.sqrt(v);
+    if(v>=WEIGHTS.open*1.5 && k.length>3 && !/\d/.test(k) && !/^(Mann|Frau|Männer|Frauen|Men|Women|Homme|Femme)$/i.test(k)) catPool[k]=Math.sqrt(v);
   }
   if(Object.keys(catPool).length && Math.random()<0.35){
     return {type:"search", term:weightedPick(catPool)};
@@ -2033,13 +2153,10 @@ async function loadMore(){
   for(let i=0;i<2;i++){ const s=document.createElement("div"); s.className="skeleton glass"; feedEl.appendChild(s); skels.push(s); }
 
   let attempts=0, added=0;
+  // topic-cluster cap: one seed/term may contribute at most MAX_PER_CLUSTER cards
+  // per fill round, so a single read can't flood the feed with same-topic articles.
+  const MAX_PER_CLUSTER=2, clusterUse={};
   try{
-    // one-shot "Continue reading" cluster on a fresh feed (in-progress articles)
-    if(state.wantContinueFirst && state.pendingStrategies.length===0 && feedEl.querySelectorAll(".card").length===0){
-      state.wantContinueFirst=false;
-      const items=continueReadingItems();
-      if(items.length) feedEl.insertBefore(buildContinueCard(items), skels[0]||null);
-    }
     // one-shot "Today on Wikipedia" cluster on a fresh feed (article of the day + digest)
     if(state.wantFeaturedFirst && state.pendingStrategies.length===0 && feedEl.querySelectorAll(".card").length===0){
       state.wantFeaturedFirst=false;
@@ -2069,6 +2186,9 @@ async function loadMore(){
       if(trendingFirst||trendingMix) strat={type:"trending"};
       else if(surprise) strat={type:"serendipity"};
       else strat = state.pendingStrategies.length ? state.pendingStrategies.shift() : pickStrategy();
+      // already pulled enough from this seed/term this round → widen out to random instead
+      let clusterKey = strat.type==="morelike" ? "m:"+strat.seed : strat.type==="search" ? "s:"+strat.term : null;
+      if(clusterKey && (clusterUse[clusterKey]||0)>=MAX_PER_CLUSTER){ strat={type:"random"}; clusterKey=null; }
       let batch=[];
       if(strat.type==="morelike") batch=await fetchMoreLike(strat.seed);
       else if(strat.type==="search") batch=await fetchSearch(strat.term);
@@ -2084,6 +2204,7 @@ async function loadMore(){
                    : strat.type==="serendipity" ? "serendipity"
                    : strat.type==="trending" ? "trending" : "none";
       const seed = strat.type==="morelike" ? strat.seed : null;
+      let fromCluster=0;
       for(const a of batch){
         if(state.seen.has(a.title) || state.disliked[a.title]) continue;
         state.seen.add(a.title);
@@ -2093,6 +2214,7 @@ async function loadMore(){
         if(strat.type==="serendipity"){ state.cardsSinceSurprise=0; state.surpriseAt=randInt(4,8); break; }
         if(strat.type==="trending"){ state.wantTrendingFirst=false; state.cardsSinceTrending=0; state.trendingAt=randInt(14,22); break; }
         state.cardsSinceSurprise++; state.cardsSinceTrending++;
+        if(clusterKey){ clusterUse[clusterKey]=(clusterUse[clusterKey]||0)+1; if(++fromCluster>=MAX_PER_CLUSTER) break; }
       }
     }
   }catch(e){
@@ -2143,7 +2265,6 @@ function resetFeed(){
   state.cardsSinceTrending=0; state.trendingAt=randInt(14,22);
   state.trendingCache=[]; state.wantTrendingFirst=true;   // fresh hook each reset (language switch refetches)
   state.featuredCache=null; state.wantFeaturedFirst=true; // "today on Wikipedia" cluster on fresh feed
-  state.wantContinueFirst=true;                           // "continue reading" cluster on fresh feed
   state._railFetching=false;
   feedEl.querySelectorAll(":scope > :not(h1)").forEach(n=>n.remove());  // keep the sr-only page heading
   loadMore().then(()=>loadMore()).then(renderRail);
@@ -2854,7 +2975,7 @@ function closeCollMenu(){ if(collMenuEl){ collMenuEl.remove(); collMenuEl=null; 
 
 /* ---------- drawer (collections + profile) ---------- */
 const drawer=$("#drawer"), scrim=$("#scrim");
-function openDrawer(){ if(drawer.classList.contains("open")) return; renderCollections(); renderProfile(); renderInterestChips(); renderGoalUI(); drawer.classList.add("open"); scrim.classList.add("open"); drawer.setAttribute("aria-hidden","false"); trapFocus(drawer); }
+function openDrawer(){ if(drawer.classList.contains("open")) return; renderCollections(); renderContinueList(); renderProfile(); renderInterestChips(); renderGoalUI(); renderSyncUI(); drawer.classList.add("open"); scrim.classList.add("open"); drawer.setAttribute("aria-hidden","false"); trapFocus(drawer); }
 function closeDrawer(){ if(!drawer.classList.contains("open")) return; drawer.classList.remove("open"); scrim.classList.remove("open"); drawer.setAttribute("aria-hidden","true"); releaseFocus(); }
 $("#btnColl").addEventListener("click",openDrawer);
 $("#closeDrawer").addEventListener("click",closeDrawer);
@@ -3053,7 +3174,10 @@ async function refillDeck(){
       const withImg=fresh.filter(a=>a.thumb), without=fresh.filter(a=>!a.thumb);
       // image-first; allow a couple of image-less as fallback so the deck never starves
       const ordered=[...withImg, ...without.slice(0,Math.max(0,2-withImg.length))];
-      ordered.forEach(a=>{ if(!inDeck(a.title)) state.deckQueue.push(a); });
+      // discovery deck: at most 2 cards per batch so one seed can't fill the queue;
+      // an explicitly chosen topic feed (activeTopic) is allowed to cluster.
+      const take = state.activeTopic ? ordered.length : 2;
+      ordered.slice(0,take).forEach(a=>{ if(!inDeck(a.title)) state.deckQueue.push(a); });
     }
   }finally{
     if(gen===state.deckGen) state.deckBusy=false;
@@ -3270,11 +3394,25 @@ document.addEventListener("keydown",e=>{
 });
 
 /* ---------- theme & lang ---------- */
+const darkMQ = matchMedia("(prefers-color-scheme: dark)");
+function effectiveDark(){ return state.theme==="dark" || (state.theme==="system" && darkMQ.matches); }
 function applyTheme(){
-  document.documentElement.classList.toggle("dark",state.theme==="dark");
-  $("#btnTheme").querySelector("use").setAttribute("href",state.theme==="dark"?"#i-sun":"#i-moon");
+  const dark=effectiveDark();
+  document.documentElement.classList.toggle("dark",dark);
+  // header quick-toggle shows the chosen mode: monitor=system, sun=light, moon=dark
+  const icon = state.theme==="system" ? "#i-monitor" : (dark ? "#i-moon" : "#i-sun");
+  $("#btnTheme").querySelector("use").setAttribute("href",icon);
+  const m=$("#themeColorMeta"); if(m) m.content=dark?"#15171d":"#f4f4f2";
+  // keep the settings segmented control in sync with the active preference
+  document.querySelectorAll("#themeSeg button").forEach(b=>b.classList.toggle("active",b.dataset.theme===state.theme));
 }
-$("#btnTheme").addEventListener("click",()=>{ state.theme=state.theme==="dark"?"light":"dark"; LS.set("wf_theme",state.theme); applyTheme(); });
+function setTheme(pref){ state.theme=pref; LS.set("wf_theme",pref); applyTheme(); }
+// header button cycles System → Light → Dark → System
+$("#btnTheme").addEventListener("click",()=>{ const order=["system","light","dark"]; setTheme(order[(order.indexOf(state.theme)+1)%order.length]); });
+// settings segmented control: explicit pick
+document.querySelectorAll("#themeSeg button").forEach(b=>b.addEventListener("click",()=>setTheme(b.dataset.theme)));
+// in "system" mode, follow the OS live when it flips day/night
+darkMQ.addEventListener("change",()=>{ if(state.theme==="system") applyTheme(); });
 // Topbar switch = ARTICLE language (Wikipedia source). UI stays as is.
 document.querySelectorAll("#langSeg button").forEach(b=>{
   b.addEventListener("click",()=>{
@@ -3401,10 +3539,338 @@ $("#onbStart").addEventListener("click",finishOnb);
 $("#onbSkip").addEventListener("click",finishOnb);
 $("#resetProfile").addEventListener("click",async ()=>{
   if(!await modalConfirm({title:t("resetProfile"),message:t("resetConfirm"),confirm:t("reset"),danger:true})) return;
-  state.profile={seeds:{},cats:{}}; state.stars={}; state.disliked={}; state.exploit=0.5;
+  state.profile={seeds:{},cats:{}}; state.stars={}; state.disliked={}; state.exploit=0.4;
   Object.keys(dwellAccum).forEach(k=>delete dwellAccum[k]);
   saveProfile(); LS.set("wf_stars",state.stars); LS.set("wf_disliked",state.disliked); LS.set("wf_exploit",state.exploit);
   renderProfile(); toast(t("profileReset")); resetFeed();
+});
+
+/* ---------- profile export / import (device-independent backup) ----------
+   The whole "algorithm" is just the wf_* keys in localStorage, so a backup is
+   simply a snapshot of those raw values. Import replaces local data, then we
+   reload to re-hydrate every in-memory field (incl. Sets/derived state) cleanly. */
+function collectProfileKeys(){
+  const keys=[];
+  for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); if(k&&k.startsWith("wf_")) keys.push(k); }
+  return keys;
+}
+
+/* ---------- E2E device sync (optional, accountless) ---------- */
+function collectProfileData(){
+  const data={};
+  for(const k of collectProfileKeys()){
+    if(SYNC_EXCLUDE.has(k)) continue;
+    data[k]=localStorage.getItem(k);
+  }
+  return data;
+}
+function safeJson(raw,fallback){
+  if(raw==null) return fallback;
+  try{ return typeof raw==="string"?JSON.parse(raw):raw; }catch(e){ return fallback; }
+}
+function mergeMaxObjects(a,b){
+  const out={...a};
+  for(const [k,v] of Object.entries(b||{})) out[k]=Math.max(out[k]||0,v||0);
+  return out;
+}
+function mergeObjects(a,b){ return {...a,...b}; }
+function unionArrays(a,b){
+  const seen=new Set(a);
+  const out=a.slice();
+  for(const x of b||[]){ if(!seen.has(x)){ seen.add(x); out.push(x); } }
+  return out;
+}
+function unionMetaArrays(a,b){
+  const seen=new Set((a||[]).map(m=>m&&m.title));
+  const out=(a||[]).slice();
+  for(const m of b||[]){
+    if(!m||!m.title||seen.has(m.title)) continue;
+    seen.add(m.title); out.push(m);
+  }
+  return out;
+}
+function mergeCollections(a,b){
+  const out={...a};
+  for(const [name,items] of Object.entries(b||{})){
+    if(!out[name]){ out[name]=(items||[]).slice(); continue; }
+    const seen=new Set(out[name].map(m=>m.title));
+    for(const item of items||[]){
+      if(!item||!item.title||seen.has(item.title)) continue;
+      seen.add(item.title); out[name].push(item);
+    }
+  }
+  return out;
+}
+function maxStr(a,b){ return (a||"")>=(b||"")?(a||""):(b||""); }
+function mergeStats(a,b){
+  return {
+    day:maxStr(a.day,b.day),
+    lastActive:maxStr(a.lastActive,b.lastActive),
+    streak:Math.max(a.streak||0,b.streak||0),
+    openedToday:Math.max(a.openedToday||0,b.openedToday||0),
+    total:Math.max(a.total||0,b.total||0)
+  };
+}
+const SYNC_SCALAR_KEYS=["wf_lang","wf_uilang","wf_theme","wf_dailygoal","wf_readerscale","wf_datasaver","wf_view","wf_deckonb"];
+function mergeProfiles(localData,remoteData,localUpdatedAt,remoteUpdatedAt){
+  const merged={...localData};
+  const remoteNewer=(remoteUpdatedAt||"")>(localUpdatedAt||"");
+  for(const k of SYNC_SCALAR_KEYS){
+    if(remoteData[k]!=null){
+      merged[k]=remoteNewer?(remoteData[k]??localData[k]):(localData[k]??remoteData[k]);
+    }
+  }
+  const lp=safeJson(localData.wf_profile,{seeds:{},cats:{}});
+  const rp=safeJson(remoteData.wf_profile,{seeds:{},cats:{}});
+  merged.wf_profile=JSON.stringify({seeds:mergeMaxObjects(lp.seeds,rp.seeds),cats:mergeMaxObjects(lp.cats,rp.cats)});
+  merged.wf_stars=JSON.stringify(mergeObjects(safeJson(localData.wf_stars,{}),safeJson(remoteData.wf_stars,{})));
+  merged.wf_disliked=JSON.stringify(mergeObjects(safeJson(localData.wf_disliked,{}),safeJson(remoteData.wf_disliked,{})));
+  merged.wf_collections=JSON.stringify(mergeCollections(safeJson(localData.wf_collections,{}),safeJson(remoteData.wf_collections,{})));
+  merged.wf_read=JSON.stringify(unionArrays(safeJson(localData.wf_read,[]),safeJson(remoteData.wf_read,[])));
+  merged.wf_interests=JSON.stringify(unionArrays(safeJson(localData.wf_interests,[]),safeJson(remoteData.wf_interests,[])));
+  merged.wf_recent=JSON.stringify(unionArrays(safeJson(localData.wf_recent,[]),safeJson(remoteData.wf_recent,[])));
+  merged.wf_readpool=JSON.stringify(unionMetaArrays(safeJson(localData.wf_readpool,[]),safeJson(remoteData.wf_readpool,[])));
+  merged.wf_readorder=JSON.stringify(unionArrays(safeJson(localData.wf_readorder,[]),safeJson(remoteData.wf_readorder,[])));
+  merged.wf_readpos=JSON.stringify(mergeObjects(safeJson(localData.wf_readpos,{}),safeJson(remoteData.wf_readpos,{})));
+  merged.wf_readprog=JSON.stringify(mergeMaxObjects(safeJson(localData.wf_readprog,{}),safeJson(remoteData.wf_readprog,{})));
+  merged.wf_exploit=JSON.stringify(Math.max(safeJson(localData.wf_exploit,0.5),safeJson(remoteData.wf_exploit,0.5)));
+  merged.wf_quizbest=JSON.stringify(Math.max(safeJson(localData.wf_quizbest,0),safeJson(remoteData.wf_quizbest,0)));
+  merged.wf_stats=JSON.stringify(mergeStats(safeJson(localData.wf_stats,{}),safeJson(remoteData.wf_stats,{})));
+  merged.wf_onboarded=JSON.stringify(!!safeJson(localData.wf_onboarded,false)||!!safeJson(remoteData.wf_onboarded,false));
+  merged.wf_decayday=JSON.stringify(maxStr(safeJson(localData.wf_decayday,""),safeJson(remoteData.wf_decayday,"")));
+  for(const src of [remoteData,localData]){
+    for(const k of Object.keys(src||{})){
+      if(!k.startsWith("wf_")||SYNC_EXCLUDE.has(k)||merged[k]!=null) continue;
+      merged[k]=src[k];
+    }
+  }
+  return merged;
+}
+function applyProfileData(data){
+  collectProfileKeys().forEach(k=>{ if(!SYNC_EXCLUDE.has(k)) localStorage.removeItem(k); });
+  for(const [k,v] of Object.entries(data)){
+    if(k.startsWith("wf_") && !SYNC_EXCLUDE.has(k) && typeof v==="string") localStorage.setItem(k,v);
+  }
+}
+function genSyncCode(){
+  const bytes=crypto.getRandomValues(new Uint8Array(16));
+  const hex=[...bytes].map(b=>b.toString(16).padStart(2,"0")).join("");
+  return `WD-${hex.slice(0,8)}-${hex.slice(8,16)}-${hex.slice(16,24)}-${hex.slice(24,32)}`;
+}
+function normalizeSyncCode(code){
+  return String(code||"").trim().toUpperCase();
+}
+async function deriveAddress(code){
+  const hash=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(normalizeSyncCode(code)));
+  return [...new Uint8Array(hash)].map(b=>b.toString(16).padStart(2,"0")).join("");
+}
+async function deriveKey(code){
+  const enc=new TextEncoder();
+  const keyMaterial=await crypto.subtle.importKey("raw",enc.encode(normalizeSyncCode(code)),"HKDF",false,["deriveKey"]);
+  return crypto.subtle.deriveKey(
+    {name:"HKDF",hash:"SHA-256",salt:enc.encode("wikidoomia-sync"),info:enc.encode("v1")},
+    keyMaterial,
+    {name:"AES-GCM",length:256},
+    false,
+    ["encrypt","decrypt"]
+  );
+}
+function bytesToB64(bytes){
+  let s=""; for(let i=0;i<bytes.length;i++) s+=String.fromCharCode(bytes[i]);
+  return btoa(s);
+}
+function b64ToBytes(b64){
+  const bin=atob(b64); const out=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) out[i]=bin.charCodeAt(i);
+  return out;
+}
+async function encryptBlob(plaintext,code){
+  const key=await deriveKey(code||state.syncCode);
+  const iv=crypto.getRandomValues(new Uint8Array(12));
+  const ct=await crypto.subtle.encrypt({name:"AES-GCM",iv},key,new TextEncoder().encode(plaintext));
+  const out=new Uint8Array(iv.length+ct.byteLength);
+  out.set(iv); out.set(new Uint8Array(ct),iv.length);
+  return bytesToB64(out);
+}
+async function decryptBlob(b64,code){
+  const key=await deriveKey(code||state.syncCode);
+  const raw=b64ToBytes(b64);
+  const pt=await crypto.subtle.decrypt({name:"AES-GCM",iv:raw.slice(0,12)},key,raw.slice(12));
+  return new TextDecoder().decode(pt);
+}
+function schedulePushSync(){
+  if(!state.syncCode||!SYNC_ENDPOINT||state.syncBusy) return;
+  clearTimeout(pushSyncTimer);
+  pushSyncTimer=setTimeout(()=>pushSync(false),3000);
+}
+async function pushSync(showToast){
+  if(!state.syncCode||!SYNC_ENDPOINT||state.syncBusy||!crypto.subtle) return false;
+  state.syncBusy=true;
+  try{
+    const updatedAt=new Date().toISOString();
+    const payload={updatedAt,data:collectProfileData()};
+    const encrypted=await encryptBlob(JSON.stringify(payload));
+    const id=await deriveAddress(state.syncCode);
+    const res=await fetch(`${SYNC_ENDPOINT}/v1/profile`,{
+      method:"PUT",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({id,data:encrypted,updatedAt})
+    });
+    if(!res.ok) throw new Error("push failed");
+    state.lastSyncAt=updatedAt;
+    LS.set("wf_lastsync",state.lastSyncAt);
+    renderSyncUI();
+    if(showToast) toast(t("syncDone"));
+    return true;
+  }catch(e){
+    if(showToast) toast(t("syncFail"));
+    return false;
+  }finally{
+    state.syncBusy=false;
+  }
+}
+async function pullSync(showToast){
+  if(!state.syncCode||!SYNC_ENDPOINT||state.syncBusy||!crypto.subtle) return false;
+  state.syncBusy=true;
+  try{
+    const id=await deriveAddress(state.syncCode);
+    const res=await fetch(`${SYNC_ENDPOINT}/v1/profile?id=${encodeURIComponent(id)}`);
+    if(res.status===404){
+      await pushSync(false);
+      if(showToast) toast(t("syncDone"));
+      return true;
+    }
+    if(!res.ok) throw new Error("pull failed");
+    const remote=await res.json();
+    const remotePayload=JSON.parse(await decryptBlob(remote.data));
+    const localData=collectProfileData();
+    const remoteUpdated=remotePayload.updatedAt||remote.updatedAt||"1970-01-01T00:00:00.000Z";
+    const merged=mergeProfiles(localData,remotePayload.data||{},state.lastSyncAt||"1970-01-01T00:00:00.000Z",remoteUpdated);
+    const changed=JSON.stringify(merged)!==JSON.stringify(localData);
+    if(!changed){
+      state.lastSyncAt=remoteUpdated;
+      LS.set("wf_lastsync",state.lastSyncAt);
+      renderSyncUI();
+      if(showToast) toast(t("syncDone"));
+      return true;
+    }
+    applyProfileData(merged);
+    state.lastSyncAt=new Date().toISOString();
+    LS.set("wf_lastsync",state.lastSyncAt);
+    state.syncBusy=false;
+    await pushSync(false);
+    if(showToast) toast(t("syncDone"));
+    setTimeout(()=>location.reload(),400);
+    return true;
+  }catch(e){
+    if(showToast) toast(t("syncFail"));
+    return false;
+  }finally{
+    state.syncBusy=false;
+  }
+}
+function formatSyncTime(iso){
+  if(!iso) return t("syncNever");
+  try{
+    const d=new Date(iso);
+    return d.toLocaleString(state.uiLang==="en"?"en-GB":state.uiLang,{dateStyle:"short",timeStyle:"short"});
+  }catch(e){ return iso; }
+}
+function renderSyncUI(){
+  const panel=$("#syncPanel");
+  if(!panel) return;
+  if(!SYNC_ENDPOINT){ panel.hidden=true; return; }
+  panel.hidden=false;
+  const setup=$("#syncSetup");
+  const active=$("#syncActive");
+  if(state.syncCode){
+    if(setup) setup.hidden=true;
+    if(active) active.hidden=false;
+    if($("#syncCodeDisplay")) $("#syncCodeDisplay").textContent=state.syncCode;
+    if($("#syncStatus")) $("#syncStatus").textContent=t("syncLast",formatSyncTime(state.lastSyncAt));
+  }else{
+    if(setup) setup.hidden=false;
+    if(active) active.hidden=true;
+  }
+}
+async function connectSyncCode(code,showToast){
+  const normalized=normalizeSyncCode(code);
+  if(!/^WD-[0-9A-F-]{35,}$/.test(normalized)) return false;
+  state.syncCode=normalized;
+  LS.set("wf_sync",state.syncCode);
+  renderSyncUI();
+  return pullSync(showToast);
+}
+async function setupNewSync(){
+  const code=genSyncCode();
+  state.syncCode=code;
+  LS.set("wf_sync",state.syncCode);
+  renderSyncUI();
+  const ok=await pushSync(false);
+  if(ok) toast(t("syncCodeShown")+" "+code);
+  else toast(t("syncFail"));
+}
+function initSync(){
+  if(!SYNC_ENDPOINT) return;
+  renderSyncUI();
+  if(!state.syncCode) return;
+  pullSync(false);
+  window.addEventListener("visibilitychange",()=>{ if(document.hidden) schedulePushSync(); });
+  window.addEventListener("beforeunload",()=>{ if(state.syncCode&&SYNC_ENDPOINT) pushSync(false); });
+}
+const _lsSet=LS.set.bind(LS);
+LS.set=function(k,v){
+  _lsSet(k,v);
+  if(state.syncCode&&SYNC_ENDPOINT&&typeof k==="string"&&k.startsWith("wf_")&&!SYNC_EXCLUDE.has(k)) schedulePushSync();
+};
+if($("#syncSetupBtn")) $("#syncSetupBtn").addEventListener("click",()=>setupNewSync());
+if($("#syncConnectBtn")) $("#syncConnectBtn").addEventListener("click",()=>{
+  const code=$("#syncCodeInput")&&$("#syncCodeInput").value.trim();
+  if(!code){ toast(t("syncFail")); return; }
+  connectSyncCode(code,true);
+});
+if($("#syncCopyBtn")) $("#syncCopyBtn").addEventListener("click",async ()=>{
+  if(!state.syncCode) return;
+  try{
+    await navigator.clipboard.writeText(state.syncCode);
+    toast(t("syncCopied"));
+  }catch(e){
+    toast(state.syncCode);
+  }
+});
+if($("#syncNowBtn")) $("#syncNowBtn").addEventListener("click",()=>pullSync(true));
+if($("#syncDisconnectBtn")) $("#syncDisconnectBtn").addEventListener("click",async ()=>{
+  if(!await modalConfirm({title:t("syncDisconnectTitle"),message:t("syncDisconnectConfirm"),confirm:t("syncDisconnect")})) return;
+  state.syncCode=null; state.lastSyncAt=null;
+  localStorage.removeItem("wf_sync"); localStorage.removeItem("wf_lastsync");
+  renderSyncUI(); toast(t("syncDisconnect"));
+});
+
+$("#exportProfile").addEventListener("click",()=>{
+  const data={};
+  for(const k of collectProfileKeys()) data[k]=localStorage.getItem(k); // raw JSON strings
+  const payload={__wikidoomia:1, version:1, exported:new Date().toISOString(), data};
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url; a.download=`wikidoomia-profil-${dayStr()}.json`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+  toast(t("exportDone"));
+});
+$("#importProfile").addEventListener("click",()=>$("#importFile").click());
+$("#importFile").addEventListener("change",async (e)=>{
+  const file=e.target.files&&e.target.files[0];
+  e.target.value="";                          // allow re-selecting the same file later
+  if(!file) return;
+  let payload;
+  try{ payload=JSON.parse(await file.text()); }catch(err){ toast(t("importBad")); return; }
+  if(!payload || payload.__wikidoomia!==1 || typeof payload.data!=="object" || !payload.data){ toast(t("importBad")); return; }
+  if(!await modalConfirm({title:t("importTitle"),message:t("importConfirm"),confirm:t("importBtn")})) return;
+  collectProfileKeys().forEach(k=>localStorage.removeItem(k));       // replace strategy
+  for(const [k,v] of Object.entries(payload.data)){ if(k.startsWith("wf_") && typeof v==="string") localStorage.setItem(k,v); }
+  toast(t("importDone"));
+  setTimeout(()=>location.reload(),600);
 });
 
 /* ---------- infinite scroll ---------- */
@@ -3533,6 +3999,7 @@ function init(){
   }
   if(state.view==="deck") setView("deck");   // restore last used view (deck loads its own queue)
   syncFromHash();   // open a shared deep link (#/<lang>/article/<title>) on first load
+  initSync();
 }
 init();
 

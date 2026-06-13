@@ -1,8 +1,8 @@
 # Wikidoomia
 
-An endless, learning Wikipedia feed — abstracts first, the full article on tap. The feed adapts to your behaviour entirely on-device (no server, no accounts), with search, collections, an A/B/C/D quiz, a reading recap, and a gentle "had enough for today?" nudge.
+An endless, learning Wikipedia feed — abstracts first, the full article on tap. The feed adapts to your behaviour entirely on-device by default (no accounts required), with optional encrypted device sync, search, collections, an A/B/C/D quiz, a reading recap, and a gentle "had enough for today?" nudge.
 
-The whole app is a single `index.html` — no build step, no backend. Everything you do (personalization, stars, collections, stats) stays in your browser's `localStorage`.
+The whole app is a single `index.html` — no build step. Personalization, stars, collections, and stats live in your browser's `localStorage`. **Optional device sync** stores an E2E-encrypted copy on a tiny Cloudflare Worker (see [`worker/README.md`](worker/README.md)); the sync code is your only key.
 
 ## Features
 
@@ -35,7 +35,19 @@ The feed mixes related content (exploit) with random discovery (explore); the ba
 - **Topic-profile searches** — the learned category profile occasionally drives a search of its own, not just article-to-article similarity.
 - **Language-scoped seeds** — seeds are tied to the article language, so switching DE/EN/FR never sends mismatched queries.
 
-None of this leaves the browser — open the dev console and type `state.profile` to inspect it.
+None of this leaves the browser during normal use — open the dev console and type `state.profile` to inspect it.
+
+## Device sync (optional)
+
+You can optionally sync your profile across devices with an **accountless sync code**:
+
+1. Open **Sammlungen & Profil** → **Geräte-Sync** → **Sync einrichten**.
+2. Save the `WD-…` code somewhere safe (password manager, export file).
+3. On another device: enter the same code under **Mit Code verbinden**.
+
+The sync code derives both the storage address (SHA-256) and the AES-GCM encryption key (HKDF). The server stores ciphertext only — it cannot read your profile. Sync is opt-in and can be disconnected anytime. Without the code, cloud data is unrecoverable.
+
+Deploy the sync worker once (free on Cloudflare) — see [`worker/README.md`](worker/README.md). Until `SYNC_ENDPOINT` is set in `index.html`, the sync UI stays hidden and the app works fully offline/on-device.
 
 ## Tech
 
@@ -69,6 +81,7 @@ Being a static site, it can be hosted on any static host (e.g. GitHub Pages); th
 ├── index.html      # the entire app
 ├── manifest.json   # PWA manifest
 ├── sw.js           # service worker (offline app shell)
+├── worker/         # optional E2E sync backend (Cloudflare Worker + KV)
 ├── icons/          # app icons (192, 512, maskable, apple-touch)
 ├── README.md
 └── LICENSE
@@ -76,7 +89,9 @@ Being a static site, it can be hosted on any static host (e.g. GitHub Pages); th
 
 ## Privacy
 
-No personal data is sent to any server. All preferences live in your browser. Article content is fetched directly from Wikipedia.
+By default, no personal data is sent to any server. All preferences live in your browser. Article content is fetched directly from Wikipedia.
+
+If you **opt in** to device sync, an E2E-encrypted blob (your `localStorage` profile) is stored on the sync worker. The server cannot decrypt it; only someone with your sync code can. You can disconnect sync or use export/import instead at any time.
 
 ## License & content
 

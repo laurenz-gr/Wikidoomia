@@ -1,0 +1,13 @@
+{
+  "name": "wikidoomia-sync-worker",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "mock": "node scripts/mock-server.mjs",
+    "test": "node scripts/sync-test.mjs"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}
